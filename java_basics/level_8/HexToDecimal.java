@@ -17,7 +17,7 @@ public class HexToDecimal {
          * @return десятичное число, int
          * @see <a href="https://www.codewars.com/kata/57a4d500e298a7952100035d">источник</a>
          */
-        return 0;
+        return Integer.parseInt(hexString, 16);
     }
 
     /**
