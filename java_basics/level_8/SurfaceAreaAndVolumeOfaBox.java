@@ -1,3 +1,5 @@
+import java.util.Arrays;
+
 public class SurfaceAreaAndVolumeOfaBox {
     public static int[] getSize(int w, int h, int d) {
         /**
@@ -6,24 +8,30 @@ public class SurfaceAreaAndVolumeOfaBox {
          * Возвращает одномерный массив, содержащий два целых числа
          */
 
-        boxAreaSurface int[] = new int[2];
-        return boxAreaSurface;
+        int boxSurfArea = 2*w*h + 2*h*d + 2*w*d;
+        int boxVol = w*h*d;
+
+        int[] result = new int[2];
+        result[0] = boxSurfArea;
+        result[1] = boxVol;
+
+        return result;
     }
 
     public void testLowerBound() {
-        assert this.getSize(1, 1, 1) == new int[] {6, 1};
+        assert Arrays.equals(this.getSize(1, 1, 1), new int[] {6, 1});
     }
     public void testHeightBound() {
-        assert this.getSize(1, 2, 1) == new int[] {10, 2};
+        assert Arrays.equals(this.getSize(1, 2, 1), new int[] {10, 2});
     }
     public void testDepthBound() {
-        assert this.getSize(1, 2, 2) == new int[] {16, 4};
+        assert Arrays.equals(this.getSize(1, 2, 2), new int[] {16, 4});
     }
     public void testMid() {
-        assert this.getSize(4, 2, 6) == new int[] {88, 48};
+        assert Arrays.equals(this.getSize(4, 2, 6), new int[] {88, 48});
     }
 
-    public static void main() {
+    public static void main(String[] args) {
         SurfaceAreaAndVolumeOfaBox boxAreaVol = new SurfaceAreaAndVolumeOfaBox();
 
         // tests
@@ -33,3 +41,11 @@ public class SurfaceAreaAndVolumeOfaBox {
         boxAreaVol.testMid();
     }
 }
+
+
+/**
+ * чему я научился
+ * - объявление массива с фиксированным количеством элементов, запись элементов
+ * - импорт модуля
+ * - метод сравнения массивов
+ */
