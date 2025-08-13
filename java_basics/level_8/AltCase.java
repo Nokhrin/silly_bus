@@ -11,12 +11,24 @@ public class AltCase {
      *      Функция чистая - функция не изменяет переданный объект, но создает новый
      */
     public static String toAlternativeString(String string) {
+        char[] invertedChars = new char[string.length()];
         try {
-            // todo
+            for (int i = 0; i < string.length(); i++) {
+                char currChar = string.charAt(i);
+                if (Character.isLowerCase(currChar)) {
+                    currChar = Character.toUpperCase(currChar);
+                }
+                else {
+                    currChar = Character.toLowerCase(currChar);
+                }
+                invertedChars[i] = currChar;
+            }
         } catch (NullPointerException e) {
-            System.out.println("Параметру передан null");
+            System.out.println("Параметру передан null\n" + e);
+        } catch (java.lang.StringIndexOutOfBoundsException e) {
+            System.out.println("Обращение к индексу вне существующего диапазона\n" + e);
         }
-        return "";
+        return new String(invertedChars);
     }
 
     public void testAllLowerToUpper() {
@@ -50,6 +62,18 @@ public class AltCase {
 
 /**
  * чему я научился
+ *
+ * - базовая отладка
+ *   - jdi - программный интерфейс виртуальной машины java (jvm), поддерживающий операции отладки
+ * - применение jdb
+ *   - определение точек останова
+ *   - чтение значений в точках останова
+ *
  * - описание параметров функций в javadoc
+ *
  * - синтаксис перехвата исключений
+ *   - вывод кастомного сообщения при перехвате исключения
+ * - организация исключений в java
+ *   - исключения есть классы в модуле java.lang
+ *   - например, исключение при обращении по несуществующему индексу к элементу строки - java.lang.StringIndexOutOfBoundsException
  */
