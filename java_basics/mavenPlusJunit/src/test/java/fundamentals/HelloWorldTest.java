@@ -1,3 +1,5 @@
+package fundamentals;
+
 import fundamentals.HelloWorld;
 import org.testng.Assert;
 import org.testng.annotations.Test;
