@@ -47,8 +47,6 @@ public class MainTest {
         assertEquals(lesson02.factorialIterativeForLoopInt(1), 1L);
         assertEquals(lesson02.factorialIterativeForLoopInt(2), 2L);
         assertEquals(lesson02.factorialIterativeForLoopInt(5), 120L);
-        assertEquals(lesson02.factorialIterativeForLoopInt(16), 20_922_789_888_000L);
-        assertEquals(lesson02.factorialIterativeForLoopInt(20), 2_432_902_008_176_640_000L);
 
     }
 

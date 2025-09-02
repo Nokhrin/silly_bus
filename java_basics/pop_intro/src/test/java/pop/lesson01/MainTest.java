@@ -7,7 +7,8 @@ import static org.testng.Assert.assertEquals;
 public class MainTest {
     @Test()
     public void basicTests() {
-        Main lesson = new Main();
-        assertEquals(1, 0);
+        assertEquals(Main.mainStrict1(), "Привет, [Имя]! Сегодня [число] урок Java.");
+        assertEquals(Main.mainStrict2(), 5);
+        assertEquals(Main.mainStrict3(), 10);
     }
 }

@@ -27,8 +27,18 @@
 2. Напишите итеративный `factorial(int n)`.  
 
 **Контрольные вопросы**:  
-- ❓ Что вернет `sum(Integer.MAX_VALUE, 1)`?  
-- ❓ Почему `factorial(20)` даст ноль?  
+- Что вернет `sum(Integer.MAX_VALUE, 1)`?
+  - Integer.MAX_VALUE -> `2147483647` -> `0` + 31 единица
+  - `2147483647 + 1` == `2147483648`, что не уместится в тип `int`
+  - старший бит представления типа `int` содержит знак числа
+  - получим минимальное отрицательное число
+  - `01111111111111111111111111111111` + `1` -> `10000000000000000000000000000000` -> `-2147483648`
+
+- Почему `factorial(20)` даст ноль?
+  - возможно, из-за особенностей реализации
+  - условие не уточняет тип возвращаемого значения
+  - если возвращать `int`, то при аргументе `20` произойдет переполнение, но вернет функция не ноль, а `-2102132736`
+  - реализация с помощью BigInteger может вернуть значение до `2^Integer.MAX_VALUE`
 
 **Ссылки**:  
 - [Variables and Methods (Oracle)](https://docs.oracle.com/javase/tutorial/java/javaOO/methods.html)  
@@ -39,12 +49,6 @@
 *Комментарий*: Все методы — **статические**, как функции в Python. ООП не требуется.
 
 
----
-
-
-<details><summary><b>
-следующие темы
-</b></summary>
 ---
 
 ### **3. Списки и карты: Работа с коллекциями**  
@@ -64,38 +68,12 @@
 - https://struchkov.dev/blog/ru/java-collection-framework/
 
 
+---
+
+
 <details><summary><b>
-Пример решения
+следующие темы
 </b></summary>
-
-```java
-import java.util.*;
-
-public class Main {
-    public static void main(String[] args) {
-        // List (часть ООП, но синтаксис как в Python)
-        List<Integer> numbers = Arrays.asList(3, 1, 4, 1, 5);
-        int max = Collections.max(numbers);
-        double avg = numbers.stream().mapToInt(i -> i).average().orElse(0);
-
-        // Map (синтаксис как словарь в Python)
-        Map<String, Integer> people = new HashMap<>();
-        people.put("Alex", 25);
-        people.put("Maria", 30);
-
-        System.out.println("Максимум: " + max + ", Среднее: " + avg);
-        System.out.println("Люди старше 20:");
-        for (String name : people.keySet()) {
-            if (people.get(name) > 20) {
-                System.out.println(name + " → " + people.get(name));
-            }
-        }
-    }
-}
-```
-*Комментарий*: `List` и `Map` — часть ООП, но для задачи достаточно знать синтаксис, как списки и словари в Python.
-
-</details>
 
 
 ---

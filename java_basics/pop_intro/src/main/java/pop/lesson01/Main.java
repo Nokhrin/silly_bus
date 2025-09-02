@@ -6,10 +6,16 @@ public class Main {
     /**
      * строго следую условиям
      */
-    public static void mainStrict(String[] args) {
-        System.out.println("Привет, [Имя]! Сегодня [число] урок Java.");
-        System.out.println("[Имя]".length());
-        System.out.println(7 + 3);
+    public static String mainStrict1() {
+        return "Привет, [Имя]! Сегодня [число] урок Java.";
+    }
+
+    public static int mainStrict2() {
+        return "[Имя]".length();
+    }
+
+    public static int mainStrict3() {
+        return 7 + 3;
     }
 
     /**
