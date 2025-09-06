@@ -138,52 +138,8 @@ public class Main {
 
 ---
 
-### **3. Списки и карты: Работа с коллекциями**  
-**Цель**: Хранить данные в `List` и `Map` (без углубления в ООП).  
-**Задания** (используют методы из п.2):  
-1. Найдите максимум и среднее в списке/массиве числе. 
-  - числа могут быть любые и сколько их в массиве не известно.
-2. Создайте `Map<String, Integer>` для пар «имя → возраст».  
+[3. Списки и карты: Работа с коллекциями](src/main/java/pop/lesson03/README.md)
 
-**Контрольные вопросы**:  
-- ❓ Почему `map.get("Alex")` вернет `null` для ключа `"alex"`?
-- ❓ Как удалить дубликаты через `new HashSet<>(list)`?  
-
-**Ссылки**:  
-- [Collections Tutorial (Oracle)](https://docs.oracle.com/javase/tutorial/collections/)  
-- https://javarush.com/groups/posts/2308-korotko-o-glavnom---java-collections-framework
-- https://skillbox.ru/media/code/gotovimsya_k_sobesedovaniyu_chto_nuzhno_znat_o_kollektsiyakh_v_java/
-- https://struchkov.dev/blog/ru/java-collection-framework/
-
-**Пример решения**:  
-```java
-import java.util.*;
-
-public class Main {
-    public static void main(String[] args) {
-        // List (часть ООП, но синтаксис как в Python)
-        List<Integer> numbers = Arrays.asList(3, 1, 4, 1, 5);
-        int max = Collections.max(numbers);
-        double avg = numbers.stream().mapToInt(i -> i).average().orElse(0);
-
-        // Map (синтаксис как словарь в Python)
-        Map<String, Integer> people = new HashMap<>();
-        people.put("Alex", 25);
-        people.put("Maria", 30);
-
-        System.out.println("Максимум: " + max + ", Среднее: " + avg);
-        System.out.println("Люди старше 20:");
-        for (String name : people.keySet()) {
-            if (people.get(name) > 20) {
-                System.out.println(name + " → " + people.get(name));
-            }
-        }
-    }
-}
-```
-*Комментарий*: `List` и `Map` — часть ООП, но для задачи достаточно знать синтаксис, как списки и словари в Python.
-
----
 
 ### **4. Ввод/вывод с консоли: Работа с пользователем**  
 **Цель**: Собирать данные от пользователя и **обрабатывать ошибки**.  
@@ -478,4 +434,6 @@ public class Main {
 3. **Минимум ООП**:  
    - Упоминание `List`/`Map` только как синтаксис (как списки/словари в Python).  
    - Нет классов, наследования, инкапсуляции — только коллекции и обработка ошибок.  
+
+
 
