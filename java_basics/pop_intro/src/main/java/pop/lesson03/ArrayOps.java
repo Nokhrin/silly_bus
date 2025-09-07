@@ -8,7 +8,7 @@ import java.util.ArrayList;
 public class ArrayOps {
     /**
      * Возвращает максимальное по значению число из списка
-     * @param list - одномерный список объектов
+     * @param list - одномерный непустой список объектов
      * @return - строковое представление числа с плавающей точкой, дробь округлена до 2х знаков
      */
     public static String getMaxValue(ArrayList<?> list) {
@@ -16,6 +16,11 @@ public class ArrayOps {
 
         double maxValue = Double.MIN_VALUE;
 
+        /* инвариант
+        значение переменной maxValue
+        на шаге i больше либо равен
+        числу в массиве list в диапазоне индексов [0; i]
+        */
         for (Object num : list) {
             if (num instanceof Integer || num instanceof Double || num instanceof Float) {
                 double currNum = Double.parseDouble(num.toString());

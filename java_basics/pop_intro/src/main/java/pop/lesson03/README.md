@@ -97,8 +97,8 @@ https://www.baeldung.com/java-list-interface
 - поверхностно попробовал `generic` при объявлении методов
   - `public static String getAvgValue(ArrayList<?> list)`
 
+
 ## вопросы
-- 
 - в каком случае применять массив примитивов (например, `int[]`), в каком - массив объектов (например, `Integer[]`)?
   - есть ли ситуации, в которых следует держаться примитивов?
     - То есть, в которых `int[]` лучше, чем  `Integer[]`
@@ -107,8 +107,6 @@ https://www.baeldung.com/java-list-interface
 - следует ли указывать тип элемента в <> инициализатора?
   - `ArrayList<Integer> listOfInts = new ArrayList<Integer>(Arrays.asList(1, 2, 3, 4, 5));` или
   - `ArrayList<Integer> listOfInts = new ArrayList<>(Arrays.asList(1, 2, 3, 4, 5));` ?
-
----
 
 #### **Контрольные вопросы**:
 - ❓ Почему `map.get("Alex")` вернет `null` для ключа `"alex"`?

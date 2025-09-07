@@ -10,8 +10,9 @@ import java.util.*;
  *  вывод результата
  * ---
  * Требования
- * 1. Запросите имя и возраст, сохраните в `Map`.
- * 2. Обработайте ошибку ввода не-числа через `try/catch`.
+ * 1. Запросите имя и возраст
+ * 2. сохраните в `Map`.
+ * 3. Обработайте ошибку ввода не-числа через `try/catch`.
  */
 public class ScannerInput {
     /**
@@ -22,7 +23,7 @@ public class ScannerInput {
     /**
      * команды отображения сохраненных значений
      */
-    private static HashSet<String> showSavedDataCommands = new HashSet<>() {{
+    private static final ArrayList<String> showSavedDataCommands = new ArrayList<>() {{
         add("/print");
         add("/p");
         add("/show");
@@ -32,7 +33,7 @@ public class ScannerInput {
     /**
      * команды завершения работы программы
      */
-    private static HashSet<String> exitCommands = new HashSet<>() {{
+    private static final ArrayList<String> exitCommands = new ArrayList<>() {{
         add("/exit");
         add("/ex");
         add("/quit");
@@ -46,6 +47,7 @@ public class ScannerInput {
 
     /**
      * Читает ввод, печатает введенную информацию, не сохраняет
+     * Блокирует поток I/O из-за ожидания ввода значения
      * 1) "баннер"
      * 2) приглашение ввода
      * 3) ввод в цикле
@@ -59,7 +61,7 @@ public class ScannerInput {
         // обработка ввода
         try {
             scanner = new Scanner(System.in);
-            getCliInput();
+            processCliInput();
         } finally {
             if (scanner != null) {
                 scanner.close();
@@ -73,36 +75,39 @@ public class ScannerInput {
      * Читает ввод пользователя, обрабатывает и записывает готовые значения в хранилище
      * @return
      */
-    private static void getCliInput() {
+    private static void processCliInput() {
         // читать данные до получения команды останова ввода/программы
         while (true) {
             try {
-                System.out.println();
                 // имя
-                System.out.print("Введи имя или команду, нажми Enter: ");
+                System.out.print("Введи имя пользователя или команду, нажми Enter: ");
+                System.out.flush();
                 String userInput = scanner.nextLine().trim();
 
                 if (showSavedDataCommands.contains(userInput)) {
-                    System.out.printf("Словарь содержит записи:\n%s", usernameAge);
+                    System.out.printf("Словарь содержит записи:\n%s\n", usernameAge);
                     continue;
                 } else if (exitCommands.contains(userInput)) {
                     System.out.println("Останавливаю выполнение программы");
-                    System.exit(0);  // todo - плохая идея?
+                    System.out.flush();
+                    System.exit(0);
                 }
 
                 String userName = userInput;
 
                 // возраст
                 System.out.printf("Введи возраст пользователя %s, нажми Enter: ", userName);
+                System.out.flush();
                 int userAge = getIntInput();
 
                 // очистка буфера
                 scanner.nextLine();
 
-                // запись пары имя:возраст в словарь
+                // запись пары "имя:возраст" в словарь
                 usernameAge.put(userName, userAge);
             } catch (IllegalStateException err) {
                 System.err.printf("Сканер закрыт или недоступен:\n%s", err.getMessage());
+                System.out.flush();
             }
         }
     }
@@ -113,19 +118,20 @@ public class ScannerInput {
                 return scanner.nextInt();
             } catch (InputMismatchException err) {
                 System.out.printf("Введенное значение %s не является целым числом, повторите ввод: ", err.getMessage());
+                System.out.flush();
                 scanner.nextLine();
             }
         }
     }
 
     /**
-     * Формирует строковое представление элементов HashMap
-     * @param hs
+     * Формирует строковое представление элементов списка
+     * @param al
      * @return
      */
-    private static String getHashSetItems(HashSet<String> hs) {
+    private static String getArrayListItems(ArrayList<String> al) {
         StringJoiner joiner = new StringJoiner("\n");
-        for (String item : hs) joiner.add(item);
+        for (String item : al) joiner.add(item);
         return joiner.toString();
     }
 
@@ -149,13 +155,16 @@ public class ScannerInput {
                 ==========
                 Поддерживаемые команды
                 """ +
-                "- напечатать элементы созданного словаря\n" + getHashSetItems(showSavedDataCommands) + "\n" +
-                "- завершить работу приложения\n" + getHashSetItems(exitCommands) + "\n" +
+                "\nнапечатать элементы созданного словаря:\n" + getArrayListItems(showSavedDataCommands) +
+                "\n" +
+                "\nзавершить работу приложения:\n" + getArrayListItems(exitCommands) +
                 "\n";
         System.out.println(welcoming);
+        System.out.flush();
     }
 
     public static void main(String[] args) {
+
         System.out.println(getUserInput());
     }
 

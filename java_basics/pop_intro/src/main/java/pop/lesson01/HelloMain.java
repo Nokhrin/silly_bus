@@ -2,7 +2,7 @@ package pop.lesson01;
 
 import java.util.Scanner;
 
-public class Main {
+public class HelloMain {
     /**
      * строго следую условиям
      */
