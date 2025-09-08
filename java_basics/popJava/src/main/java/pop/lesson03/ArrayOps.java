@@ -52,9 +52,11 @@ public class ArrayOps {
                 count++;
             }
         }
-        double avgValue = total / count;
+        if (count == 0) {
+            throw new ArithmeticException("Ошибка! Деление на ноль, переданный список не содержит числовых элементов");
+        }
 
-        return String.format("%.2f", avgValue);
+        return String.format("%.2f", total / count);
     }
 
     /**

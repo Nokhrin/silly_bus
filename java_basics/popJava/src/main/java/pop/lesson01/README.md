@@ -10,9 +10,18 @@
 
 **Ссылки**:
 - [Java Hello World (Oracle)](https://docs.oracle.com/javase/tutorial/getStarted/application/index.html)
+- https://ru.hexlet.io/courses/java-basics
 - Установка JDK, Idea
   - https://javarush.com/quests/lectures/questsyntaxpro.level20.lecture00
   - https://skillbox.ru/media/base/kak_ustanovit_jdk_i_sredu_razrabotki_intellij_idea/
-- база https://ru.hexlet.io/courses/java-basics
 
 *Комментарий*: Здесь `String` и `.length()` — часть ООП, но для задачи достаточно знать синтаксис, как калькулятор.
+
+
+## вопросы
+- оправданно ли разрабатывать юнит-тесты для метода `main`?
+
+
+#### ответ
+
+---

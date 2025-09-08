@@ -85,6 +85,12 @@ public class ArrayOpsTest {
         getAvgValue(null);
     }
 
+    @Test(expectedExceptions = ArithmeticException.class)
+    public void testGetAvgValueListNoNumbers() {
+        int[] arr = {1, 2, 3};
+        getAvgValue(new ArrayList<>(Arrays.asList("notNum", false, 'A', null, arr)));
+    }
+
     @Test
     public void testGetAvgValueIntsOnly() {
         ArrayList<Integer> listOfInts = new ArrayList<>(Arrays.asList(1, 2, 3, 4, 5));

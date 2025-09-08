@@ -13,6 +13,7 @@ import java.util.*;
  * 1. Запросите имя и возраст
  * 2. сохраните в `Map`.
  * 3. Обработайте ошибку ввода не-числа через `try/catch`.
+ * 4. Все методы static
  */
 public class ScannerInput {
     /**

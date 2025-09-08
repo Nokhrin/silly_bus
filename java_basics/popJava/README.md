@@ -108,8 +108,8 @@ java -jar myapp.jar
 - https://github.com/gochaorg/blog/tree/master/itdocs/maven
 
 **Пример решения**:  
-```java
-// pom.xml
+```xml
+<!-- pom.xml -->
 <dependencies>
     <dependency>
         <groupId>org.apache.commons</groupId>
@@ -117,7 +117,9 @@ java -jar myapp.jar
         <version>3.12.0</version>
     </dependency>
 </dependencies>
+```
 
+```java
 // Main.java
 import org.apache.commons.lang3.StringUtils;
 
