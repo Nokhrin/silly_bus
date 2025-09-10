@@ -1,40 +1,37 @@
 package pop.lesson04;
 
+import java.io.PrintStream;
 import java.util.*;
 
-/**
- * Задача -
- *  Чтение данных из stdin,
- *  валидация значений,
- *  выполнение операций над данными,
- *  вывод результата
- * ---
- * Требования
- * 1. Запросите имя и возраст
- * 2. сохраните в `Map`.
- * 3. Обработайте ошибку ввода не-числа через `try/catch`.
- * 4. Все методы static
- */
-public class ScannerInput {
-    /**
-     * сканер stdin
-     */
-    private static Scanner scanner;
+import static java.lang.System.err;
+import static java.lang.System.out;
 
-    /**
-     * команды отображения сохраненных значений
-     */
-    private static final ArrayList<String> showSavedDataCommands = new ArrayList<>() {{
+
+public class ScannerInput {
+    // команды вызова справки
+    public static final LinkedHashSet<String> printHelpCommands = new LinkedHashSet<>() {{
+        add("/help");
+        add("/h");
+    }};
+
+    // команды добавления значений
+    public static final LinkedHashSet<String> addRecordCommands = new LinkedHashSet<>() {{
+        add("/add");
+        add("/a");
+        add("/new");
+        add("/n");
+    }};
+
+    // команды отображения сохраненных значений
+    public static final LinkedHashSet<String> printRecordsCommands = new LinkedHashSet<>() {{
         add("/print");
         add("/p");
         add("/show");
         add("/s");
     }};
 
-    /**
-     * команды завершения работы программы
-     */
-    private static final ArrayList<String> exitCommands = new ArrayList<>() {{
+    // команды завершения работы программы
+    public static final LinkedHashSet<String> exitCommands = new LinkedHashSet<>() {{
         add("/exit");
         add("/ex");
         add("/quit");
@@ -42,131 +39,143 @@ public class ScannerInput {
     }};
 
     /**
-     * формируемый словарь
+     * Возвращает имя команды
      */
-    private static HashMap<String, Integer> usernameAge = new HashMap<>();
-
-    /**
-     * Читает ввод, печатает введенную информацию, не сохраняет
-     * Блокирует поток I/O из-за ожидания ввода значения
-     * 1) "баннер"
-     * 2) приглашение ввода
-     * 3) ввод в цикле
-     * 4) отдельная команда завершения ввода
-     * @return
-     */
-    public static HashMap<String, Integer> getUserInput() {
-        // "баннер"
-        doWelcome();
-
-        // обработка ввода
-        try {
-            scanner = new Scanner(System.in);
-            processCliInput();
-        } finally {
-            if (scanner != null) {
-                scanner.close();
-            }
-        }
-
-        return usernameAge;
+    private static String getCommand(Scanner scanner, PrintStream ps) {
+        ps.print("Введи команду, нажми Enter (/help для отображения доступных команд): ");
+        return scanner.nextLine().trim();
     }
 
     /**
-     * Читает ввод пользователя, обрабатывает и записывает готовые значения в хранилище
-     * @return
+     * Считывает и возвращает имя
      */
-    private static void processCliInput() {
-        // читать данные до получения команды останова ввода/программы
+    private static String getName(Scanner scanner, PrintStream ps) {
+        ps.print("Введи имя пользователя, нажми Enter: ");
+        return scanner.nextLine().trim();
+    }
+
+    /**
+     * Считывает и возвращает возраст
+     */
+    private static int getAge(Scanner scanner, PrintStream ps) {
         while (true) {
             try {
-                // имя
-                System.out.print("Введи имя пользователя или команду, нажми Enter: ");
-                System.out.flush();
-                String userInput = scanner.nextLine().trim();
-
-                if (showSavedDataCommands.contains(userInput)) {
-                    System.out.printf("Словарь содержит записи:\n%s\n", usernameAge);
-                    continue;
-                } else if (exitCommands.contains(userInput)) {
-                    System.out.println("Останавливаю выполнение программы");
-                    System.out.flush();
-                    System.exit(0);
-                }
-
-                String userName = userInput;
-
-                // возраст
-                System.out.printf("Введи возраст пользователя %s, нажми Enter: ", userName);
-                System.out.flush();
-                int userAge = getIntInput();
-
-                // очистка буфера
-                scanner.nextLine();
-
-                // запись пары "имя:возраст" в словарь
-                usernameAge.put(userName, userAge);
-            } catch (IllegalStateException err) {
-                System.err.printf("Сканер закрыт или недоступен:\n%s", err.getMessage());
-                System.out.flush();
-            }
-        }
-    }
-
-    private static int getIntInput() {
-        while (true) {
-            try {
-                return scanner.nextInt();
-            } catch (InputMismatchException err) {
-                System.out.printf("Введенное значение %s не является целым числом, повторите ввод: ", err.getMessage());
-                System.out.flush();
-                scanner.nextLine();
+                ps.print("Введи возраст, нажми Enter: ");
+                return Integer.parseInt(scanner.nextLine().trim());
+            } catch (NumberFormatException errInt) {
+                ps.println("Введенное значение не является целым числом");
             }
         }
     }
 
     /**
-     * Формирует строковое представление элементов списка
-     * @param al
-     * @return
+     * Формирует строковое представление элементов упорядоченного множества
+     *
+     * @param lhs: множество строковых объектов
+     * @return строка, которая объединяет переданные строки символом новой строки
+     * другими словами, каждый объект из переданного множества выводится на новой строке
      */
-    private static String getArrayListItems(ArrayList<String> al) {
+    private static String formatLinkedHashSet(LinkedHashSet<String> lhs) {
         StringJoiner joiner = new StringJoiner("\n");
-        for (String item : al) joiner.add(item);
+        for (String item : lhs) joiner.add(item);
         return joiner.toString();
     }
 
-    public static void doWelcome() {
+    /**
+     * Печатает приветственное сообщение в stdout
+     */
+    public static void printWelcome(PrintStream ps) {
         String welcoming = """
                 Программа создает словарь имя->возраст
+                и позволяет добавить записи в словарь
                 
-                ==========
-                Первым запрашивается значение поля `имя` - значение должно быть строкой
-                Вторым запрашивается значение поля `возраст` - значение должно быть целым числом
+                Чтобы начать добавление записи, выполни /add
+                Чтобы посмотреть существующие записи, выполни /show
+                Для вывода всех поддерживаемых комманд, выполни /help
                 
-                По запросу в консоли введи соответствующее значение
-                Чтобы сохранить значение и перейти к вводу следующего, нажми Enter
-                
-                Пробельные символы в начале и в конце введенного значения отбрасываются
-                Чтение значение возраста выполняется, пока не будет получено целое число
-                
-                Процедуру чтения данных можно прервать с помощью Поддерживаемых команд
-                Поддерживаемые команды выполняются только при вводе значения `имя`
-                
+                """;
+        ps.print(welcoming);
+    }
+
+    /**
+     * Печатает приветственное сообщение в stdout
+     */
+    public static void printHelp(PrintStream ps) {
+        String help = """
                 ==========
                 Поддерживаемые команды
                 """ +
-                "\nнапечатать элементы созданного словаря:\n" + getArrayListItems(showSavedDataCommands) +
+                "\nдобавить запись:\n" + formatLinkedHashSet(addRecordCommands) +
                 "\n" +
-                "\nзавершить работу приложения:\n" + getArrayListItems(exitCommands) +
+                "\nнапечатать сохраненные записи:\n" + formatLinkedHashSet(printRecordsCommands) +
+                "\n" +
+                "\nзавершить работу приложения:\n" + formatLinkedHashSet(exitCommands) +
+                "\n" +
+                "\nнапечатать это сообщение:\n" + formatLinkedHashSet(printHelpCommands) +
                 "\n";
-        System.out.println(welcoming);
-        System.out.flush();
+        ps.print(help);
+        ps.flush();
     }
 
+    /**
+     * Направляет текстовое представление коллекции в указанный поток
+     */
+    public static void printRecords(SortedMap<String, Integer> recordsCollection, PrintStream ps) {
+        if (recordsCollection.isEmpty()) {
+            ps.println("Каталог записей пуст");
+        } else {
+            ps.println(recordsCollection);
+        }
+    }
+
+    /**
+     * Задача -
+     * Чтение данных из stdin,
+     * валидация значений,
+     * выполнение операций над данными,
+     * вывод результата
+     * ---
+     * Требования
+     * 1. Запросите имя и возраст
+     * 2. сохраните в `Map`.
+     * 3. Обработайте ошибку ввода не-числа через `try/catch`.
+     * 4. Все методы static
+     */
     public static void main(String[] args) {
+        // сканер stdin
+        Scanner scanner = new Scanner(System.in);
 
-        System.out.println(getUserInput());
+        // поток stdout
+        PrintStream printStream = new PrintStream(out, true);
+
+        // поток stderr
+        PrintStream errorStream = new PrintStream(err, true);
+
+        // приветствие
+        printWelcome(printStream);
+
+        // формируемый словарь
+        SortedMap<String, Integer> users = new TreeMap<>();
+
+        // чтение из stdin
+        // читать данные до получения команды останова ввода/программы
+        String command;
+        while (true) {
+            try {
+                command = getCommand(scanner, printStream);
+
+                if (printHelpCommands.contains(command)) {
+                    printHelp(printStream);
+                } else if (printRecordsCommands.contains(command)) {
+                    printRecords(users, printStream);
+                } else if (addRecordCommands.contains(command)) {
+                    users.put(getName(scanner, printStream), getAge(scanner, printStream));
+                } else if (exitCommands.contains(command)) {
+                    System.exit(0);
+                }
+            } catch (IllegalStateException err) {
+                errorStream.printf("Сканер закрыт или недоступен:\n%s", err.getMessage());
+            }
+        }
     }
-
 }

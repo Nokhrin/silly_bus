@@ -1,14 +1,8 @@
 package pop.lesson01;
 
 /**
- * Типы данных
- * - примитивы
- * - объекты - только
- *   - String
- *   - Array
- *   - Collection
- *   <p>
- * Базовые операции
+ 1. Создайте `Main.java`, выведите `Привет, [Имя]! Сегодня [число] урок Java.`
+ 2. Добавьте вывод длины имени и сумму `7 + 3`.
  */
 public class StringBasics {
     /**
@@ -42,13 +36,14 @@ public class StringBasics {
     }
 
     public static void main(String[] args) {
+        // Печатает в stdout строку, определенную заданием
         String userName = "[Имя]";
-        System.out.println(userName.length());
-
         int lessonNumber = 1;
-
         System.out.println(getGreeting(userName, lessonNumber));
+
+        // Печатает в stdout длину имени и сумму `7 + 3`.
+        System.out.println(userName.length());
+        System.out.println(7 + 3);
     }
 
 }
-
