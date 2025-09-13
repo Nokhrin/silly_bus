@@ -65,19 +65,7 @@
 
 [4. Ввод/вывод с консоли: Работа с пользователем](src/main/java/pop/lesson04/README.md)
 
-### **5. Отладка: Поиск ошибок**  
-**Цель**: Использовать дебаггер для анализа кода из п.4.  
-**Задания**:  
-1. Поставьте breakpoint в `try/catch` (п.4), проверьте изменение переменных.  
-
-**Ссылки**:  
-- [Debugging in IntelliJ (JetBrains)](https://www.jetbrains.com/help/idea/debugging-code.html)  
-
-**Пример решения**:  
-- Запустите программу в дебаггере, поставьте breakpoint на `int age = scanner.nextInt();`.  
-- При вводе `abc` увидите:  
-  - Переменная `e` содержит текст ошибки.  
-  - Выполнение переходит в `catch` блок.  
+[5. Отладка: Поиск ошибок](src/main/java/pop/lesson05/README.md)
 
 ---
 
