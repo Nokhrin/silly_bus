@@ -2,12 +2,12 @@ package pop.lesson04;
 
 import java.io.PrintStream;
 import java.util.*;
-
-import static java.lang.System.err;
-import static java.lang.System.out;
+import java.util.logging.Logger;
 
 
 public class ScannerInput {
+    public static Logger logger = Logger.getLogger(ScannerInput.class.getName());
+
     // команды вызова справки
     public static final LinkedHashSet<String> printHelpCommands = new LinkedHashSet<>() {{
         add("/help");
@@ -41,7 +41,7 @@ public class ScannerInput {
     /**
      * Возвращает имя команды
      */
-    private static String getCommand(Scanner scanner, PrintStream ps) {
+    public static String getCommand(Scanner scanner, PrintStream ps) {
         ps.print("Введи команду, нажми Enter (/help для отображения доступных команд): ");
         return scanner.nextLine().trim();
     }
@@ -49,7 +49,7 @@ public class ScannerInput {
     /**
      * Считывает и возвращает имя
      */
-    private static String getName(Scanner scanner, PrintStream ps) {
+    public static String getName(Scanner scanner, PrintStream ps) {
         ps.print("Введи имя пользователя, нажми Enter: ");
         return scanner.nextLine().trim();
     }
@@ -57,7 +57,7 @@ public class ScannerInput {
     /**
      * Считывает и возвращает возраст
      */
-    private static int getAge(Scanner scanner, PrintStream ps) {
+    public static int getAge(Scanner scanner, PrintStream ps) {
         while (true) {
             try {
                 ps.print("Введи возраст, нажми Enter: ");
@@ -75,7 +75,7 @@ public class ScannerInput {
      * @return строка, которая объединяет переданные строки символом новой строки
      * другими словами, каждый объект из переданного множества выводится на новой строке
      */
-    private static String formatLinkedHashSet(LinkedHashSet<String> lhs) {
+    public static String formatLinkedHashSet(LinkedHashSet<String> lhs) {
         StringJoiner joiner = new StringJoiner("\n");
         for (String item : lhs) joiner.add(item);
         return joiner.toString();
@@ -114,7 +114,6 @@ public class ScannerInput {
                 "\nнапечатать это сообщение:\n" + formatLinkedHashSet(printHelpCommands) +
                 "\n";
         ps.print(help);
-        ps.flush();
     }
 
     /**
@@ -122,9 +121,9 @@ public class ScannerInput {
      */
     public static void printRecords(SortedMap<String, Integer> recordsCollection, PrintStream ps) {
         if (recordsCollection.isEmpty()) {
-            ps.println("Каталог записей пуст");
+            ps.print("Каталог записей пуст");
         } else {
-            ps.println(recordsCollection);
+            ps.print(recordsCollection);
         }
     }
 
@@ -146,10 +145,10 @@ public class ScannerInput {
         Scanner scanner = new Scanner(System.in);
 
         // поток stdout
-        PrintStream printStream = new PrintStream(out, true);
+        PrintStream printStream = new PrintStream(System.out, true);
 
         // поток stderr
-        PrintStream errorStream = new PrintStream(err, true);
+        PrintStream errorStream = new PrintStream(System.err, true);
 
         // приветствие
         printWelcome(printStream);
