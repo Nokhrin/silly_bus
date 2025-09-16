@@ -23,10 +23,12 @@
   - например, `guava`
 
 
-## уроки
+## дополнить темы уроков
 
 ### [урок 0 - основные понятия, настройка проекта](src/main/java/pop/lesson00/README.md)
 
+- настройка .gitignore
+  - служебные каталоги и файлы Maven, IDEA
 - проект, атрибуты проекта
 - модуль
 - либа/пакет/библиотека проекта
@@ -41,8 +43,9 @@
   - [документация SDK, внешних библиотек](https://www.jetbrains.com/help/idea/working-offline.html#sdk-open-offline)
   - [зависимости Maven](https://www.jetbrains.com/help/idea/working-offline.html#maven)
 
-- jshell
-  - отработка атомарных действий
+- jshell - 
+  - математические операции
+  - операции со строками
 
 
 
@@ -90,3 +93,14 @@
       - SortedMap
 - Базовые операции для рассмотренных объектов
   - практика
+
+### [урок 6](src/main/java/pop/lesson06/README.md)
+- результат выполнения урока - bash скрипт, создающий jar
+- настройка точки входа программы в манифесте
+- пояснить назначение скомпилированных файлов с "долларом"
+  - target/classes/pop/lesson04
+    ├── ScannerInput$1.class
+    ├── ScannerInput$2.class
+    ├── ScannerInput$3.class
+    ├── ScannerInput$4.class
+    └── ScannerInput.class
