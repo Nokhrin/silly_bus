@@ -104,3 +104,7 @@
     ├── ScannerInput$3.class
     ├── ScannerInput$4.class
     └── ScannerInput.class
+
+### [урок 8](src/main/java/pop/lesson08/README.md)
+- добавить в задачу использование логирования
+- показать принятый порядок работы с `Logger` в Java
