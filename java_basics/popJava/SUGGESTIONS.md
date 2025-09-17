@@ -114,3 +114,7 @@
 - [Стандартная структура каталога проекта Maven](https://maven.apache.org/guides/introduction/introduction-to-the-standard-directory-layout.html)
 - [Настройка Maven](https://github.com/gochaorg/blog/blob/master/itdocs/maven/docs/official-configuring-maven.md)
 - [настройка/применение Maven в среде разработки IDEA](https://www.jetbrains.com/help/idea/maven-support.html)
+
+### [урок 8](src/main/java/pop/lesson08/README.md)
+- добавить в задачу использование логирования
+- показать принятый порядок работы с `Logger` в Java
