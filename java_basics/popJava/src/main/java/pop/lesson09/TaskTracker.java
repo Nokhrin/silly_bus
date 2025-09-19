@@ -218,35 +218,32 @@ public class TaskTracker {
         printHeader(writer);
         printMenu(writer);
 
-        logger.debug("Запрос ввода");
-        String line;
+        String userInput;
         try {
-            writer.write("\nВведи команду (/h для печати доступных команд): ");
-            writer.flush();
-            while ((line = reader.readLine()) != null) {
-                logger.debug(String.format("Введено: %s", line));
+            while (true) {
+                userInput = getInput("\nВведи команду (/h для печати доступных команд): ", writer, reader);
 
-                if (line.trim().isEmpty()) {
+                if (userInput.trim().isEmpty()) {
                     logger.debug("Введена пустая строка");
                     writer.write("Введена пустая строка - Завершаю выполнение\n");
                     writer.flush();
                     break;
                 }
-                char firstChar = line.charAt(0);
-                if (firstChar != '/' || !isValidCommand(line)) {
-                    writer.write(String.format("%s - не команда, попробуй ещё\n", line));
+                char firstChar = userInput.charAt(0);
+                if (firstChar != '/' || !isValidCommand(userInput)) {
+                    writer.write(String.format("%s - не команда, попробуй ещё\n", userInput));
                     writer.flush();
                     continue;
                 }
 
                 logger.debug("Определяю запрошенное действие");
-                String operationRequired = getOperation(line);
+                String operationRequired = getOperation(userInput);
                 // NOTE: задача требует процедурного подхода
                 //  появлялась идея вызывать функцию с помощью лямбда выражения
                 //  хорошая ли это идея?
                 switch (operationRequired) {
                     case "create-task" -> {
-                        tasksListAll.get("Все задачи").add(createTask(tasksListAll));
+                        createTask(tasksListAll, writer, reader);
                     }
 
                     case "print-all-tasks" -> {
@@ -276,7 +273,8 @@ public class TaskTracker {
 
             }
         } catch (IOException e) {
-            logger.error(String.format("Ошибка ввода:\n%s", e));
+            logger.error(String.format("Ошибка буфера записи:\n%s", e));
+            throw new RuntimeException(e);
         }
 // TODO: 24.09.2025 
 //  создание + вывод + изменение для задачи
@@ -399,12 +397,12 @@ public class TaskTracker {
     static void editTask(String taskId) {
     }
 
-    static LinkedHashMap<String, Object> createTask(LinkedHashMap<String, ArrayList<Map<String, Object>>> allTasks) {
+    static LinkedHashMap<String, Object> createTask(LinkedHashMap<String, ArrayList<Map<String, Object>>> allTasks, BufferedWriter bw, BufferedReader br) {
         String id = UUID.randomUUID().toString();
         String owner = System.getProperty("user.name");
         LocalDateTime creation_time = LocalDateTime.now();
         boolean done = false;
-        String name = getInput("Имя задачи: ");
+        String name = getInput("Имя задачи: ", bw, br);
         LinkedHashMap<String, Object> newTask = buildTask(id, name, owner, creation_time, done);
         logger.debug(String.format("Создана задача %s", newTask));
 
@@ -414,14 +412,25 @@ public class TaskTracker {
         return newTask;
     }
 
-    static String getInput(String prompt) {
-        System.out.print(prompt);
-        System.out.flush();
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(System.in))) {
-            return reader.readLine();
+    /**
+     * Печатаю сообщение для пользователя, считываю ответный ввод
+     * @param prompt
+     * @param br
+     * @param bw
+     * @return
+     */
+    static String getInput(String prompt, BufferedWriter bw, BufferedReader br) {
+        String userInput = null;
+        try {
+            bw.write(prompt);
+            bw.flush();
+            userInput = br.readLine();
+            logger.debug(String.format("Введено: %s", userInput));
+
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            logger.error(String.format("Ошибка ввода:\n%s", e));
         }
+        return userInput;
     }
 
     /**
