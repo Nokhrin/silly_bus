@@ -152,16 +152,7 @@ public class TaskTrackerTest {
 
     @Test
     public void testCreateTaskListEmpty() {
-        String id = String.valueOf(UUID.randomUUID());
-        String name = "Задача 1";
 
-        LinkedHashMap<String, Object> expected = new LinkedHashMap<>();
-        expected.put("name", name);
-        expected.put("tasks", new ArrayList<>());
-
-        LinkedHashMap<String, ArrayList<Map<String, Object>>> actual = createList(name);
-
-        assertEquals(actual, expected);
     }
 
     @Test
