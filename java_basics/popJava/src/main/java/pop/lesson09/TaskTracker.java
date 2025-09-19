@@ -269,7 +269,6 @@ public class TaskTracker {
                         printTask();
                     }
                     case "edit-task" -> {
-                        writer.write("Введи id задачи, которую хочешь редактировать");
                         editTask(allLists.get(ALL_TASKS_LIST_NAME), writer, reader);
                     }
                 }
@@ -437,9 +436,10 @@ public class TaskTracker {
                 }
             }
             logger.debug("Введена строка {}", taskIdToEdit);
+            bw.write("Введена строка " + taskIdToEdit);
             // TODO: 27.09.2025
 
-            bw.write("Для изменения названия введите name, пробел, новое название");
+            bw.write("Для изменения параметра введите имя параметра");
             bw.write(System.lineSeparator());
             bw.flush();
 
@@ -448,9 +448,21 @@ public class TaskTracker {
             while (true) {
                 line = br.readLine();
                 logger.debug("Введена строка {}", line);
-                // // TODO: 27.09.2025  if name
-                allTasksMap.get(taskIdToEdit).put("name", line);
+                if (taskIdToEdit == null || taskIdToEdit.trim().isEmpty()) {
+                    bw.write("Выхожу из режима редактирования");
+                    break;
+                } else if (line.equals("done")) {
+                    allTasksMap.get(taskIdToEdit).put("done", true);
+                } else if (line.equals("owner")) {
+                    allTasksMap.get(taskIdToEdit).put("owner", line);
+                }
+                allTasksMap.get(taskIdToEdit).put("modification_time", LocalDateTime.now());
+
+                bw.write("Для изменения названия введите name, пробел, новое название");
+                bw.write(System.lineSeparator());
+                bw.flush();
             }
+
 
         } catch (IOException e) {
             logger.error("Ошибка чтения ввода {}", e.toString());
@@ -462,9 +474,10 @@ public class TaskTracker {
         String id = UUID.randomUUID().toString();
         String owner = System.getProperty("user.name");
         LocalDateTime creation_time = LocalDateTime.now();
+        LocalDateTime modification_time = creation_time;
         boolean done = false;
         String name = getInput("Имя задачи: ", bw, br);
-        LinkedHashMap<String, Object> newTask = buildTask(id, name, owner, creation_time, done);
+        LinkedHashMap<String, Object> newTask = buildTask(id, name, owner, creation_time, modification_time, done);
         logger.debug(String.format("Создана задача %s", newTask));
 
         addTaskToList(newTask, ALL_TASKS_LIST_NAME, allTasks);
@@ -608,15 +621,17 @@ public class TaskTracker {
      * {"name", String},
      * {"owner", String},
      * {"creation_time", LocalDateTime},
+     * {"modification_time", LocalDateTime},
      * {"done", boolean},
      */
-    static LinkedHashMap<String, Object> buildTask(String id, String name, String owner, LocalDateTime creation_time, boolean done) {
+    static LinkedHashMap<String, Object> buildTask(String id, String name, String owner, LocalDateTime creation_time, LocalDateTime modification_time, boolean done) {
 
         LinkedHashMap<String, Object> task = new LinkedHashMap<>();
         task.put("id", id);
         task.put("name", name);
         task.put("owner", owner);
         task.put("creation_time", creation_time);
+        task.put("modification_time", modification_time);
         task.put("done", done);
 
         return task;
