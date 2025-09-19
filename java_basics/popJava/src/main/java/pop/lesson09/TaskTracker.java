@@ -3,7 +3,6 @@ package pop.lesson09;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.xml.validation.TypeInfoProvider;
 import java.io.*;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -19,10 +18,8 @@ import java.util.*;
  * - уникальный идентификатор / id
  * - наименование
  * - владелец
- * - статус - выполнена/не выполнена
  * - дата/время создания
- * - дата/время начала выполнения
- * - дата/время завершения выполнения
+ * - статус - выполнена/не выполнена
  * ---
  * - объект задачи является экземпляром класса LinkedHashMap
  * - структура объекта задачи
@@ -31,8 +28,6 @@ import java.util.*;
  * {"владелец", String},
  * {"статус", boolean},
  * {"дата/время создания", Date},
- * {"дата/время начала выполнения", Date},
- * {"дата/время завершения выполнения", Date},
  * - ссылка на объект задачи существует только в области видимости метода main
  * - не хранится в полях классов
  * ---
@@ -208,7 +203,7 @@ public class TaskTracker {
 
 
         logger.debug("Список задач по умолчанию");
-        LinkedHashMap<String, Object> tasksListAll = createTaskList("1", "Все задачи");
+        LinkedHashMap<String, Object> tasksListAll = buildList("1", "Все задачи");
         logger.debug("Создал список задач по умолчанию: " + tasksListAll);
 
         logger.debug("Загружен файл с задачами");
@@ -243,18 +238,12 @@ public class TaskTracker {
         } catch (IOException e) {
             logger.error(String.format("Ошибка ввода:\n%s", e));
         }
+// TODO: 24.09.2025 
+//  создание + вывод + изменение для задачи
+//      в задаче не ссылаться на список
+//  создание + вывод + изменение для списка
+        
 
-
-        logger.debug("Ожидаю ввода пользователя");
-        // TODO: 23.09.2025
-
-        logger.debug("Поток ввода");
-        Scanner scanner = new Scanner(System.in);
-        logger.debug("Создал Поток ввода: " + scanner);
-
-        logger.debug("Чтение ввода");
-        String userInput = getInput(scanner);
-        logger.debug("Введено значение: " + userInput);
 
         logger.debug("Завершил выполнение метода main Трекера задач");
     }
@@ -315,10 +304,12 @@ public class TaskTracker {
         String operationRequired = innerOperations.get(cmdName);
         logger.debug(String.format("Запрошена операция %s", operationRequired));
 
+        // TODO: 25.09.2025  
         // как иначе можно реализовать определение функции для вызова?
         //  хранить ссылку на функцию в словаре?
 
-        if (operationRequired.equals("create-task")) addTask();
+        if (operationRequired.equals("create-task")) createTask();
+        // TODO: 25.09.2025  
         if (operationRequired.equals("edit-task")) editTask();
         if (operationRequired.equals("print-task")) printTask();
         if (operationRequired.equals("delete-task")) deleteTask();
@@ -332,15 +323,60 @@ public class TaskTracker {
         if (operationRequired.equals("help")) printHelp(System.out);
     }
 
-    private static void addTask() {
-        // запросить ввод значений
-        // String id, String name, String owner, boolean done, LocalDateTime creation_time, LocalDateTime start_time, LocalDateTime finish_time
-
-        // создать task
-        // createTask()
+    private static void importTasks() {
     }
 
+    private static void exportTasks() {
+    }
+
+    private static void deleteList() {
+    }
+
+    private static void printList() {
+    }
+
+    private static void editList() {
+    }
+
+    private static void createList() {
+    }
+
+    private static void deleteTask() {
+    }
+
+    private static void printTask() {
+    }
+
+    private static void editTask() {
+    }
+
+    static LinkedHashMap<String, Object> createTask() {
+        String id = UUID.randomUUID().toString();
+        String owner = System.getProperty("user.name");
+        LocalDateTime creation_time = LocalDateTime.now();
+        boolean done = false;
+        String name = getInput("Имя задачи: ");
+        LinkedHashMap<String, Object> newTask = buildTask(id, name, owner, creation_time, done);
+        logger.debug(String.format("Создана задача %s", newTask));
+        return newTask;
+    }
+
+    static String getInput(String prompt) {
+        System.out.print(prompt);
+        System.out.flush();
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(System.in))) {
+            return reader.readLine();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * Создает и печатает справку по командам меню
+     * @param ps
+     */
     public static void printHelp(PrintStream ps) {
+        // TODO: 24.09.2025 - создавать меню динамически
         String helpMessage = """
                 Операции
                 
@@ -432,7 +468,7 @@ public class TaskTracker {
      * {"name", String},
      * {"tasks", ArrayList[{Task_1} , {Task_2}, [...], {Task_N}]},
      */
-    static LinkedHashMap<String, Object> createTaskList(String id, String name) {
+    static LinkedHashMap<String, Object> buildList(String id, String name) {
         ArrayList<Map<String, Object>> tasks = new ArrayList<>();
 
         LinkedHashMap<String, Object> taskList = new LinkedHashMap<>();
@@ -450,21 +486,17 @@ public class TaskTracker {
      * {"id", String},
      * {"name", String},
      * {"owner", String},
-     * {"done", boolean},
      * {"creation_time", LocalDateTime},
-     * {"start_time", LocalDateTime},
-     * {"finish_time", LocalDateTime},
+     * {"done", boolean},
      */
-    static LinkedHashMap<String, Object> createTask(String id, String name, String owner, boolean done, LocalDateTime creation_time, LocalDateTime start_time, LocalDateTime finish_time) {
+    static LinkedHashMap<String, Object> buildTask(String id, String name, String owner, LocalDateTime creation_time, boolean done) {
 
         LinkedHashMap<String, Object> task = new LinkedHashMap<>();
         task.put("id", id);
         task.put("name", name);
         task.put("owner", owner);
-        task.put("done", done);
         task.put("creation_time", creation_time);
-        task.put("start_time", start_time);
-        task.put("finish_time", finish_time);
+        task.put("done", done);
 
         return task;
     }
