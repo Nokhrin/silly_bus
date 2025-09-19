@@ -134,7 +134,7 @@ public class TaskTracker {
     }
     static final Logger logger = LoggerFactory.getLogger(TaskTracker.class);
 
-    public static HashMap<String, String> cmdOperations = new HashMap<>() {{
+    static HashMap<String, String> cmdOperations = new HashMap<>() {{
         put("--read", "read");
         put("-r", "read");
         put("--help", "help");
@@ -143,7 +143,7 @@ public class TaskTracker {
         put("-v", "version");
     }};
 
-    public static HashMap<String, String> innerOperations = new HashMap<>() {{
+    static HashMap<String, String> innerOperations = new HashMap<>() {{
         // общие
         put("/exit", "exit");
         put("/ex", "exit");
@@ -165,8 +165,8 @@ public class TaskTracker {
         // список задач
         put("/create-list", "create-list");
         put("/cl", "create-list");
-        put("/edit-list", "edit-list");
-        put("/el", "edit-list");
+        put("/a", "add-task-to-list");
+        put("/d", "remove-task-from-list");
         put("/print-list", "print-list");
         put("/pl", "print-list");
         put("/delete-list", "delete-list");
@@ -234,7 +234,7 @@ public class TaskTracker {
         String userInput;
         try {
             while (true) {
-                userInput = getInput("\n/h для печати доступных команд\nПустая строка + Enter -> завершение работы\nВведи команду: ", writer, reader);
+                userInput = getInput("Введи команду: ", writer, reader);
 
                 if (userInput.trim().isEmpty()) {
                     logger.debug("Введена пустая строка");
@@ -251,15 +251,15 @@ public class TaskTracker {
 
                 logger.debug("Определяю запрошенное действие");
                 String operationRequired = getOperation(userInput);
-                // NOTE: задача требует процедурного подхода
-                //  появлялась идея вызывать функцию с помощью лямбда выражения
-                //  хорошая ли это идея?
                 switch (operationRequired) {
                     case "exit" -> {
                         return;
                     }
                     case "help" -> {
                         printHelp(writer);
+                    }
+                    case "version" -> {
+                        printVersion(writer);
                     }
                     case "create-task" -> {
                         createTask(allLists, writer, reader);
@@ -279,8 +279,11 @@ public class TaskTracker {
                     case "print-list" -> {
                         printList(allLists, writer, reader);
                     }
-                    case "edit-list" -> {
-                        editList(allLists, writer, reader);
+                    case "add-task-to-list" -> {
+                        addTaskToList(allLists, writer, reader);
+                    }
+                    case "remove-task-from-list" -> {
+                        removeTaskFromList(allLists, writer, reader);
                     }
                     case "delete-list" -> {
                         deleteList(allLists, writer, reader);
@@ -318,7 +321,7 @@ public class TaskTracker {
      * @param line
      * @return
      */
-    public static boolean isValidCommand(String line) {
+    static boolean isValidCommand(String line) {
         return innerOperations.containsKey(line);
     }
 
@@ -328,7 +331,7 @@ public class TaskTracker {
      * @param fileName директория файла относительно корня проекта / расположения JAR
      * @return список строк
      */
-    public static List<String> readFromFile(String fileName) {
+    static List<String> readFromFile(String fileName) {
         List<String> lines = new ArrayList<>();
         try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
             String line;
@@ -349,7 +352,7 @@ public class TaskTracker {
      * @param   data     строки для записи
      * @param   filePath директория файла относительно корня проекта / расположения JAR
      */
-    public static void writeToFile(List<String> data, String filePath) {
+    static void writeToFile(List<String> data, String filePath) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
             for (String line : data) {
                 writer.write(line);
@@ -365,7 +368,7 @@ public class TaskTracker {
      * Выполняет запрошенную команду
      * @param cmdName   имя команды
      */
-    public static String getOperation(String cmdName) {
+    static String getOperation(String cmdName) {
         String operationRequired = innerOperations.get(cmdName);
         logger.debug(String.format("Запрошена операция %s", operationRequired));
         return operationRequired;
@@ -402,56 +405,206 @@ public class TaskTracker {
         }
     }
 
-    static void editList(LinkedHashMap<String, LinkedHashMap<String, LinkedHashMap<String, Object>>> lists, BufferedWriter bw, BufferedReader br) {
-        try {
-            bw.write("Существуют списки " + lists);
-            bw.write(System.lineSeparator());
-            bw.flush();
+    /**
+     * Добавляю задачу в список задач
+     * @param lists  все списки задач
+     */
+    static void addTaskToListNoDialog(LinkedHashMap<String, Object> task, String listName, LinkedHashMap<String, LinkedHashMap<String, LinkedHashMap<String, Object>>> lists) {
+// TODO: 01.10.2025  
+        LinkedHashMap<String, Object> tasks = lists.get(listName).get("tasks");
+        LinkedHashMap<String, Object> allTasks = lists.get("Все задачи").get("tasks");
 
-            String listToDelete = getInput("Введи имя списка, который надо редактировать", bw, br);
-            logger.debug("Введена строка {}", listToDelete);
-
-            // TODO: 29.09.2025
-
-            bw.write("Существуют списки " + lists);
-            bw.write(System.lineSeparator());
-            bw.flush();
-
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    static void printList(LinkedHashMap<String, LinkedHashMap<String, LinkedHashMap<String, Object>>> lists, BufferedWriter bw, BufferedReader br) {
-        try {
-            bw.write("Существуют списки " + lists);
-            bw.write(System.lineSeparator());
-            bw.flush();
-
-            String listToPrint = getInput("Введи имя списка, который надо напечатать", bw, br);
-            logger.debug("Введена строка {}", listToPrint);
-
-            bw.write("Список " + listToPrint);
-            bw.write(System.lineSeparator());
-            bw.write(String.valueOf(lists.get(listToPrint)));
-            bw.write(System.lineSeparator());
-            bw.flush();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        tasks.put((String) task.get("name"), task);
+        tasks.put("modification_time", LocalDateTime.now());
     }
 
     /**
      * Добавляю задачу в список задач
-     * @param task      объект задачи
-     * @param listName  имя списка задач, в который включать задачу
-     * @param allLists  все списки задач
+     * @param lists  все списки задач
      */
-    static void addTaskToList(LinkedHashMap<String, Object> task, String listName, LinkedHashMap<String, LinkedHashMap<String, LinkedHashMap<String, Object>>> allLists) {
-        logger.debug("Добавляю задачу {} в список {}", task, allLists.get(listName));
-        allLists.get(listName).put((String) task.get("name"), task);
+    static void addTaskToList(LinkedHashMap<String, LinkedHashMap<String, LinkedHashMap<String, Object>>> lists, BufferedWriter bw, BufferedReader br) {
+        try {
+            while (true) {
+                bw.write("+++ Добавление задачи в список +++");
+                bw.write(System.lineSeparator());
+                bw.flush();
+
+                String listName = getInput("Введи имя списка: ", bw, br);
+
+                if (listName == null || listName.trim().isEmpty()) {
+                    bw.write("Передана пустая строка, отменяю операцию");
+                    bw.write(System.lineSeparator());
+                    return;
+                }
+
+                if (lists.containsKey(listName)) {
+                    while (true) {
+                        bw.write("В список " + listName + " входят задачи: ");
+                        bw.write(String.valueOf(lists.get(listName)));
+                        bw.write(System.lineSeparator());
+
+                        LinkedHashMap<String, Object> tasks = lists.get(listName).get("tasks");
+                        LinkedHashMap<String, Object> allTasks = lists.get("Все задачи").get("tasks");
+
+                        String taskName = getInput("Введи имя задачи, которую добавить: ", bw, br);
+                        if (taskName == null || taskName.trim().isEmpty()) {
+                            bw.write("Передана пустая строка, повтори ввод");
+                            bw.write(System.lineSeparator());
+                            continue;
+                        }
+
+                        tasks.put(taskName, allTasks.get(taskName));
+                        tasks.put("modification_time", LocalDateTime.now());
+                        bw.write("Добавление выполнено");
+                        bw.write(System.lineSeparator());
+                        break;
+                    }
+                    bw.write("В список " + listName + " входят задачи: ");
+                    bw.write(String.valueOf(lists.get(listName)));
+                    bw.write(System.lineSeparator());
+
+                } else {
+                    bw.write("Список не существует, отменяю операцию");
+                    bw.write(System.lineSeparator());
+                    bw.flush();
+                }
+            }
+        } catch (IOException e) {
+            logger.error("Ошибка записи в поток {}", e.toString());
+            throw new RuntimeException(e);
+        }
     }
 
+    static void removeTaskFromList(LinkedHashMap<String, LinkedHashMap<String, LinkedHashMap<String, Object>>> lists, BufferedWriter bw, BufferedReader br) {
+        try {
+            while (true) {
+                bw.write("--- Удаление задачи из списка ---");
+                bw.write(System.lineSeparator());
+                bw.flush();
+
+                String listName = getInput("Введи имя списка: ", bw, br);
+
+                if (listName == null || listName.trim().isEmpty()) {
+                    bw.write("Передана пустая строка, отменяю операцию");
+                    bw.write(System.lineSeparator());
+                    return;
+                }
+
+                if (lists.containsKey(listName)) {
+                    while (true) {
+                        bw.write("В список " + listName + " входят задачи: ");
+                        bw.write(String.valueOf(lists.get(listName)));
+                        bw.write(System.lineSeparator());
+
+                        LinkedHashMap<String, Object> tasks = lists.get(listName).get("tasks");
+                        LinkedHashMap<String, Object> allTasks = lists.get("Все задачи").get("tasks");
+
+                        String taskName = getInput("Введи имя задачи, которую удалить: ", bw, br);
+                        if (taskName == null || taskName.trim().isEmpty()) {
+                            bw.write("Передана пустая строка, повтори ввод");
+                            bw.write(System.lineSeparator());
+                            continue;
+                        }
+                        if (tasks.containsKey(taskName)) {
+                            tasks.remove(taskName);
+                            tasks.put("modification_time", LocalDateTime.now());
+                            bw.write("Удаление выполнено");
+                            bw.write(System.lineSeparator());
+                            break;
+                        }
+                        bw.write("Передана пустая строка, повтори ввод");
+                        bw.write(System.lineSeparator());
+                    }
+                    bw.write("В список " + listName + " входят задачи: ");
+                    bw.write(String.valueOf(lists.get(listName)));
+                    bw.write(System.lineSeparator());
+
+                } else {
+                    bw.write("Список не существует, отменяю операцию");
+                    bw.write(System.lineSeparator());
+                    bw.flush();
+                }
+            }
+        } catch (IOException e) {
+            logger.error("Ошибка записи в поток {}", e.toString());
+            throw new RuntimeException(e);
+        }
+    }
+    
+    /**
+     * Диалог для получения аргументов команды
+     */
+    static void getMenuCommand(BufferedWriter bw, BufferedReader br) {
+        // TODO: 01.10.2025 ?? 
+        try {
+            while (true) {
+                bw.write("Актуальная инфа");
+                bw.write(System.lineSeparator());
+                bw.flush();
+
+                String userInput = getInput("Введи команду: ", bw, br);
+
+                if (userInput == null || userInput.trim().isEmpty()) {
+                    bw.write("Передана пустая строка, отменяю операцию");
+                    bw.write(System.lineSeparator());
+                    break;
+                }
+                if (userInput.equals("Известная команда")) {
+                    bw.write("Выполняю команду");
+                    bw.write(System.lineSeparator());
+                    break;
+                } else {
+                    bw.write("Команда не существует, повтори ввод");
+                    bw.write(System.lineSeparator());
+                    bw.flush();
+                }
+                    
+            }
+
+            bw.write("Инфа после выполнения команды");
+            bw.write(System.lineSeparator());
+            bw.flush();
+
+        } catch (IOException e) {
+            logger.error("Ошибка записи в поток {}", e.toString());
+            throw new RuntimeException(e);
+        }
+    }
+
+    // TODO: 30.09.2025 test
+    static void printList(LinkedHashMap<String, LinkedHashMap<String, LinkedHashMap<String, Object>>> lists, BufferedWriter bw, BufferedReader br) {
+        try {
+            while (true) {
+                bw.write("Существуют списки " + lists.keySet());
+                bw.write(System.lineSeparator());
+                bw.flush();
+                bw.write("Для отмены печати введи пустую строку");
+                bw.write(System.lineSeparator());
+                String listName = getInput("Для печати списка введи имя списка: ", bw, br);
+                logger.debug("Введена строка {}", listName);
+
+                if (listName == null || listName.trim().isEmpty()) {
+                    bw.write("Передана пустая строка, отменяю печать");
+                    bw.write(System.lineSeparator());
+                    continue;
+                }
+                if (lists.containsKey(listName)) {
+                    bw.write("Список " + listName);
+                    bw.write(System.lineSeparator());
+                    bw.write(String.valueOf(lists.get(listName)));
+                    bw.write(System.lineSeparator());
+                    break;
+                } else {
+                    bw.write("Список не существует, попробуй еще");
+                    bw.write(System.lineSeparator());
+                    bw.flush();
+                }
+            }
+            bw.flush();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     /**
      * Инициализирую Список задач, то есть,
@@ -474,13 +627,22 @@ public class TaskTracker {
 
     static void createList(LinkedHashMap<String, LinkedHashMap<String, LinkedHashMap<String, Object>>> allLists, BufferedWriter bw, BufferedReader br) {
         LocalDateTime creation_time = LocalDateTime.now();
-        LocalDateTime modification_time = creation_time;
         String name = getInput("Имя списка задач: ", bw, br);
-        LinkedHashMap<String, LinkedHashMap<String, Object>> newTaskList = buildList(name, creation_time, modification_time);
+        LinkedHashMap<String, LinkedHashMap<String, Object>> newTaskList = buildList(name, creation_time, creation_time);
         logger.debug(String.format("Создан список задач %s", newTaskList));
 
-        logger.debug("Добавить список задач {} в коллекцию списков задач", newTaskList);
         allLists.put(name, newTaskList);
+
+        try {
+            bw.write("Список " + newTaskList + " создан");
+            bw.write(System.lineSeparator());
+            bw.write("Существуют списки задач: " + allLists.keySet());
+            bw.write(System.lineSeparator());
+            bw.flush();
+        } catch (IOException e) {
+            logger.error("Ошибка записи в поток {}", e.toString());
+            throw new RuntimeException(e);
+        }
         logger.debug("Общий список задач\n{}", allLists);
     }
 
@@ -533,7 +695,7 @@ public class TaskTracker {
         try {
             bw.write("Существуют задачи");
             bw.write(System.lineSeparator());
-            bw.write(String.valueOf(allTasks));
+            bw.write(String.valueOf(allTasks.keySet()));
             bw.write(System.lineSeparator());
             bw.write("Для печати задачи введи Имя задачи и нажми Enter");
             bw.write(System.lineSeparator());
@@ -559,8 +721,8 @@ public class TaskTracker {
                     bw.write(System.lineSeparator());
                     bw.write("Попробуй еще");
                     bw.write(System.lineSeparator());
-                    bw.flush();
                 }
+                bw.flush();
             }
         } catch (IOException e) {
             logger.error("Ошибка чтения ввода {}", e.toString());
@@ -571,14 +733,13 @@ public class TaskTracker {
     static void editTask(LinkedHashMap<String, LinkedHashMap<String, LinkedHashMap<String, Object>>> allLists, BufferedWriter bw, BufferedReader br) {
         LinkedHashMap<String, LinkedHashMap<String, Object>> allTasks = allLists.get(ALL_TASKS_LIST_NAME);
         try {
+            bw.write(System.lineSeparator());
             bw.write("=== Редактирование задачи ===");
             bw.write(System.lineSeparator());
-            bw.write("Для начала редактирования введи id задачи и нажми Enter");
+            bw.write("Для начала редактирования введи имя задачи и нажми Enter");
             bw.write(System.lineSeparator());
-
             bw.write("Для завершения редактирования нажми Enter в новой строке");
             bw.write(System.lineSeparator());
-
             bw.flush();
 
             String taskIdToEdit;
@@ -590,8 +751,6 @@ public class TaskTracker {
                 }
             }
             logger.debug("Введена строка {}", taskIdToEdit);
-            bw.write("Введена строка " + taskIdToEdit);
-            // TODO: 27.09.2025
 
             bw.write("Текущее состояние задачи " + taskIdToEdit + ":");
             bw.write(System.lineSeparator());
@@ -608,6 +767,7 @@ public class TaskTracker {
                 if (taskIdToEdit == null || taskIdToEdit.trim().isEmpty()) {
                     bw.write("Выхожу из режима редактирования");
                     break;
+// TODO: 30.09.2025 test
                 } else if (line.equals("done")) {
                     bw.write("Запрошено изменение статуса");
                     bw.write(System.lineSeparator());
@@ -615,23 +775,21 @@ public class TaskTracker {
                     allTasks.get(taskIdToEdit).put("modification_time", LocalDateTime.now());
                     bw.write("Статус изменен");
                     bw.write(System.lineSeparator());
+// TODO: 30.09.2025 test
                 } else if (line.equals("owner")) {
                     bw.write("Запрошено изменение владельца");
                     bw.write(System.lineSeparator());
-
-                    // TODO: 29.09.2025
-                    allTasks.get(taskIdToEdit).put("owner", "new_owner");
-
+                    String new_owner = getInput("Введи имя владельца задачи", bw, br);
+                    allTasks.get(taskIdToEdit).put("owner", new_owner);
                     allTasks.get(taskIdToEdit).put("modification_time", LocalDateTime.now());
                     bw.write("Владелец изменен");
                     bw.write(System.lineSeparator());
+// TODO: 30.09.2025 test
                 } else if (line.equals("name")) {
                     bw.write("Запрошено изменение наименования задачи");
                     bw.write(System.lineSeparator());
-
-                    // TODO: 29.09.2025
-                    allTasks.get(taskIdToEdit).put("name", "new_name");
-
+                    String new_name = getInput("Введи имя задачи", bw, br);
+                    allTasks.get(taskIdToEdit).put("name", new_name);
                     allTasks.get(taskIdToEdit).put("modification_time", LocalDateTime.now());
                     bw.write("Наименование задачи изменено");
                     bw.write(System.lineSeparator());
@@ -660,7 +818,7 @@ public class TaskTracker {
         logger.debug(String.format("Создана задача %s", newTask));
 
         logger.debug("Добавить задачу {} в общий список задач", newTask);
-        addTaskToList(newTask, ALL_TASKS_LIST_NAME, allLists);
+        addTaskToListNoDialog(newTask, ALL_TASKS_LIST_NAME, allLists);
         logger.debug("Общий список задач\n{}", allLists);
     }
 
@@ -691,25 +849,36 @@ public class TaskTracker {
      // TODO: 25.09.2025 методы вывода сообщений дублируются, меняется только текст, создать один метод с параметром
      * @param bw
      */
-    public static void printHelp(BufferedWriter bw) {
+    static void printHelp(BufferedWriter bw) {
         String helpMessage = """
+                
+                ============
                 Операции
+                ============
                 
                 Списки задач
-                /pl             напечатать все
-                /cl list_name   создать
-                /el list_id     редактировать
-                /dl list_id     удалить
+                /pl             напечатать
+                /cl             создать
+                /el             редактировать
+                /dl             удалить
                 
                 Задачи
-                /pt             напечатать все
-                /ct task_name   создать
-                /et task_id     редактировать
-                /dt task_id     удалить
+                /pt             напечатать
+                /ct             создать
+                /et             редактировать
+                /dt             удалить
                 
                 Экспорт/импорт всех задач
                 /w              записать в файл
                 /r              прочитать из файла
+                
+                Общие
+                /h              напечатать это меню
+                /v              напечатать версию
+                /ex             завершить работу
+                
+                ============
+                
                 """;
         try {
             bw.write(helpMessage);
@@ -719,7 +888,7 @@ public class TaskTracker {
         }
     }
 
-    public static void printVersion(BufferedWriter bw) {
+    static void printVersion(BufferedWriter bw) {
         String version = """
                 v0.0.1
                 """;
@@ -731,10 +900,13 @@ public class TaskTracker {
         }
     }
 
-    public static void printHeader(BufferedWriter bw) {
+    static void printHeader(BufferedWriter bw) {
         String appHeader = """
+            
+            ============
             Трекер задач
             ============
+            
             """;
         try {
             bw.write(appHeader);
@@ -749,7 +921,7 @@ public class TaskTracker {
      * @param   cmdArgs  считанные аргументы
      * @return  имя команды
      */
-     public static String getArg(String[] cmdArgs) throws IllegalArgumentException {
+     static String getArg(String[] cmdArgs) throws IllegalArgumentException {
          if (cmdArgs.length > 2) {
              throw new IllegalArgumentException("Превышено допустимое количество параметров");
          }
@@ -767,7 +939,7 @@ public class TaskTracker {
     /**
      * Печатаю на консоль меню программы
      */
-    public static void printMenu(BufferedWriter bw) {
+    static void printMenu(BufferedWriter bw) {
         final String menuText = """
             Программа позволяет
             - создавать, изменять, удалять задачи
@@ -778,10 +950,10 @@ public class TaskTracker {
             - в интерактивном режиме в командой строке
             - из файла определенного формата
 
+            Для печати доступных команд выполни команду /h
+            
             ==============
-            Введи команду, нажми Enter
-            /h -> все команды
-            /v -> версия программы
+            
             """;
         try {
             bw.write(menuText);
@@ -832,7 +1004,7 @@ public class TaskTracker {
  *          },
  *     }
      */
-    public static LinkedHashMap<Integer, LinkedHashMap<String, Object>> parseTasksDump(String[] tasksDump) {
+    static LinkedHashMap<Integer, LinkedHashMap<String, Object>> parseTasksDump(String[] tasksDump) {
         // TODO: 23.09.2025
         return new LinkedHashMap<>();
     }
