@@ -138,8 +138,6 @@ public class TaskTrackerTest {
         String owner = "User 1";
         boolean done = false;
         LocalDateTime creation_time = LocalDateTime.now();
-        LocalDateTime start_time = null;
-        LocalDateTime finish_time = null;
 
         LinkedHashMap<String, Object> expected = new LinkedHashMap<>();
         expected.put("id", id);
@@ -147,10 +145,8 @@ public class TaskTrackerTest {
         expected.put("owner", owner);
         expected.put("done", done);
         expected.put("creation_time", creation_time);
-        expected.put("start_time", start_time);
-        expected.put("finish_time", finish_time);
 
-        LinkedHashMap<String, Object> actual = createTask(id, name, owner, done, creation_time, start_time, finish_time);
+        LinkedHashMap<String, Object> actual = buildTask(id, name, owner, creation_time, done);
 
         assertEquals(actual, expected);
     }
@@ -165,7 +161,7 @@ public class TaskTrackerTest {
         expected.put("name", name);
         expected.put("tasks", new ArrayList<>());
 
-        LinkedHashMap<String, Object> actual = createTaskList(id, name);
+        LinkedHashMap<String, Object> actual = buildList(id, name);
 
         assertEquals(actual, expected);
     }
