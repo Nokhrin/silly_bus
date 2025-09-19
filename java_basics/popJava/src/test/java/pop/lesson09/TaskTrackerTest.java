@@ -4,8 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.Test;
 
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
+import java.io.*;
 import java.net.URL;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -42,7 +41,7 @@ public class TaskTrackerTest {
 
         logger.debug("Подменяю стандартный поток вывода");
         ByteArrayOutputStream mockedOutContent = new ByteArrayOutputStream();
-        PrintStream mockedOut = new PrintStream(mockedOutContent);
+        BufferedWriter mockedOut = new BufferedWriter(new OutputStreamWriter(mockedOutContent));
 
         printMenu(mockedOut);
 
@@ -62,7 +61,7 @@ public class TaskTrackerTest {
 
         logger.debug("Подменяю стандартный поток вывода");
         ByteArrayOutputStream mockedOutContent = new ByteArrayOutputStream();
-        PrintStream mockedOut = new PrintStream(mockedOutContent);
+        BufferedWriter mockedOut = new BufferedWriter(new OutputStreamWriter(mockedOutContent));
 
         printVersion(mockedOut);
 
@@ -83,7 +82,7 @@ public class TaskTrackerTest {
 
         logger.debug("Подменяю стандартный поток вывода");
         ByteArrayOutputStream mockedOutContent = new ByteArrayOutputStream();
-        PrintStream mockedOut = new PrintStream(mockedOutContent);
+        BufferedWriter mockedOut = new BufferedWriter(new OutputStreamWriter(mockedOutContent));
 
         printHeader(mockedOut);
 
@@ -119,7 +118,7 @@ public class TaskTrackerTest {
 
         logger.debug("Подменяю стандартный поток вывода");
         ByteArrayOutputStream mockedOutContent = new ByteArrayOutputStream();
-        PrintStream mockedOut = new PrintStream(mockedOutContent);
+        BufferedWriter mockedOut = new BufferedWriter(new OutputStreamWriter(mockedOutContent));
 
         printHelp(mockedOut);
 
@@ -157,11 +156,10 @@ public class TaskTrackerTest {
         String name = "Задача 1";
 
         LinkedHashMap<String, Object> expected = new LinkedHashMap<>();
-        expected.put("id", id);
         expected.put("name", name);
         expected.put("tasks", new ArrayList<>());
 
-        LinkedHashMap<String, Object> actual = buildList(id, name);
+        LinkedHashMap<String, ArrayList<Map<String, Object>>> actual = createList(name);
 
         assertEquals(actual, expected);
     }
