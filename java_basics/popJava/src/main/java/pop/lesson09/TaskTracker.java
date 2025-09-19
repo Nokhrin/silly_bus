@@ -43,8 +43,14 @@ import java.util.*;
  * - структура объекта Список задач
  * {"id списка задач", String},
  * {"имя списка задач", String},
- * {"задачи", ArrayList[{Задача_1} , {Задача_2}, [...], {Задача_N}]},
+ * {"задачи", Mapping},
  * ---
+ *
+ * задача - LinkedHashMap<String, Object>
+ * список задач - LinkedHashMap<String, LinkedHashMap<String, Object>>
+ * список списков задач - LinkedHashMap<String, LinkedHashMap<String, LinkedHashMap<String, Object>>>
+ *
+ *
  * Список задач поддерживает операции
  * - создание
  * - изменение
@@ -168,6 +174,8 @@ public class TaskTracker {
         put("/r", "read");
     }};
 
+    static String ALL_TASKS_LIST_NAME = "Все задачи";
+
     /**
      * Точка входа
      * @param args  имя программы и параметры запуска
@@ -175,8 +183,15 @@ public class TaskTracker {
     public static void main(String[] args) {
         logger.debug("Начал выполнение метода main Трекера задач");
 
+        logger.debug("Все списки задач");
+        LinkedHashMap<String, LinkedHashMap<String, LinkedHashMap<String, Object>>> allLists = new LinkedHashMap<>();
+
         logger.debug("Список всех задач");
-        LinkedHashMap<String, ArrayList<Map<String, Object>>> tasksListAll = createList("Все задачи");
+        LinkedHashMap<String, LinkedHashMap<String, Object>> allTasks = createList(ALL_TASKS_LIST_NAME);
+
+        allLists.put(ALL_TASKS_LIST_NAME, allTasks);
+        logger.debug("Все списки задач:\n{}", allLists);
+
 
         // 
         // 
@@ -243,20 +258,19 @@ public class TaskTracker {
                 //  хорошая ли это идея?
                 switch (operationRequired) {
                     case "create-task" -> {
-                        createTask(tasksListAll, writer, reader);
+                        createTask(allLists.get(ALL_TASKS_LIST_NAME), writer, reader);
                     }
 
                     case "print-all-tasks" -> {
-                        printList(tasksListAll, writer);
+                        printList(allLists.get(ALL_TASKS_LIST_NAME), writer);
                     }
 
                     case "print-task" -> {
                         printTask();
                     }
                     case "edit-task" -> {
-                        // TODO: 25.09.2025 обработать id задачи
-                        String taskId = "";
-                        editTask(taskId);
+                        writer.write("Введи id задачи, которую хочешь редактировать");
+                        editTask(allLists.get(ALL_TASKS_LIST_NAME), writer, reader);
                     }
                 }
 
@@ -356,7 +370,7 @@ public class TaskTracker {
     static void editList() {
     }
 
-    static void printList(LinkedHashMap<String, ArrayList<Map<String, Object>>> list, BufferedWriter bw) {
+    static void printList(LinkedHashMap<String, LinkedHashMap<String, Object>> list, BufferedWriter bw) {
         try {
             bw.write(String.valueOf(list) + "\n");
             bw.flush();
@@ -365,8 +379,14 @@ public class TaskTracker {
         }
     }
 
-    static void addTaskToList(LinkedHashMap<String, Object> task, String listName, LinkedHashMap<String, ArrayList<Map<String, Object>>> allLists) {
-        allLists.get(listName).add(task);
+    /**
+     * Добавляю mapping id задачи: задача в mapping всех задач
+     * @param task
+     * @param listName
+     * @param allLists
+     */
+    static void addTaskToList(LinkedHashMap<String, Object> task, String listName, LinkedHashMap<String, LinkedHashMap<String, Object>> allLists) {
+        allLists.get(listName).put((String) task.get("id"), task);
     }
 
 
@@ -376,16 +396,18 @@ public class TaskTracker {
      * @return hashmap
      * {"id", String},
      * {"name", String},
-     * {"tasks", ArrayList[{Task_1} , {Task_2}, [...], {Task_N}]},
+     * {"tasks", Mapping},
      */
-    static LinkedHashMap<String, ArrayList<Map<String, Object>>> createList(String listName) {
-        ArrayList<Map<String, Object>> tasks = new ArrayList<>();
+    static LinkedHashMap<String, LinkedHashMap<String, Object>> createList(String listName) {
+        LinkedHashMap<String, LinkedHashMap<String, Object>> taskList = new LinkedHashMap<>();
+        String taskListId = UUID.randomUUID().toString();
 
-        LinkedHashMap<String, ArrayList<Map<String, Object>>> tasksList = new LinkedHashMap<>();
+        taskList.put("id", new LinkedHashMap<>());
 
-        tasksList.put(listName, tasks);
+        taskList.get(taskListId).put("name", listName);
+        taskList.get(taskListId).put("tasks", new LinkedHashMap<String, LinkedHashMap<String, Object>>());
 
-        return tasksList;
+        return taskList;
     }
 
     static void deleteTask() {
@@ -394,10 +416,49 @@ public class TaskTracker {
     static void printTask() {
     }
 
-    static void editTask(String taskId) {
+    static void editTask(LinkedHashMap<String, LinkedHashMap<String, Object>> allTasksMap, BufferedWriter bw, BufferedReader br) {
+        try {
+            bw.write("=== Редактирование задачи ===");
+            bw.write(System.lineSeparator());
+            bw.write("Для начала редактирования введи id задачи и нажми Enter");
+            bw.write(System.lineSeparator());
+
+            bw.write("Для завершения редактирования нажми Enter в новой строке");
+            bw.write(System.lineSeparator());
+
+            bw.flush();
+
+            String taskIdToEdit;
+            while (true) {
+                taskIdToEdit = br.readLine();
+                if (taskIdToEdit == null || taskIdToEdit.trim().isEmpty()) {
+                    bw.write("Выхожу из режима редактирования");
+                    break;
+                }
+            }
+            logger.debug("Введена строка {}", taskIdToEdit);
+            // TODO: 27.09.2025
+
+            bw.write("Для изменения названия введите name, пробел, новое название");
+            bw.write(System.lineSeparator());
+            bw.flush();
+
+            logger.debug("Читаю ввод");
+            String line;
+            while (true) {
+                line = br.readLine();
+                logger.debug("Введена строка {}", line);
+                // // TODO: 27.09.2025  if name
+                allTasksMap.get(taskIdToEdit).put("name", line);
+            }
+
+        } catch (IOException e) {
+            logger.error("Ошибка чтения ввода {}", e.toString());
+            throw new RuntimeException(e);
+        }
     }
 
-    static LinkedHashMap<String, Object> createTask(LinkedHashMap<String, ArrayList<Map<String, Object>>> allTasks, BufferedWriter bw, BufferedReader br) {
+    static LinkedHashMap<String, Object> createTask(LinkedHashMap<String, LinkedHashMap<String, Object>> allTasks, BufferedWriter bw, BufferedReader br) {
         String id = UUID.randomUUID().toString();
         String owner = System.getProperty("user.name");
         LocalDateTime creation_time = LocalDateTime.now();
@@ -406,7 +467,7 @@ public class TaskTracker {
         LinkedHashMap<String, Object> newTask = buildTask(id, name, owner, creation_time, done);
         logger.debug(String.format("Создана задача %s", newTask));
 
-        addTaskToList(newTask, "Все задачи", allTasks);
+        addTaskToList(newTask, ALL_TASKS_LIST_NAME, allTasks);
         logger.debug(String.format("Добавить задачу %s в общий список задач", newTask));
 
         return newTask;
