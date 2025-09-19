@@ -100,6 +100,34 @@ public class TaskTracker {
     }
     private static final Logger logger = LoggerFactory.getLogger(TaskTracker.class);
 
+    public static HashMap<String, String> cmdOperations = new HashMap<>() {{
+        put("--read", "read");
+        put("-r", "read");
+        put("--help", "help");
+        put("-h", "help");
+        put("--version", "version");
+        put("-v", "version");
+    }};
+
+    public static HashMap<String, String> innerOperations = new HashMap<>() {{
+        // общие
+        put("/help", "help");
+        put("/h", "help");
+        put("/version", "version");
+        put("/v", "version");
+        // задача
+        put("/create-task", "create-task");
+        put("/ct", "create-task");
+        put("/edit-task", "edit-task");
+        put("/et", "edit-task");
+        // список задач
+        put("/create-list", "create-list");
+        put("/cl", "create-list");
+        // экспорт/импорт
+        put("/w", "write");
+        put("/r", "read");
+    }};
+
     /**
      * Точка входа
      * @param args  имя программы и параметры запуска
@@ -109,27 +137,98 @@ public class TaskTracker {
 
         logger.debug("Проверка команды запуска");
         // TODO: 20.09.2025
-        ArrayList<String> initArguments = getArgs(args);
-        logger.debug("Получены аргументы: " + initArguments);
+        String initArgument = getArg(args);
+        logger.debug("Получен аргумент: " + initArgument);
 
-        logger.debug("Поток вывода");
-        PrintStream streamOut = new PrintStream(System.out, true);
-        logger.debug("Создал Поток вывода: " + streamOut);
+        if (initArgument != null) {
+            if (initArgument.equals("read")) {
+                logger.debug("Передан ключ чтения файла");
+                logger.debug("Следующим аргументом должно быть имя файла");
+                if (args.length == 1) {
+                    throw new IllegalArgumentException("Для команды чтения необходимо указать имя файла");
+                }
+                String fileName = args[1];
+                logger.debug(String.format("Запрошена загрузка из файла %s", fileName));
+            } else {
+                printHeader();
+                runCommand(initArgument);
+                System.exit(0);
+            }
+        }
 
+        // TODO: 20.09.2025 - надо ?
+//        logger.debug("Поток вывода");
+//        PrintStream streamOut = new PrintStream(System.out, true);
+//        logger.debug("Создал Поток вывода: " + streamOut);
+
+        logger.debug("Приветствие");
+        printHeader();
+        printMenu();
+
+        // если не загружен файл
         logger.debug("Список задач по умолчанию");
         LinkedHashMap<String, Object> tasksListAll = createTaskList("1", "Все задачи");
         logger.debug("Создал список задач по умолчанию: " + tasksListAll);
 
-        logger.debug("Поток вывода");
+        logger.debug("Поток ввода");
         Scanner scanner = new Scanner(System.in);
-        logger.debug("Создал Поток вывода: " + scanner);
+        logger.debug("Создал Поток ввода: " + scanner);
 
         logger.debug("Чтение ввода");
         String userInput = getInput(scanner);
         logger.debug("Введено значение: " + userInput);
 
-        printMenu(streamOut);
         logger.debug("Завершил выполнение метода main Трекера задач");
+    }
+
+    /**
+     * Выполняет запрошенную команду
+     * @param cmdName
+     */
+    public static void runCommand(String cmdName) {
+        logger.debug(cmdName);
+        if (cmdName.equals("version")) printVersion();
+        if (cmdName.equals("help")) printHelp();
+    }
+
+    public static void printHelp() {
+        String helpMessage = """
+                Операции
+                
+                Списки задач
+                /pl             напечатать все
+                /cl list_name   создать
+                /el list_id     редактировать
+                /dl list_id     удалить
+                
+                Задачи
+                /pt             напечатать все
+                /ct task_name   создать
+                /et task_id     редактировать
+                /dt task_id     удалить
+                
+                Экспорт/импорт всех задач
+                /s              выгрузить в файл
+                /l              загрузить из файла""";
+        System.out.println(helpMessage);
+        System.out.flush();
+    }
+
+    public static void printVersion() {
+        String version = """
+                v0.0.1
+                """;
+        System.out.println(version);
+        System.out.flush();
+    }
+
+    public static void printHeader() {
+        String appHeader = """
+            Трекер задач
+            ============
+            """;
+        System.out.println(appHeader);
+        System.out.flush();
     }
 
     /**
@@ -137,50 +236,42 @@ public class TaskTracker {
      * @param   cmdArgs  считанные аргументы
      * @return  имя команды
      */
-     public static ArrayList<String> getArgs(String[] cmdArgs) {
-         logger.debug(String.valueOf(cmdArgs));
-
-         HashMap<String, String> cmdOperations = new HashMap<>() {{
-             put("-v", "version");
-             put("--version", "version");
-             put("--help", "help");
-             put("-h", "help");
-         }};
-
-         ArrayList<String> commands = new ArrayList<>();
-
-         for (String arg : cmdArgs) {
-             logger.debug(arg);
-             if (arg.charAt(0) == '-') {
-                 if (cmdOperations.containsKey(arg)) {
-                     commands.add(arg);
-                 } else {
-                     logger.error(String.format("Ключ %s неизвестен и не будет обработан", arg));
-                 }
-             } else {
-                 logger.debug("Аргумент не является параметром");
-                 logger.debug("Аргумент может быть значением параметра");
-                 logger.debug("Например, именем файла");
-                 // TODO: 20.09.2025
-             }
+     public static String getArg(String[] cmdArgs) throws IllegalArgumentException {
+         if (cmdArgs.length > 2) {
+             throw new IllegalArgumentException("Превышено допустимое количество параметров");
          }
-         return commands;
+         if (cmdArgs.length == 0) return null;
+
+         String arg = cmdArgs[0];
+         logger.debug(arg);
+         if (cmdOperations.containsKey(arg)) {
+             return cmdOperations.get(arg);
+         } else {
+             throw new IllegalArgumentException(String.format("Ключ %s неизвестен и не будет обработан", arg));
+         }
     }
 
     /**
      * Выводит на консоль меню программы
      */
-    static void printMenu(PrintStream ps) {
+    public static void printMenu() {
         final String menuText = """
-                 Трекер задач
-                ==============
+                Программа позволяет
+                - создавать, изменять, удалять задачи
+                - создавать, изменять, удалять списки задачи
+                - выгружать задачи в файл
                 
-                Команды:
-                /ct, /create-task   создать Задачу
-                /cl, /create-list   создать Список задач
+                Программа поддерживает ввод
+                - в интерактивном режиме в командой строке
+                - из файла определенного формата
+
+                ==============
+                Введи команду, нажми Enter
+                /h -> все команды
+                /v -> версия программы
                 """;
-        ps.print(menuText);
-        ps.flush();
+        System.out.print(menuText);
+        System.out.flush();
     }
 
     /**
