@@ -42,7 +42,11 @@ public class Task {
         return new Task(id, name, owner, create, modify, done);
     }
 
-    public String toPrint() {
+    /**
+     * Создаю строковое представление задачи
+     * @return
+     */
+    public String getStrRepr() {
         return "Печатаю Задачу " + this.id + ";" + this.name + ";" + this.owner + ";" + this.create + ";" + this.modify + ";" + this.done;
     }
 
@@ -51,7 +55,13 @@ public class Task {
         this.modify = LocalDateTime.now();
     }
 
+    public void setOwner(String owner) {
+        this.owner = owner;
+        this.modify = LocalDateTime.now();
+    }
+
     public void setDone(boolean done) {
         this.done = done;
+        this.modify = LocalDateTime.now();
     }
 }
