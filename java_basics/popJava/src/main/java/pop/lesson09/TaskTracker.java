@@ -3,7 +3,7 @@ package pop.lesson09;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.PrintStream;
+import java.io.*;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -149,6 +149,7 @@ public class TaskTracker {
                 }
                 String fileName = args[1];
                 logger.debug(String.format("Запрошена загрузка из файла %s", fileName));
+                ArrayList<String> dumpData = readTasksDump(fileName);
             } else {
                 printHeader();
                 runCommand(initArgument);
@@ -182,8 +183,31 @@ public class TaskTracker {
     }
 
     /**
+     * Возвращаю содержимое файла
+     *
+     * @param fileName директория файла относительно корня проекта / расположения JAR
+     * @return список строк
+     */
+    public static ArrayList<String> readTasksDump(String fileName) {
+        ArrayList<String> lines = new ArrayList<>();
+        try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                lines.add(line);
+            }
+            return lines;
+        } catch (FileNotFoundException e) {
+            logger.error(String.format("Файл %s не найден", fileName));
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            logger.error("Ошибка чтения файла");
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
      * Выполняет запрошенную команду
-     * @param cmdName
+     * @param cmdName   имя команды
      */
     public static void runCommand(String cmdName) {
         logger.debug(cmdName);
