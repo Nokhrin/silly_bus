@@ -409,11 +409,9 @@ public class TaskTracker {
      * Добавляю задачу в список задач
      * @param lists  все списки задач
      */
-    static void addTaskToListNoDialog(LinkedHashMap<String, Object> task, String listName, LinkedHashMap<String, LinkedHashMap<String, LinkedHashMap<String, Object>>> lists) {
-// TODO: 01.10.2025  
+    static void addTaskToListNoDialog( task, String listName, LinkedHashMap<String, LinkedHashMap<String, LinkedHashMap<String, Object>>> lists) {
+// TODO: 01.10.2025
         LinkedHashMap<String, Object> tasks = lists.get(listName).get("tasks");
-        LinkedHashMap<String, Object> allTasks = lists.get("Все задачи").get("tasks");
-
         tasks.put((String) task.get("name"), task);
         tasks.put("modification_time", LocalDateTime.now());
     }
