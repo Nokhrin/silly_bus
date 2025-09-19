@@ -170,7 +170,7 @@ public class ScannerInput {
                 } else if (addRecordCommands.contains(command)) {
                     users.put(getName(scanner, printStream), getAge(scanner, printStream));
                 } else if (exitCommands.contains(command)) {
-                    System.exit(0);
+                    return;
                 }
             } catch (IllegalStateException err) {
                 errorStream.printf("Сканер закрыт или недоступен:\n%s", err.getMessage());

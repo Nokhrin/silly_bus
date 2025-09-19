@@ -2,15 +2,15 @@ package pop.lesson09;
 
 import org.testng.annotations.Test;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
+import static pop.lesson09.TaskTracker.readFromFile;
+import static pop.lesson09.TaskTracker.writeToFile;
 
 public class FileOperationsTest {
 
@@ -18,7 +18,7 @@ public class FileOperationsTest {
     private static final List<String> EXPECTED_CONTENT = Arrays.asList("Строка 1","Строка 2","Строка 3","Строка 4");
 
     @Test(description = "Проверка записи файла на диск")
-    public void testWriteFileExistence() {
+    public void testWriteToFileExistence() {
         // Убедимся, что файл существует перед тестом (очистим, если есть)
         File actualFile = new File(TEST_FILE_PATH);
         if (actualFile.exists()) {
@@ -36,8 +36,29 @@ public class FileOperationsTest {
         }
     }
 
+    @Test()
+    public void testWriteToFileContent() {
+        List<String> expected = Arrays.asList("Строка 1","Строка 2","Строка 3","Строка 4");
+
+        writeToFile(expected, TEST_FILE_PATH);
+
+        List<String> actual = new ArrayList<>();
+        try (BufferedReader br = new BufferedReader(new FileReader(TEST_FILE_PATH))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                actual.add(line);
+            }
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(String.format("Файл %s не найден\n%s", TEST_FILE_PATH, e));
+        } catch (IOException e) {
+            throw new RuntimeException(String.format("Ошибка чтения файла %s\n%s", TEST_FILE_PATH, e));
+        }
+
+        assertEquals(actual, expected);
+    }
+
     @Test(description = "Проверка содержимого файла")
-    public void testReadFileContent() {
+    public void testReadFromFileContent() {
         File expectedFile = new File(TEST_FILE_PATH);
         // Убедимся, что файл существует перед тестом (очистим, если есть)
         if (expectedFile.exists()) {
@@ -61,5 +82,14 @@ public class FileOperationsTest {
             expectedFile.delete();
         }
     }
+
+    @Test(expectedExceptions = RuntimeException.class)
+    public void testReadFromFileNotExist() {
+        String fileName = "TaskTrackerData.dump";
+        readFromFile(fileName);
+        throw new RuntimeException();
+    }
+
+
 
 }

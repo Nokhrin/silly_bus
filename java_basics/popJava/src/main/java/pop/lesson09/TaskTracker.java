@@ -3,9 +3,8 @@ package pop.lesson09;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.xml.validation.TypeInfoProvider;
 import java.io.*;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -135,6 +134,8 @@ public class TaskTracker {
      * @param args  имя программы и параметры запуска
      */
     public static void main(String[] args) {
+        PrintStream defaultPrintStream = new PrintStream(System.out);
+
         logger.debug("Начал выполнение метода main Трекера задач");
 
         logger.debug("Проверка команды запуска");
@@ -153,9 +154,9 @@ public class TaskTracker {
                 logger.debug(String.format("Запрошена загрузка из файла %s", fileName));
                 List<String> dumpData = readFromFile(fileName);
             } else {
-                printHeader();
+                printHeader(defaultPrintStream);
                 runCommand(initArgument);
-                System.exit(0);
+                return;
             }
         }
 
@@ -165,8 +166,8 @@ public class TaskTracker {
 //        logger.debug("Создал Поток вывода: " + streamOut);
 
         logger.debug("Приветствие");
-        printHeader();
-        printMenu();
+        printHeader(defaultPrintStream);
+        printMenu(defaultPrintStream);
 
         // если не загружен файл
         logger.debug("Список задач по умолчанию");
@@ -229,11 +230,11 @@ public class TaskTracker {
      */
     public static void runCommand(String cmdName) {
         logger.debug(cmdName);
-        if (cmdName.equals("version")) printVersion();
-        if (cmdName.equals("help")) printHelp();
+        if (cmdName.equals("version")) printVersion(System.out);
+        if (cmdName.equals("help")) printHelp(System.out);
     }
 
-    public static void printHelp() {
+    public static void printHelp(PrintStream ps) {
         String helpMessage = """
                 Операции
                 
@@ -251,26 +252,27 @@ public class TaskTracker {
                 
                 Экспорт/импорт всех задач
                 /s              выгрузить в файл
-                /l              загрузить из файла""";
-        System.out.println(helpMessage);
-        System.out.flush();
+                /l              загрузить из файла
+                """;
+        ps.print(helpMessage);
+        ps.flush();
     }
 
-    public static void printVersion() {
+    public static void printVersion(PrintStream ps) {
         String version = """
                 v0.0.1
                 """;
-        System.out.println(version);
-        System.out.flush();
+        ps.print(version);
+        ps.flush();
     }
 
-    public static void printHeader() {
+    public static void printHeader(PrintStream ps) {
         String appHeader = """
             Трекер задач
             ============
             """;
-        System.out.println(appHeader);
-        System.out.flush();
+        ps.print(appHeader);
+        ps.flush();
     }
 
     /**
@@ -296,7 +298,7 @@ public class TaskTracker {
     /**
      * Выводит на консоль меню программы
      */
-    public static void printMenu() {
+    public static void printMenu(PrintStream ps) {
         final String menuText = """
                 Программа позволяет
                 - создавать, изменять, удалять задачи
@@ -312,8 +314,8 @@ public class TaskTracker {
                 /h -> все команды
                 /v -> версия программы
                 """;
-        System.out.print(menuText);
-        System.out.flush();
+        ps.print(menuText);
+        ps.flush();
     }
 
     /**

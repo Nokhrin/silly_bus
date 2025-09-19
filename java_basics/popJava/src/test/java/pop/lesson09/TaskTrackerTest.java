@@ -25,17 +25,105 @@ public class TaskTrackerTest {
     @Test
     public void testPrintMenu() {
         final String expected = """
-             Трекер задач
+            Программа позволяет
+            - создавать, изменять, удалять задачи
+            - создавать, изменять, удалять списки задачи
+            - выгружать задачи в файл
+            
+            Программа поддерживает ввод
+            - в интерактивном режиме в командой строке
+            - из файла определенного формата
+
             ==============
+            Введи команду, нажми Enter
+            /h -> все команды
+            /v -> версия программы
             """;
 
-        // создаю поток с пустым значением, ввод не предусмотрен
-        ByteArrayOutputStream bytesOut = new ByteArrayOutputStream();
-        PrintStream customStreamOut = new PrintStream(bytesOut);
+        logger.debug("Подменяю стандартный поток вывода");
+        ByteArrayOutputStream mockedOutContent = new ByteArrayOutputStream();
+        PrintStream mockedOut = new PrintStream(mockedOutContent);
 
-        printMenu();
+        printMenu(mockedOut);
 
-        String actual = bytesOut.toString();
+        String actual = mockedOutContent.toString();
+
+        logger.debug(String.format("ожидание: %s", expected));
+        logger.debug(String.format("реальность: %s", actual));
+
+        assertEquals(actual, expected);
+    }
+
+    @Test
+    public void testPrintVersion() {
+        final String expected = """
+            v0.0.1
+            """;
+
+        logger.debug("Подменяю стандартный поток вывода");
+        ByteArrayOutputStream mockedOutContent = new ByteArrayOutputStream();
+        PrintStream mockedOut = new PrintStream(mockedOutContent);
+
+        printVersion(mockedOut);
+
+        String actual = mockedOutContent.toString();
+
+        logger.debug(String.format("ожидание: %s", expected));
+        logger.debug(String.format("реальность: %s", actual));
+
+        assertEquals(actual, expected);
+    }
+
+    @Test
+    public void testPrintHeader() {
+        final String expected = """
+            Трекер задач
+            ============
+            """;
+
+        logger.debug("Подменяю стандартный поток вывода");
+        ByteArrayOutputStream mockedOutContent = new ByteArrayOutputStream();
+        PrintStream mockedOut = new PrintStream(mockedOutContent);
+
+        printHeader(mockedOut);
+
+        String actual = mockedOutContent.toString();
+
+        logger.debug(String.format("ожидание: %s", expected));
+        logger.debug(String.format("реальность: %s", actual));
+
+        assertEquals(actual, expected);
+    }
+
+    @Test
+    public void testPrintHelp() {
+        final String expected = """
+            Операции
+            
+            Списки задач
+            /pl             напечатать все
+            /cl list_name   создать
+            /el list_id     редактировать
+            /dl list_id     удалить
+            
+            Задачи
+            /pt             напечатать все
+            /ct task_name   создать
+            /et task_id     редактировать
+            /dt task_id     удалить
+            
+            Экспорт/импорт всех задач
+            /s              выгрузить в файл
+            /l              загрузить из файла
+            """;
+
+        logger.debug("Подменяю стандартный поток вывода");
+        ByteArrayOutputStream mockedOutContent = new ByteArrayOutputStream();
+        PrintStream mockedOut = new PrintStream(mockedOutContent);
+
+        printHelp(mockedOut);
+
+        String actual = mockedOutContent.toString();
 
         logger.debug(String.format("ожидание: %s", expected));
         logger.debug(String.format("реальность: %s", actual));
@@ -102,14 +190,16 @@ public class TaskTrackerTest {
         main(args);
     }
 
-    @Test
+    @Test(expectedExceptions = IllegalArgumentException.class,
+            expectedExceptionsMessageRegExp = "Ключ -l неизвестен и не будет обработан")
     public void testGetArgUnknownKey() {
         String[] args = new String[1];
         args[0] = "-l";
         main(args);
     }
 
-    @Test
+    @Test(expectedExceptions = IllegalArgumentException.class,
+            expectedExceptionsMessageRegExp = "Для команды чтения необходимо указать имя файла")
     public void testGetArgReadFileNoName() {
         String[] args = new String[1];
         args[0] = "-r";
@@ -131,26 +221,6 @@ public class TaskTrackerTest {
         args[1] = "TaskTrackerData.dump";
         main(args);
     }
-
-    @Test(expectedExceptions = RuntimeException.class)
-    public void testReadFromFileNotExist() {
-        String fileName = "TaskTrackerData.dump";
-        readFromFile(fileName);
-        throw new RuntimeException();
-    }
-
-    @Test(expectedExceptions = RuntimeException.class)
-    public void testWriteToFile() {
-        List<String> expected = Arrays.asList("Строка 1","Строка 2","Строка 3","Строка 4");
-        String fileName = "TaskTrackerData.dump";
-
-        writeToFile(expected, fileName);
-
-        List<String> actual = null;
-
-        assertEquals(actual, expected);
-    }
-
 
 
 }
