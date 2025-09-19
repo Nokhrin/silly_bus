@@ -134,7 +134,7 @@ public class TaskTracker {
      * @param args  имя программы и параметры запуска
      */
     public static void main(String[] args) {
-        PrintStream defaultPrintStream = new PrintStream(System.out);
+        PrintStream writer = new PrintStream(System.out);
 
         logger.debug("Начал выполнение метода main Трекера задач");
 
@@ -154,25 +154,59 @@ public class TaskTracker {
                 logger.debug(String.format("Запрошена загрузка из файла %s", fileName));
                 List<String> dumpData = readFromFile(fileName);
             } else {
-                printHeader(defaultPrintStream);
+                printHeader(writer);
                 runCommand(initArgument);
                 return;
             }
         }
 
-        // TODO: 20.09.2025 - надо ?
-//        logger.debug("Поток вывода");
-//        PrintStream streamOut = new PrintStream(System.out, true);
-//        logger.debug("Создал Поток вывода: " + streamOut);
-
         logger.debug("Приветствие");
-        printHeader(defaultPrintStream);
-        printMenu(defaultPrintStream);
+        printHeader(writer);
+        printMenu(writer);
 
-        // если не загружен файл
+
         logger.debug("Список задач по умолчанию");
         LinkedHashMap<String, Object> tasksListAll = createTaskList("1", "Все задачи");
         logger.debug("Создал список задач по умолчанию: " + tasksListAll);
+
+        logger.debug("Загружен файл с задачами");
+        // TODO: 23.09.2025
+
+        logger.debug("Создаю поток ввода");
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+
+        logger.debug("Запрос ввода");
+        String line;
+        try {
+            writer.print("\nВведи команду (/h для печати доступных команд): ");
+            writer.flush();
+            line = reader.readLine();
+            while (line != null) {
+                logger.debug(String.format("Введено: %s", line));
+                writer.println(String.format("Введено: %s", line));
+
+                line = reader.readLine();
+                if (line.trim().isEmpty()) {
+                    logger.debug("Введена пустая строка");
+                    writer.print("Введена пустая строка - Завершаю выполнение\n");
+                    writer.flush();
+                    break;
+                }
+                char firstChar = line.charAt(0);
+                if (firstChar != '/') {
+                    writer.printf("%s - не команда, попробуй ещё\n", line);
+                    writer.flush();
+                    continue;
+                }
+                runCommand(line);
+            }
+        } catch (IOException e) {
+            logger.error(String.format("Ошибка ввода:\n%s", e));
+        }
+
+
+        logger.debug("Ожидаю ввода пользователя");
+        // TODO: 23.09.2025
 
         logger.debug("Поток ввода");
         Scanner scanner = new Scanner(System.in);
@@ -296,24 +330,24 @@ public class TaskTracker {
     }
 
     /**
-     * Выводит на консоль меню программы
+     * Печатаю на консоль меню программы
      */
     public static void printMenu(PrintStream ps) {
         final String menuText = """
-                Программа позволяет
-                - создавать, изменять, удалять задачи
-                - создавать, изменять, удалять списки задачи
-                - выгружать задачи в файл
-                
-                Программа поддерживает ввод
-                - в интерактивном режиме в командой строке
-                - из файла определенного формата
+            Программа позволяет
+            - создавать, изменять, удалять задачи
+            - создавать, изменять, удалять списки задачи
+            - выгружать задачи в файл
+            
+            Программа поддерживает ввод
+            - в интерактивном режиме в командой строке
+            - из файла определенного формата
 
-                ==============
-                Введи команду, нажми Enter
-                /h -> все команды
-                /v -> версия программы
-                """;
+            ==============
+            Введи команду, нажми Enter
+            /h -> все команды
+            /v -> версия программы
+            """;
         ps.print(menuText);
         ps.flush();
     }
@@ -361,6 +395,29 @@ public class TaskTracker {
         task.put("finish_time", finish_time);
 
         return task;
+    }
+
+    /**
+     * Преобразую список строк из дампа в список задач
+     * @param tasksDump список строк
+     * @return          отображение id задачи на экземпляр задачи
+     *
+     * {
+     * {"id", String} ->
+     *      {
+     *          {"id", String},
+     *          {"name", String},
+     *          {"owner", String},
+     *          {"done", boolean},
+     *          {"creation_time", LocalDateTime},
+     *          {"start_time", LocalDateTime},
+     *          {"finish_time", LocalDateTime}
+ *          },
+ *     }
+     */
+    public static LinkedHashMap<Integer, LinkedHashMap<String, Object>> parseTasksDump(String[] tasksDump) {
+        // TODO: 23.09.2025
+        return new LinkedHashMap<>();
     }
 
     /**
