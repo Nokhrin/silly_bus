@@ -125,11 +125,32 @@ public class TaskTrackerTest {
     }
 
     @Test
-    public void testReadTasksDumpFileNotExists() {
+    public void testMainImportFileNotExists() {
         String[] args = new String[2];
         args[0] = "-r";
         args[1] = "TaskTrackerData.dump";
         main(args);
     }
+
+    @Test(expectedExceptions = RuntimeException.class)
+    public void testReadFromFileNotExist() {
+        String fileName = "TaskTrackerData.dump";
+        readFromFile(fileName);
+        throw new RuntimeException();
+    }
+
+    @Test(expectedExceptions = RuntimeException.class)
+    public void testWriteToFile() {
+        List<String> expected = Arrays.asList("Строка 1","Строка 2","Строка 3","Строка 4");
+        String fileName = "TaskTrackerData.dump";
+
+        writeToFile(expected, fileName);
+
+        List<String> actual = null;
+
+        assertEquals(actual, expected);
+    }
+
+
 
 }
