@@ -94,6 +94,38 @@ import java.util.*;
  * Установка проекта для разработчика
  * выполняется клонирование репозитория
  * выполняется установка зависимостей
+ * 
+ * 
+ * Реализация
+ * 0. Системные данные
+ *      - перечень команд
+ *          @see <a href="java_basics/popJava/src/main/java/pop/lesson09/TaskTracker.java#L142">поддерживаемые команды</a>
+ *          - методы выполнения действий по имени команды
+*           -
+ * 1. Считывание аргументов командной строки
+ * 2. Определение действия, заданного аргументами
+ * 3. Выполение действия, заданного аргументами
+ *      - загрузка файла
+ *         - чтение файла
+ *         - преобразование считанных данных
+ *      - печать помощи
+ *      - печать версии
+ * 4. Запуск меню
+ * 5. Взаимодействие с пользователем
+ *     - считывание команды
+ *      @see <a href="java_basics/popJava/src/main/java/pop/lesson09/TaskTracker.java#L225">проверка команды</a>
+ *     - валидация команды
+ *     -
+ * 6. Выполнение команды
+ *      - создание задачи
+         * @see <a href="java_basics/popJava/src/main/java/pop/lesson09/TaskTracker.java#L207">получение ввода</a>
+ *      - печать задачи
+ *      - изменение задачи
+ *      - удаление задачи
+ *      
+ *      
+ * 
+ * 
  */
 public class TaskTracker {
     static {
@@ -121,9 +153,19 @@ public class TaskTracker {
         put("/ct", "create-task");
         put("/edit-task", "edit-task");
         put("/et", "edit-task");
+        put("/print-task", "print-task");
+        put("/pt", "print-task");
+        put("/delete-task", "delete-task");
+        put("/dt", "delete-task");
         // список задач
         put("/create-list", "create-list");
         put("/cl", "create-list");
+        put("/edit-list", "edit-list");
+        put("/el", "edit-list");
+        put("/print-list", "print-list");
+        put("/pl", "print-list");
+        put("/delete-list", "delete-list");
+        put("/dl", "delete-list");
         // экспорт/импорт
         put("/w", "write");
         put("/r", "read");
@@ -180,12 +222,9 @@ public class TaskTracker {
         try {
             writer.print("\nВведи команду (/h для печати доступных команд): ");
             writer.flush();
-            line = reader.readLine();
-            while (line != null) {
+            while ((line = reader.readLine()) != null) {
                 logger.debug(String.format("Введено: %s", line));
-                writer.println(String.format("Введено: %s", line));
 
-                line = reader.readLine();
                 if (line.trim().isEmpty()) {
                     logger.debug("Введена пустая строка");
                     writer.print("Введена пустая строка - Завершаю выполнение\n");
@@ -193,11 +232,12 @@ public class TaskTracker {
                     break;
                 }
                 char firstChar = line.charAt(0);
-                if (firstChar != '/') {
+                if (firstChar != '/' || !isValidCommand(line)) {
                     writer.printf("%s - не команда, попробуй ещё\n", line);
                     writer.flush();
                     continue;
                 }
+
                 runCommand(line);
             }
         } catch (IOException e) {
@@ -217,6 +257,15 @@ public class TaskTracker {
         logger.debug("Введено значение: " + userInput);
 
         logger.debug("Завершил выполнение метода main Трекера задач");
+    }
+
+    /**
+     * Проверяю, поддерживается ли команда
+     * @param line
+     * @return
+     */
+    public static boolean isValidCommand(String line) {
+        return innerOperations.containsKey(line);
     }
 
     /**
@@ -263,9 +312,32 @@ public class TaskTracker {
      * @param cmdName   имя команды
      */
     public static void runCommand(String cmdName) {
-        logger.debug(cmdName);
-        if (cmdName.equals("version")) printVersion(System.out);
-        if (cmdName.equals("help")) printHelp(System.out);
+        String operationRequired = innerOperations.get(cmdName);
+        logger.debug(String.format("Запрошена операция %s", operationRequired));
+
+        // как иначе можно реализовать определение функции для вызова?
+        //  хранить ссылку на функцию в словаре?
+
+        if (operationRequired.equals("create-task")) addTask();
+        if (operationRequired.equals("edit-task")) editTask();
+        if (operationRequired.equals("print-task")) printTask();
+        if (operationRequired.equals("delete-task")) deleteTask();
+        if (operationRequired.equals("create-list")) createList();
+        if (operationRequired.equals("edit-list")) editList();
+        if (operationRequired.equals("print-list")) printList();
+        if (operationRequired.equals("delete-list")) deleteList();
+        if (operationRequired.equals("write")) exportTasks();
+        if (operationRequired.equals("read")) importTasks();
+        if (operationRequired.equals("version")) printVersion(System.out);
+        if (operationRequired.equals("help")) printHelp(System.out);
+    }
+
+    private static void addTask() {
+        // запросить ввод значений
+        // String id, String name, String owner, boolean done, LocalDateTime creation_time, LocalDateTime start_time, LocalDateTime finish_time
+
+        // создать task
+        // createTask()
     }
 
     public static void printHelp(PrintStream ps) {
@@ -285,8 +357,8 @@ public class TaskTracker {
                 /dt task_id     удалить
                 
                 Экспорт/импорт всех задач
-                /s              выгрузить в файл
-                /l              загрузить из файла
+                /w              записать в файл
+                /r              прочитать из файла
                 """;
         ps.print(helpMessage);
         ps.flush();
@@ -418,26 +490,6 @@ public class TaskTracker {
     public static LinkedHashMap<Integer, LinkedHashMap<String, Object>> parseTasksDump(String[] tasksDump) {
         // TODO: 23.09.2025
         return new LinkedHashMap<>();
-    }
-
-    /**
-     * Возвращаю имя команды по ключу
-     * @param scanner   потока ввода
-     * @param cmdKey    псевдоним команды
-     * @return          системное имя команды
-     */
-    public static String getCommand(Scanner scanner, String cmdKey) {
-
-        return "";
-    }
-
-    /**
-     * Возвращаю содержимое потока ввода
-     * @param scanner   поток ввода
-     * @return          строка
-     */
-    private static String getInput(Scanner scanner) {
-        return "";
     }
 
 }
