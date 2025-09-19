@@ -6,6 +6,7 @@ import org.testng.annotations.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
+import java.net.URL;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -14,6 +15,13 @@ import static pop.lesson09.TaskTracker.*;
 
 public class TaskTrackerTest {
     private static final Logger logger = LoggerFactory.getLogger(TaskTrackerTest.class);
+
+    @Test
+    public void checkLoggerConfig() {
+        URL config = getClass().getClassLoader().getResource("simplelogger.properties");
+        System.out.println("Config location: " + config);
+    }
+
     @Test
     public void testPrintMenu() {
         final String expected = """
@@ -115,4 +123,13 @@ public class TaskTrackerTest {
         args[1] = "TaskTrackerData.dump";
         main(args);
     }
+
+    @Test
+    public void testReadTasksDumpFileNotExists() {
+        String[] args = new String[2];
+        args[0] = "-r";
+        args[1] = "TaskTrackerData.dump";
+        main(args);
+    }
+
 }

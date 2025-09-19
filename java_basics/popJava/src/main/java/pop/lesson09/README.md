@@ -38,6 +38,10 @@
 
 ## вопросы
 
+### конфигурация Maven
+- назначение и практическое применение тега <scope> в <dependency>
+> TODO
+
 ### данные
 - сообщение лога - поясни происхождение символов `[L`
 > [main] DEBUG pop.lesson09.TaskTracker - [Ljava.lang.String;@31221be2
