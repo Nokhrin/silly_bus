@@ -21,11 +21,11 @@ public class TaskTrackerTest {
             ==============
             """;
 
-        // создаю поток с пустой значением, ввод не предусмотрен
+        // создаю поток с пустым значением, ввод не предусмотрен
         ByteArrayOutputStream bytesOut = new ByteArrayOutputStream();
         PrintStream customStreamOut = new PrintStream(bytesOut);
 
-        printMenu(customStreamOut);
+        printMenu();
 
         String actual = bytesOut.toString();
 
@@ -72,5 +72,47 @@ public class TaskTrackerTest {
         LinkedHashMap<String, Object> actual = createTaskList(id, name);
 
         assertEquals(actual, expected);
+    }
+
+    @Test
+    public void testMainNoArgs() {
+        String[] args = new String[0];
+        main(args);
+    }
+
+    @Test
+    public void testMainVersionArg() {
+        String[] args = new String[1];
+        args[0] = "-v";
+        main(args);
+    }
+
+    @Test
+    public void testMainHelpArg() {
+        String[] args = new String[1];
+        args[0] = "-h";
+        main(args);
+    }
+
+    @Test
+    public void testGetArgUnknownKey() {
+        String[] args = new String[1];
+        args[0] = "-l";
+        main(args);
+    }
+
+    @Test
+    public void testGetArgReadFileNoName() {
+        String[] args = new String[1];
+        args[0] = "-r";
+        main(args);
+    }
+
+    @Test
+    public void testGetArgReadFileWithName() {
+        String[] args = new String[2];
+        args[0] = "-r";
+        args[1] = "TaskTrackerData.dump";
+        main(args);
     }
 }
