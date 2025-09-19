@@ -4,6 +4,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -149,7 +151,7 @@ public class TaskTracker {
                 }
                 String fileName = args[1];
                 logger.debug(String.format("Запрошена загрузка из файла %s", fileName));
-                ArrayList<String> dumpData = readTasksDump(fileName);
+                List<String> dumpData = readFromFile(fileName);
             } else {
                 printHeader();
                 runCommand(initArgument);
@@ -188,8 +190,8 @@ public class TaskTracker {
      * @param fileName директория файла относительно корня проекта / расположения JAR
      * @return список строк
      */
-    public static ArrayList<String> readTasksDump(String fileName) {
-        ArrayList<String> lines = new ArrayList<>();
+    public static List<String> readFromFile(String fileName) {
+        List<String> lines = new ArrayList<>();
         try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
             String line;
             while ((line = br.readLine()) != null) {
@@ -197,12 +199,28 @@ public class TaskTracker {
             }
             return lines;
         } catch (FileNotFoundException e) {
-            logger.error(String.format("Файл %s не найден", fileName));
-            throw new RuntimeException(e);
+            throw new RuntimeException(String.format("Файл %s не найден\n%s", fileName, e));
         } catch (IOException e) {
-            logger.error("Ошибка чтения файла");
-            throw new RuntimeException(e);
+            throw new RuntimeException(String.format("Ошибка чтения файла %s\n%s", fileName, e));
         }
+    }
+
+    /**
+     * Записываю список строк в файл
+     *
+     * @param   data     строки для записи
+     * @param   filePath директория файла относительно корня проекта / расположения JAR
+     */
+    public static void writeToFile(List<String> data, String filePath) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
+            for (String line : data) {
+                writer.write(line);
+                writer.newLine();
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Ошибка при записи файла: " + filePath, e);
+        }
+        logger.debug(String.format("Записал файл %s", filePath));
     }
 
     /**
