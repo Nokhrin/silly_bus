@@ -126,7 +126,7 @@ public class TaskTracker {
     static {
         System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "trace");
     }
-    private static final Logger logger = LoggerFactory.getLogger(TaskTracker.class);
+    static final Logger logger = LoggerFactory.getLogger(TaskTracker.class);
 
     public static HashMap<String, String> cmdOperations = new HashMap<>() {{
         put("--read", "read");
@@ -150,6 +150,8 @@ public class TaskTracker {
         put("/et", "edit-task");
         put("/print-task", "print-task");
         put("/pt", "print-task");
+        put("/print-all-tasks", "print-all-tasks");
+        put("/pa", "print-all-tasks");
         put("/delete-task", "delete-task");
         put("/dt", "delete-task");
         // список задач
@@ -171,17 +173,21 @@ public class TaskTracker {
      * @param args  имя программы и параметры запуска
      */
     public static void main(String[] args) {
-        PrintStream writer = new PrintStream(System.out);
-
         logger.debug("Начал выполнение метода main Трекера задач");
 
-        logger.debug("Проверка команды запуска");
-        // TODO: 20.09.2025
+        logger.debug("Список всех задач");
+        LinkedHashMap<String, ArrayList<Map<String, Object>>> tasksListAll = createList("Все задачи");
+
+        // 
+        // 
+        // 
+        logger.debug("Обработка параметров запуска");
         String initArgument = getArg(args);
         logger.debug("Получен аргумент: " + initArgument);
 
         if (initArgument != null) {
             if (initArgument.equals("read")) {
+                // работа с импортированными данными
                 logger.debug("Передан ключ чтения файла");
                 logger.debug("Следующим аргументом должно быть имя файла");
                 if (args.length == 1) {
@@ -190,50 +196,84 @@ public class TaskTracker {
                 String fileName = args[1];
                 logger.debug(String.format("Запрошена загрузка из файла %s", fileName));
                 List<String> dumpData = readFromFile(fileName);
-            } else {
-                printHeader(writer);
-                runCommand(initArgument);
-                return;
+
+                logger.debug(String.format("Загружен файл с задачами %s", fileName));
+                
+                logger.debug(String.format("Загружен файл с задачами %s", fileName));
+                // TODO: 25.09.2025
+                // 
             }
         }
+
+        //
+        // меню приложения
+        //
+        logger.debug("Создаю буфер записи потока вывода / stdout");
+        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(System.out));
+        logger.debug("Создаю буфер чтения потока ввода / клавиатуры");
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+
 
         logger.debug("Приветствие");
         printHeader(writer);
         printMenu(writer);
 
-
-        logger.debug("Список задач по умолчанию");
-        LinkedHashMap<String, Object> tasksListAll = buildList("1", "Все задачи");
-        logger.debug("Создал список задач по умолчанию: " + tasksListAll);
-
-        logger.debug("Загружен файл с задачами");
-        // TODO: 23.09.2025
-
-        logger.debug("Создаю поток ввода");
-        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-
         logger.debug("Запрос ввода");
         String line;
         try {
-            writer.print("\nВведи команду (/h для печати доступных команд): ");
+            writer.write("\nВведи команду (/h для печати доступных команд): ");
             writer.flush();
             while ((line = reader.readLine()) != null) {
                 logger.debug(String.format("Введено: %s", line));
 
                 if (line.trim().isEmpty()) {
                     logger.debug("Введена пустая строка");
-                    writer.print("Введена пустая строка - Завершаю выполнение\n");
+                    writer.write("Введена пустая строка - Завершаю выполнение\n");
                     writer.flush();
                     break;
                 }
                 char firstChar = line.charAt(0);
                 if (firstChar != '/' || !isValidCommand(line)) {
-                    writer.printf("%s - не команда, попробуй ещё\n", line);
+                    writer.write(String.format("%s - не команда, попробуй ещё\n", line));
                     writer.flush();
                     continue;
                 }
 
-                runCommand(line);
+                logger.debug("Определяю запрошенное действие");
+                String operationRequired = getOperation(line);
+                // NOTE: задача требует процедурного подхода
+                //  появлялась идея вызывать функцию с помощью лямбда выражения
+                //  хорошая ли это идея?
+                switch (operationRequired) {
+                    case "create-task" -> {
+                        tasksListAll.get("Все задачи").add(createTask(tasksListAll));
+                    }
+
+                    case "print-all-tasks" -> {
+                        printList(tasksListAll, writer);
+                    }
+
+                    case "print-task" -> {
+                        printTask();
+                    }
+                    case "edit-task" -> {
+                        // TODO: 25.09.2025 обработать id задачи
+                        String taskId = "";
+                        editTask(taskId);
+                    }
+                }
+
+//                if (operationRequired.equals("delete-task")) deleteTask();
+//                if (operationRequired.equals("create-list")) createList("");
+//                if (operationRequired.equals("edit-list")) editList();
+//                if (operationRequired.equals("delete-list")) deleteList();
+//                if (operationRequired.equals("write")) exportTasks();
+//                if (operationRequired.equals("read")) importTasks();
+//                if (operationRequired.equals("version")) printVersion(writer);
+//                if (operationRequired.equals("help")) printHelp(writer);
+
+
+
             }
         } catch (IOException e) {
             logger.error(String.format("Ошибка ввода:\n%s", e));
@@ -300,57 +340,66 @@ public class TaskTracker {
      * Выполняет запрошенную команду
      * @param cmdName   имя команды
      */
-    public static void runCommand(String cmdName) {
+    public static String getOperation(String cmdName) {
         String operationRequired = innerOperations.get(cmdName);
         logger.debug(String.format("Запрошена операция %s", operationRequired));
-
-        // TODO: 25.09.2025  
-        // как иначе можно реализовать определение функции для вызова?
-        //  хранить ссылку на функцию в словаре?
-
-        if (operationRequired.equals("create-task")) createTask();
-        // TODO: 25.09.2025  
-        if (operationRequired.equals("edit-task")) editTask();
-        if (operationRequired.equals("print-task")) printTask();
-        if (operationRequired.equals("delete-task")) deleteTask();
-        if (operationRequired.equals("create-list")) createList();
-        if (operationRequired.equals("edit-list")) editList();
-        if (operationRequired.equals("print-list")) printList();
-        if (operationRequired.equals("delete-list")) deleteList();
-        if (operationRequired.equals("write")) exportTasks();
-        if (operationRequired.equals("read")) importTasks();
-        if (operationRequired.equals("version")) printVersion(System.out);
-        if (operationRequired.equals("help")) printHelp(System.out);
+        return operationRequired;
     }
 
-    private static void importTasks() {
+    static void importTasks() {
     }
 
-    private static void exportTasks() {
+    static void exportTasks() {
     }
 
-    private static void deleteList() {
+    static void deleteList() {
     }
 
-    private static void printList() {
+    static void editList() {
     }
 
-    private static void editList() {
+    static void printList(LinkedHashMap<String, ArrayList<Map<String, Object>>> list, BufferedWriter bw) {
+        try {
+            bw.write(String.valueOf(list) + "\n");
+            bw.flush();
+        } catch (IOException e) {
+            logger.error("Ошибка операции ввода/вывода\n" + e);
+        }
     }
 
-    private static void createList() {
+    static void addTaskToList(LinkedHashMap<String, Object> task, String listName, LinkedHashMap<String, ArrayList<Map<String, Object>>> allLists) {
+        allLists.get(listName).add(task);
     }
 
-    private static void deleteTask() {
+
+    /**
+     * Создаю Список задач
+     *
+     * @return hashmap
+     * {"id", String},
+     * {"name", String},
+     * {"tasks", ArrayList[{Task_1} , {Task_2}, [...], {Task_N}]},
+     */
+    static LinkedHashMap<String, ArrayList<Map<String, Object>>> createList(String listName) {
+        ArrayList<Map<String, Object>> tasks = new ArrayList<>();
+
+        LinkedHashMap<String, ArrayList<Map<String, Object>>> tasksList = new LinkedHashMap<>();
+
+        tasksList.put(listName, tasks);
+
+        return tasksList;
     }
 
-    private static void printTask() {
+    static void deleteTask() {
     }
 
-    private static void editTask() {
+    static void printTask() {
     }
 
-    static LinkedHashMap<String, Object> createTask() {
+    static void editTask(String taskId) {
+    }
+
+    static LinkedHashMap<String, Object> createTask(LinkedHashMap<String, ArrayList<Map<String, Object>>> allTasks) {
         String id = UUID.randomUUID().toString();
         String owner = System.getProperty("user.name");
         LocalDateTime creation_time = LocalDateTime.now();
@@ -358,6 +407,10 @@ public class TaskTracker {
         String name = getInput("Имя задачи: ");
         LinkedHashMap<String, Object> newTask = buildTask(id, name, owner, creation_time, done);
         logger.debug(String.format("Создана задача %s", newTask));
+
+        addTaskToList(newTask, "Все задачи", allTasks);
+        logger.debug(String.format("Добавить задачу %s в общий список задач", newTask));
+
         return newTask;
     }
 
@@ -373,10 +426,11 @@ public class TaskTracker {
 
     /**
      * Создает и печатает справку по командам меню
-     * @param ps
-     */
-    public static void printHelp(PrintStream ps) {
         // TODO: 24.09.2025 - создавать меню динамически
+     // TODO: 25.09.2025 методы вывода сообщений дублируются, меняется только текст, создать один метод с параметром
+     * @param bw
+     */
+    public static void printHelp(BufferedWriter bw) {
         String helpMessage = """
                 Операции
                 
@@ -396,25 +450,37 @@ public class TaskTracker {
                 /w              записать в файл
                 /r              прочитать из файла
                 """;
-        ps.print(helpMessage);
-        ps.flush();
+        try {
+            bw.write(helpMessage);
+            bw.flush();
+        } catch (IOException e) {
+            logger.error("Ошибка операции ввода/вывода\n" + e);
+        }
     }
 
-    public static void printVersion(PrintStream ps) {
+    public static void printVersion(BufferedWriter bw) {
         String version = """
                 v0.0.1
                 """;
-        ps.print(version);
-        ps.flush();
+        try {
+            bw.write(version);
+            bw.flush();
+        } catch (IOException e) {
+            logger.error("Ошибка операции ввода/вывода\n" + e);
+        }
     }
 
-    public static void printHeader(PrintStream ps) {
+    public static void printHeader(BufferedWriter bw) {
         String appHeader = """
             Трекер задач
             ============
             """;
-        ps.print(appHeader);
-        ps.flush();
+        try {
+            bw.write(appHeader);
+            bw.flush();
+        } catch (IOException e) {
+            logger.error("Ошибка операции ввода/вывода\n" + e);
+        }
     }
 
     /**
@@ -440,7 +506,7 @@ public class TaskTracker {
     /**
      * Печатаю на консоль меню программы
      */
-    public static void printMenu(PrintStream ps) {
+    public static void printMenu(BufferedWriter bw) {
         final String menuText = """
             Программа позволяет
             - создавать, изменять, удалять задачи
@@ -456,27 +522,12 @@ public class TaskTracker {
             /h -> все команды
             /v -> версия программы
             """;
-        ps.print(menuText);
-        ps.flush();
-    }
-
-    /**
-     * Создаю Список задач
-     *
-     * @return hashmap
-     * {"id", String},
-     * {"name", String},
-     * {"tasks", ArrayList[{Task_1} , {Task_2}, [...], {Task_N}]},
-     */
-    static LinkedHashMap<String, Object> buildList(String id, String name) {
-        ArrayList<Map<String, Object>> tasks = new ArrayList<>();
-
-        LinkedHashMap<String, Object> taskList = new LinkedHashMap<>();
-        taskList.put("id", id);
-        taskList.put("name", name);
-        taskList.put("tasks", tasks);
-
-        return taskList;
+        try {
+            bw.write(menuText);
+            bw.flush();
+        } catch (IOException e) {
+            logger.error("Ошибка операции ввода/вывода\n" + e);
+        }
     }
 
     /**
