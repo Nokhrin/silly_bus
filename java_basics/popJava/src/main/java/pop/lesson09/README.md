@@ -43,7 +43,41 @@
 
 ---
 
-## вопросы
+# вопросы
+
+### переопределения
+
+ai-assistant посоветовал
+
+```java
+    // Переопределение equals и hashCode — важно для тестов
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Task task = (Task) o;
+        return id.equals(task.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+```
+
+почему важно?
+equals() и hashCode() — основа корректной работы коллекций (Set, Map)
+в частности, для операций сравнения
+
+если не переопределить метод equals, он будет работать по умолчанию, то есть, будет проверять равенство ссылок на объекты, но не содержимое объектов 
+
+
+
+
+
+
+
+
 
 ### работа с файлами
 - какой подход работы с директориями лучше и почему?
