@@ -131,7 +131,7 @@ public class TaskTracker {
         logger.debug("Инициализация");
 
         logger.debug("Создаю список Существующие задачи");
-        TasksList tasksList = new TasksList();
+        TasksList tasksList = new TasksList(new ArrayList<>());
 
         logger.debug("Создаю поток вывода с буферизацией");
         BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(System.out));
