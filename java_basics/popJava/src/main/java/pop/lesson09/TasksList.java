@@ -45,51 +45,15 @@ public class TasksList {
      *  инкапсулирован - не позволяет вызвать конструктор с помощью оператора new
      */
 
-    /** выполняется при загрузке класса
-     * этапы загрузки класса:
-     *  JVM читает скомпилированный класс,
-     *  JVM проверяет структуру,
-     *  JVM выполняет код статических инструкций класса - на этом этапе будет создан экземпляр списка задач
-     * справа налево:
-     * создание экземпляра + создание ссылки на экземпляр + запрет на переопределение ссылки на экземпляр + принадлежность к классу + доступ только внутри класса
-     */
-    private static final TasksList TASKS_LIST = new TasksList();
-
     // хранилище объектов
     private final List<Task> tasks;
 
     /**
-     * Конструктор с областью видимости только в данном классе
-     * Это значит, оператор new выбросит исключение при попытке выполнить конструктор извне класса
+     * Конструктор по умолчанию — создаёт пустой список
      */
-    private TasksList() {
-        // Проверка: вызван ли через рефлексию?
-        StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
-        boolean isReflected = false;
-        for (StackTraceElement element : stackTrace) {
-            if ("java.lang.reflect.Constructor".equals(element.getClassName())) {
-                isReflected = true;
-                break;
-            }
-        }
-        if (isReflected) {
-            throw new AssertionError("Нельзя создавать экземпляр через reflection! Используйте getInstance().");
-        }
-
-        // запись в поле класса ссылки на объект ArrayList
-        //  jvm выделяет память в heap для ArrayList, new вызывает конструктор, конструктор создает экземпляр ArrayList и возвращает ссылку на него
-        //  jvm записывает ссылку на ArrayList в поле tasks экземпляра TasksList
+    public TasksList() {
         this.tasks = new ArrayList<>();
     }
-
-    /**
-     * Точка доступа к списку задач
-     * @return
-     */
-    public static TasksList getTasksList() {
-        return TASKS_LIST;
-    }
-
 
     /**
      * Создаю объект списка задачи из List задач
@@ -116,6 +80,13 @@ public class TasksList {
             throw new IllegalArgumentException("Вместо объекта задачи передан null");
         }
         this.tasks.remove(task);
+    }
+
+    /**
+     * Очистить список задач
+     */
+    public void clear() {
+        this.tasks.clear();
     }
 
     /**
@@ -185,6 +156,21 @@ public class TasksList {
     }
 
     /**
+     * Возвращаю задачу из списка по id задачи
+     */
+    public Task getTaskById(String id) {
+        if (id == null) {
+            throw new NullPointerException("Получен null в качестве значения id");
+        }
+        for (Task task : this.tasks) {
+            if (task.getId().equals(id)) {
+                return task;
+            }
+        }
+        return null;
+    }
+
+    /**
      * Возвращаю количество задач, входящих в список
      */
     public int size() {
@@ -208,7 +194,7 @@ public class TasksList {
         if (this == obj) return true;
         if (obj == null || this.getClass() != obj.getClass()) return false;
         TasksList listToCheck = (TasksList) obj;
-        return Objects.equals(this, listToCheck);
+        return Objects.equals(this.tasks, listToCheck.tasks);
     }
 
     /**

@@ -29,7 +29,7 @@ import java.util.UUID;
  *  и, как следствие, удаление экземпляра задачи
  */
 public class Task {
-    private final String id; // не должен изменяться после создания
+    private String id; // не должен изменяться после создания
     private String name; 
     private String owner = System.getProperty("user.name");
     private final LocalDateTime create; // не должен изменяться после создания
@@ -69,6 +69,15 @@ public class Task {
         this.create = LocalDateTime.now();
         this.name = name;
         this.owner = owner;
+        this.modify = this.create;
+        this.done = false;
+    }
+
+    public Task(String name) {
+        this.id = UUID.randomUUID().toString();
+        this.create = LocalDateTime.now();
+        this.name = name;
+        this.owner = System.getProperty("user.name");;
         this.modify = this.create;
         this.done = false;
     }
