@@ -4,6 +4,30 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
 
+/**
+ * Сущность "Задача"
+ * Минимальная единица, которой манипулирует трекер
+ * @see Task
+ * ---
+ * Задача поддерживает операции
+ * - создание
+ * @see Task#Task(String, String, String, LocalDateTime, LocalDateTime, boolean)
+ * - обновление - для изменения доступны
+ *  - заголовок задачи
+ *  @see Task#setName(String)
+ *  - владелец задачи
+ *  @see Task#setOwner(String)
+ *  - статуч задачи
+ *  @see Task#setDone(boolean)
+ * - печать текстового представления
+ * @see Task#toString()
+ * ---
+ * Задача всегда включена в список задач
+ * список задач - хранилище ссылок на задачи
+ * @see TasksList
+ * удаление задачи из списка задач есть удаление ссылки на задачу
+ *  и, как следствие, удаление экземпляра задачи
+ */
 public class Task {
     private final String id; // не должен изменяться после создания
     private String name; 
@@ -14,13 +38,14 @@ public class Task {
 
     /**
      * Конструктор - позволяет задать значение final полям
+     * Значения id, время создания генерируются при вызове оператора new
      */
     public Task() {
         this.id = UUID.randomUUID().toString();
         this.create = LocalDateTime.now();
     }
 
-    private Task(String id, String name, String owner, LocalDateTime create, LocalDateTime modify, boolean done) {
+    public Task(String id, String name, String owner, LocalDateTime create, LocalDateTime modify, boolean done) {
         this.id = id;
         this.name = name;
         this.owner = owner;
@@ -31,7 +56,7 @@ public class Task {
 
     /**
      * Создаю текстовое представление задачи для записи в файл
-     * @return
+     * @return  значения полей, разделенный символом ";"
      */
     public String toStore() {
         return String.join(";", this.id,  this.name,  this.owner,  this.create.toString(),  this.modify.toString(),  Boolean.toString(this.done));
