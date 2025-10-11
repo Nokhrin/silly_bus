@@ -91,11 +91,28 @@ shell скрипт сборки
 
 # вопросы
 
+### проблема с зависимостями Maven
+
+```shell
+javac -d build/classes src/main/java/pop/lesson09/TaskTracker.java
+```
+>>> src/main/java/pop/lesson09/TaskTracker.java:3: error: package org.slf4j does not exist
+import org.slf4j.Logger;
+^
+
+#### решение
+
+- pom.xml — в корне проекта,  slf4j-api — в  .m2,  createdFiles.lst — есть, но  slf4j-api не в classpath во время компиляции
+
+- пересборка
+rm -rf target/
+mvn clean compile
+
 ### переопределения
 
 ai-assistant посоветовал
 
-```java
+```
     // Переопределение equals и hashCode — важно для тестов
     @Override
     public boolean equals(Object o) {
