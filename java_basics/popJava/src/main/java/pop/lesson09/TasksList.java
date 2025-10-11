@@ -7,8 +7,89 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+/**
+ * Сущность "Список задач"
+ * Является коллекцией ссылок на задачи
+ * @see Task
+ * ---
+ * Существует в единственном экземпляре
+ * ---
+ * Поддерживает операции
+ * - создание
+ * @see TasksList#TasksList(List)
+ * - добавление задачи в список
+ * @see TasksList#addTask(Task)
+ * - удаление задачи из списка
+ * @see TasksList#delTask(Task)
+ * - получение списка задач в виде Java коллекции
+ * @see TasksList#getTasks()
+ * - проверка вхождения задачи в список задач
+ * @see TasksList#contains
+ * - получение текстового представления списка задач
+ * @see TasksList#toString()
+ * - запись списка задач в файл
+ * @see TasksList#toStore(String)
+ * - чтение задач из файла
+ * @see TasksList#fromStore(String)
+ * - получение количества задач в списке
+ * @see TasksList#size()
+ * - получение состояния списка - пустой/не пустой
+ * @see TasksList#isEmpty()
+ */
 public class TasksList {
-    private List<Task> tasks;
+    /**
+     * Список задач
+     *  в единственном экземпляре
+     *  доступен глобально - из всех модулей проекта
+     *  предоставляет извлечение объектов
+     *  инкапсулирован - не позволяет вызвать конструктор с помощью оператора new
+     */
+
+    /** выполняется при загрузке класса
+     * этапы загрузки класса:
+     *  JVM читает скомпилированный класс,
+     *  JVM проверяет структуру,
+     *  JVM выполняет код статических инструкций класса - на этом этапе будет создан экземпляр списка задач
+     * справа налево:
+     * создание экземпляра + создание ссылки на экземпляр + запрет на переопределение ссылки на экземпляр + принадлежность к классу + доступ только внутри класса
+     */
+    private static final TasksList TASKS_LIST = new TasksList();
+
+    // хранилище объектов
+    private final List<Task> tasks;
+
+    /**
+     * Конструктор с областью видимости только в данном классе
+     * Это значит, оператор new выбросит исключение при попытке выполнить конструктор извне класса
+     */
+    private TasksList() {
+        // Проверка: вызван ли через рефлексию?
+        StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+        boolean isReflected = false;
+        for (StackTraceElement element : stackTrace) {
+            if ("java.lang.reflect.Constructor".equals(element.getClassName())) {
+                isReflected = true;
+                break;
+            }
+        }
+        if (isReflected) {
+            throw new AssertionError("Нельзя создавать экземпляр через reflection! Используйте getInstance().");
+        }
+
+        // запись в поле класса ссылки на объект ArrayList
+        //  jvm выделяет память в heap для ArrayList, new вызывает конструктор, конструктор создает экземпляр ArrayList и возвращает ссылку на него
+        //  jvm записывает ссылку на ArrayList в поле tasks экземпляра TasksList
+        this.tasks = new ArrayList<>();
+    }
+
+    /**
+     * Точка доступа к списку задач
+     * @return
+     */
+    public static TasksList getTasksList() {
+        return TASKS_LIST;
+    }
+
 
     /**
      * Создаю объект списка задачи из List задач
