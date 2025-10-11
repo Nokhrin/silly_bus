@@ -36,10 +36,6 @@ import java.io.*;
  * "--about" информация о приложении
  */
 public class TaskTracker {
-    static {
-        System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "trace");
-    }
-
 
     /**
      * Точка входа
@@ -48,7 +44,8 @@ public class TaskTracker {
      */
     public static void main(String[] args) {
         try (BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-             BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out))) {
+             BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
+             BufferedWriter be = new BufferedWriter(new OutputStreamWriter(System.err))) {
 
             // пустой экземпляр списка задач
             TasksList tasksList = new TasksList();
@@ -84,13 +81,14 @@ public class TaskTracker {
                         String[] parts = arg.split("=", 2);
                         if (parts.length > 1) {
                             String fileName = parts[1];
-                            bw.write("Получен путь к файлу задач: " + fileName + '\n');
-                            bw.flush();
-                            tasksList.fromStore(fileName);
-                            break;
-                        } else {
-                            throw new IllegalArgumentException("Для параметра read не получено значение");
+                            if (!fileName.equals("")) {
+                                bw.write("Получен путь к файлу задач: " + fileName + '\n');
+                                bw.flush();
+                                tasksList.fromStore(fileName);
+                                break;
+                            }
                         }
+                        throw new IllegalArgumentException("Некорректное значение параметра read");
                     }
                 }
             }
@@ -118,35 +116,44 @@ public class TaskTracker {
                 if ("help".equalsIgnoreCase(input)) {
                     bw.write("""
                     -список задач
-                    list список задач
-                    add добавить задачу
-                    delete удалить задачу
-                    write экспорт в файл
-                    read импорт из файла
+                    list     список задач
+                    add      добавить задачу
+                    delete   удалить задачу
+                    write    экспорт в файл
+                    read     импорт из файла
+                    
                     -задача
-                    create создать задачу
-                    edit редактировать задачу
-                    show напечатать задачу
+                    create   создать задачу
+                    edit     редактировать задачу
+                    show     напечатать задачу
+                    
                     """);
                     bw.newLine();
                 } else if ("list".equalsIgnoreCase(input)) {
                     if (tasksList.isEmpty()) {
-                        bw.write("Список задач пуст");
+                        if (tasksList.isEmpty()) {
+                            bw.write("""
+                            Список задач пуст
+                            
+                            Введи команду
+                            """);
+                            bw.flush();
+                            continue;
+                        }
+
                     } else {
                         bw.write(tasksList.toString());
                     }
                     bw.newLine();
                 } else if ("add".equalsIgnoreCase(input)) {
                     Task task = new Task();
-                    bw.write("Создана задача " + task);
-                    bw.newLine();
+                    bw.write("Создана задача " + task + "\n\n");
                 } else if ("delete".equalsIgnoreCase(input)) {
-                    bw.write("Удалить задачу");
-
                     bw.write("""
                         Удалить задачу
                         Введи id задачи: """);
 
+                    bw.newLine();
                     bw.newLine();
                     bw.flush();
 
@@ -156,16 +163,30 @@ public class TaskTracker {
                     }
                     Task taskToDelete = tasksList.getTaskById(taskId);
                     if (taskToDelete == null) {
-                        throw new IllegalArgumentException("Задача с id=" + taskId + " не найдена в списке задач");
+                        throw new IllegalArgumentException("Задача с id=" + taskId + " не существует");
                     }
 
-                    tasksList.delTask(taskToDelete);
-                    bw.write("""
-                        Задача удалена
-                        """);
-                    bw.flush();
+                    if (tasksList.delTask(taskToDelete)) {
+                        bw.write("""
+                                Задача успешно удалена
+                                """);
+                    } else {
+                        bw.write("""
+                                Удаление задачи не удалось
+                                """);
+                    }
 
                 } else if ("write".equalsIgnoreCase(input)) {
+                    if (tasksList.isEmpty()) {
+                        bw.write("""
+                            Список задач пуст
+                            
+                            Введи команду
+                            """);
+                        bw.flush();
+                        continue;
+                    }
+
                     bw.write("""
                             Записать задачи в файл
                             Введи имя файла: """);
@@ -179,6 +200,7 @@ public class TaskTracker {
                     tasksList.toStore(fileOut);
 
                     bw.write("Задачи записаны в файл " + fileOut);
+                    bw.newLine();
                     bw.newLine();
 
                 } else if ("read".equalsIgnoreCase(input)) {
@@ -221,6 +243,16 @@ public class TaskTracker {
                     Task task = new Task(taskName, taskOwner);
 
                 } else if ("edit".equalsIgnoreCase(input)) {
+                    if (tasksList.isEmpty()) {
+                        bw.write("""
+                            Список задач пуст
+                            
+                            Введи команду
+                            """);
+                        bw.flush();
+                        continue;
+                    }
+
                     bw.write("""
                         Редактировать задачу
                         Введи id задачи: """);
@@ -231,7 +263,7 @@ public class TaskTracker {
                     }
                     Task taskToEdit = tasksList.getTaskById(taskId);
                     if (taskToEdit == null) {
-                        throw new IllegalArgumentException("Задача с id=" + taskId + " не найдена в списке задач");
+                        throw new IllegalArgumentException("Задача с id=" + taskId + " не существует");
                     }
                     bw.write("""
                         Задача
@@ -282,15 +314,32 @@ public class TaskTracker {
                     bw.flush();
 
                 } else if ("show".equalsIgnoreCase(input)) {
-                    bw.write("Напечатать задачу");
-                    bw.newLine();
-                    bw.write("Введи id задачи: ");
+                    if (tasksList.isEmpty()) {
+                        bw.write("""
+                            Список задач пуст
+                            
+                            Введи команду
+                            """);
+                        bw.flush();
+                        continue;
+                    }
+
+                    bw.write("""
+                        Напечатать задачу
+                        Введи id задачи: """);
                     bw.flush();
 
                     String taskId = br.readLine();
                     if (taskId.trim().equals("")) {
                         throw new IOException("В качестве имени задачи получена пустая строка");
                     }
+
+                    Task task = tasksList.getTaskById(taskId);
+                    if (task == null) {
+                        throw new IllegalArgumentException("Задача с id=" + taskId + " не существует");
+                    }
+
+
                     Task taskToPrint = tasksList.getTasks().get(Integer.parseInt(taskId));
 
                     bw.write("Задача");
