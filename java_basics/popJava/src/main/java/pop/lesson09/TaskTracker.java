@@ -54,12 +54,7 @@ public class TaskTracker {
             TasksList tasksList = new TasksList();
 
             // параметры командной строки
-            if (args.length == 0) {
-                bw.write("Параметры не получены. Продолжаю работу без параметров\n");
-                bw.flush();
-            } else {
-                bw.write("Разбираю параметры\n");
-                bw.flush();
+            if (args.length != 0) {
                 for (String arg : args) {
                     // разбор ключа загрузки задач из файла
                     if ("--about".equals(arg)) {
@@ -72,7 +67,6 @@ public class TaskTracker {
                         return;
 
                     } else if ("--help".equals(arg) || "-h".equals(arg)) {
-                        //  вынести в метод?
                         bw.write("""
                             Запуск: java -jar TaskTracker.jar [опции]
                             --read=путь/к/файлу   Загрузить задачи из файла
@@ -89,9 +83,9 @@ public class TaskTracker {
                     } else if (arg.startsWith("--read")) {
                         String[] parts = arg.split("=", 2);
                         if (parts.length > 1) {
-
-                            // экземпляр списка задач с задачами из файла
                             String fileName = parts[1];
+                            bw.write("Получен путь к файлу задач: " + fileName + '\n');
+                            bw.flush();
                             tasksList.fromStore(fileName);
                             break;
                         } else {
@@ -310,12 +304,13 @@ public class TaskTracker {
                     bw.newLine();
                 }
 
-                bw.flush();  // отображение содержимого буфера
+                bw.flush();
 
             }
 
         } catch (IOException e) {
-            System.out.println("Ошибка ввода / вывода " + e);
+            System.err.println("Ошибка ввода / вывода " + e);
+            System.err.flush();
         }
     }
 }
