@@ -43,6 +43,7 @@ public class Task {
     public Task() {
         this.id = UUID.randomUUID().toString();
         this.create = LocalDateTime.now();
+        this.name = "Задача " + this.id;
         this.modify = this.create;
     }
 
@@ -109,12 +110,12 @@ public class Task {
      * @return строка со значениями всех атрибутов
      */
     public String toString() {
-        return "Задача\n" + "id=" + this.id +
-                ";name=" + this.name +
-                ";owner=" + this.owner +
-                ";create=" + this.create +
-                ";modify=" + this.modify +
-                ";done=" + this.done;
+        return "\nid=" + this.id +
+                "\nname=" + this.name +
+                "\nowner=" + this.owner +
+                "\ncreate=" + this.create +
+                "\nmodify=" + this.modify +
+                "\ndone=" + this.done;
     }
 
     // getters

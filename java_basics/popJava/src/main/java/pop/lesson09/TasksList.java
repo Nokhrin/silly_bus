@@ -59,9 +59,8 @@ public class TasksList {
      * Создаю объект списка задачи из List задач
      */
     public TasksList(List<Task> tasks) {
-        if (tasks == null) {
-            throw new IllegalArgumentException("Вместо списка задач передан null");
-        }
+        Objects.requireNonNull(tasks, "Список задач не может быть null");
+
         this.tasks = new ArrayList<>(tasks);
     }
     /**
@@ -69,17 +68,14 @@ public class TasksList {
      * @param task
      */
     public void addTask(Task task) {
-        if (task == null) {
-            throw new IllegalArgumentException("Вместо объекта задачи передан null");
-        }
+        Objects.requireNonNull(task, "Задача не может быть null");
+
         this.tasks.add(task);
     }
 
-    public void delTask(Task task) {
-        if (task == null) {
-            throw new IllegalArgumentException("Вместо объекта задачи передан null");
-        }
-        this.tasks.remove(task);
+    public boolean delTask(Task task) {
+        Objects.requireNonNull(task, "Задача не может быть null");
+        return this.tasks.remove(task);
     }
 
     /**
