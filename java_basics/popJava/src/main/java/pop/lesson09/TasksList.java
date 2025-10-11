@@ -104,7 +104,7 @@ public class TasksList {
                 this.tasks.add(task);
             }
         } catch (FileNotFoundException e) {
-            throw new IOException(String.format("Файл %s не найден\n%s", filePath, e));
+            throw new FileNotFoundException(String.format("Файл %s не найден\n%s", filePath, e));
         } catch (IOException e) {
             throw new IOException(String.format("Ошибка чтения файла %s\n%s", filePath, e));
         }
