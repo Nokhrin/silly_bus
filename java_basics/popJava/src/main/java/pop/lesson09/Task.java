@@ -14,7 +14,7 @@ import java.util.UUID;
  * @see Task#Task(String, String, String, LocalDateTime, LocalDateTime, boolean)
  * - обновление - для изменения доступны
  *  - заголовок задачи
- *  @see Task#setName(String)
+ *  @see Task#setDefinition(String)
  *  - владелец задачи
  *  @see Task#setOwner(String)
  *  - статуч задачи
@@ -29,8 +29,8 @@ import java.util.UUID;
  *  и, как следствие, удаление экземпляра задачи
  */
 public class Task {
-    private String id; // не должен изменяться после создания
-    private String name; 
+    private final String id; // уникальное неизменяемое значение
+    private String definition;
     private String owner = System.getProperty("user.name");
     private final LocalDateTime create; // не должен изменяться после создания
     private LocalDateTime modify = LocalDateTime.now();
@@ -43,42 +43,42 @@ public class Task {
     public Task() {
         this.id = UUID.randomUUID().toString();
         this.create = LocalDateTime.now();
-        this.name = "Задача " + this.id;
+        this.definition = "Задача " + this.id;
         this.modify = this.create;
     }
 
     /**
      * Конструктор - для импорта из файла - требует значения для всех полей Task
      * @param id
-     * @param name
+     * @param definition
      * @param owner
      * @param create
      * @param modify
      * @param done
      */
-    public Task(String id, String name, String owner, LocalDateTime create, LocalDateTime modify, boolean done) {
+    public Task(String id, String definition, String owner, LocalDateTime create, LocalDateTime modify, boolean done) {
         this.id = id;
-        this.name = name;
+        this.definition = definition;
         this.owner = owner;
         this.create = create;
         this.modify = modify;
         this.done = done;
     }
 
-    public Task(String name, String owner) {
+    public Task(String definition, String owner) {
         this.id = UUID.randomUUID().toString();
         this.create = LocalDateTime.now();
-        this.name = name;
+        this.definition = definition;
         this.owner = owner;
         this.modify = this.create;
         this.done = false;
     }
 
-    public Task(String name) {
+    public Task(String definition) {
         this.id = UUID.randomUUID().toString();
         this.create = LocalDateTime.now();
-        this.name = name;
-        this.owner = System.getProperty("user.name");;
+        this.definition = definition;
+        this.owner = System.getProperty("user.name");
         this.modify = this.create;
         this.done = false;
     }
@@ -88,7 +88,7 @@ public class Task {
      * @return  значения полей, разделенный символом ";"
      */
     public String toStore() {
-        return String.join(";", this.id,  this.name,  this.owner,  this.create.toString(),  this.modify.toString(),  Boolean.toString(this.done));
+        return String.join(";", this.id,  this.definition,  this.owner,  this.create.toString(),  this.modify.toString(),  Boolean.toString(this.done));
     }
 
     public static Task fromStore(String taskAsString) {
@@ -111,7 +111,7 @@ public class Task {
      */
     public String toString() {
         return "\nid=" + this.id +
-                "\nname=" + this.name +
+                "\ndefinition=" + this.definition +
                 "\nowner=" + this.owner +
                 "\ncreate=" + this.create +
                 "\nmodify=" + this.modify +
@@ -122,8 +122,8 @@ public class Task {
     public String getId() {
         return this.id;
     }
-    public String getName() {
-        return this.name;
+    public String getDefinition() {
+        return this.definition;
     }
     public String getOwner() {
         return this.owner;
@@ -139,16 +139,16 @@ public class Task {
     }
 
     // setters
-    public void setName(String name) {
-        if (name == null || name.trim().isEmpty()) {
+    public void setDefinition(String definition) {
+        if (definition == null || definition.trim().isEmpty()) {
             throw new IllegalArgumentException("Название задачи не может быть пустым или null");
         }
-        this.name = name;
+        this.definition = definition;
         this.modify = LocalDateTime.now();
     }
 
     public void setOwner(String owner) {
-        if (name == null || name.trim().isEmpty()) {
+        if (definition == null || definition.trim().isEmpty()) {
             throw new IllegalArgumentException("Имя владельца не может быть пустым или null");
         }
         this.owner = owner;
