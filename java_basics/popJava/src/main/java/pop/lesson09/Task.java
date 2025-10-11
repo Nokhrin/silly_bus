@@ -43,8 +43,18 @@ public class Task {
     public Task() {
         this.id = UUID.randomUUID().toString();
         this.create = LocalDateTime.now();
+        this.modify = this.create;
     }
 
+    /**
+     * Конструктор - для импорта из файла - требует значения для всех полей Task
+     * @param id
+     * @param name
+     * @param owner
+     * @param create
+     * @param modify
+     * @param done
+     */
     public Task(String id, String name, String owner, LocalDateTime create, LocalDateTime modify, boolean done) {
         this.id = id;
         this.name = name;
@@ -52,6 +62,15 @@ public class Task {
         this.create = create;
         this.modify = modify;
         this.done = done;
+    }
+
+    public Task(String name, String owner) {
+        this.id = UUID.randomUUID().toString();
+        this.create = LocalDateTime.now();
+        this.name = name;
+        this.owner = owner;
+        this.modify = this.create;
+        this.done = false;
     }
 
     /**
