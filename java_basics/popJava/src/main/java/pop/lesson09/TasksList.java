@@ -121,21 +121,18 @@ public class TasksList {
     /**
      * Читаю задачи из файла
      * @param filePath путь к файлу с задачами
-     * @return экземпляр TasksList - список задач
      * @throws IOException - файл не найден или ошибка чтения файла
      */
-    public static TasksList fromStore(String filePath) throws IOException {
+    public void fromStore(String filePath) throws IOException {
         if (filePath == null) {
             throw new IllegalArgumentException("Вместо пути к файлу передан null");
         }
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
-            var tasksList = new TasksList(new ArrayList<>());
             String line;
             while ((line = br.readLine()) != null) {
                 var task = Task.fromStore(line);
-                tasksList.tasks.add(task);
+                this.tasks.add(task);
             }
-            return tasksList;
         } catch (FileNotFoundException e) {
             throw new IOException(String.format("Файл %s не найден\n%s", filePath, e));
         } catch (IOException e) {
