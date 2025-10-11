@@ -52,9 +52,29 @@ public class TaskTracker {
                         if (parts.length > 1) {
                             String fileName = parts[1];
                             if (!fileName.equals("")) {
-                                bw.write("Получен путь к файлу задач: " + fileName + '\n');
+                                bw.write(String.format("""
+                                        Получено имя файла задач
+                                        '%s'
+                                        
+                                        """, fileName));
+
+                                try {
+                                    tasksList.fromStore(fileName);
+                                } catch (FileNotFoundException e) {
+                                    bw.write(String.format("""
+                                    Файл '%s' не найден
+                                    
+                                    """, fileName));
+                                    bw.flush();
+                                    return;
+                                }
+
+                                bw.write(String.format("""
+                                Добавлены задачи из файла '%s'
+                                
+                                """, fileName));
+
                                 bw.flush();
-                                tasksList.fromStore(fileName);
                                 break;
                             }
                         }
@@ -70,7 +90,6 @@ public class TaskTracker {
                     >>> Трекер задач <<<
                                         
                     help    справка о командах
-                    quit    завершение работы
                                         
                     """);
 
@@ -80,7 +99,7 @@ public class TaskTracker {
             while ((input = br.readLine()) != null) {
                 input = input.trim();
 
-                if ("".equals(input) || "quit".equalsIgnoreCase(input)) {
+                if ("quit".equalsIgnoreCase(input)) {
                     bw.write("""
                             
                             Завершаю работу Трекера
@@ -91,14 +110,16 @@ public class TaskTracker {
                 if ("help".equalsIgnoreCase(input)) {
                     bw.write("""
                                                 
-                            list     напечатать список задач
-                            add      создать задачу
-                            show     напечатать задачу
-                            edit     редактировать задачу
-                            delete   удалить задачу
+                            list    напечатать список задач
+                            add     создать задачу
+                            show    напечатать задачу
+                            edit    редактировать задачу
+                            delete  удалить задачу
                             
-                            write    экспорт списка задач в файл
-                            read     импорт списка задач из файла
+                            write   экспорт списка задач в файл
+                            read    импорт списка задач из файла
+                            
+                            quit    завершить работу
                                                 
                             """);
                 } else if ("list".equalsIgnoreCase(input)) {
@@ -138,8 +159,8 @@ public class TaskTracker {
                         bw.flush();
                         taskDefinition = br.readLine();
                         if (taskDefinition.trim().isEmpty()) {
-                            be.write("Значение не может быть пустым\n\n");
-                            be.flush();
+                            bw.write("Значение не может быть пустым\n\n");
+                            bw.flush();
                         }
                     }
 
@@ -149,8 +170,8 @@ public class TaskTracker {
                         bw.flush();
                         taskOwner = br.readLine();
                         if (taskOwner.trim().isEmpty()) {
-                            be.write("Значение не может быть пустым\n\n");
-                            be.flush();
+                            bw.write("Значение не может быть пустым\n\n");
+                            bw.flush();
                         }
                     }
 
@@ -164,50 +185,56 @@ public class TaskTracker {
                             """, task));
 
                 } else if ("delete".equalsIgnoreCase(input)) {
-                    bw.write("""
-                            
-                            Удалить задачу
-                            
-                            """);
+                    if (tasksList.isEmpty()) {
+                        bw.write("""
+                                Список задач пуст
+                                                            
+                                """);
+                    } else {
+                        bw.write("""
+                                                            
+                                Удалить задачу
+                                                            
+                                """);
 
-                    String taskId = "";
-                    while (taskId.trim().isEmpty()) {
-                        bw.write("Введи id задачи\n> ");
-                        bw.flush();
-                        taskId = br.readLine();
-                        if (taskId.trim().isEmpty()) {
-                            be.write("Значение не может быть пустым\n\n");
-                            be.flush();
-                            continue;
-                        }
-                        Task taskToDelete = tasksList.getTaskById(taskId);
-                        if (taskToDelete == null) {
-                            be.write(String.format("""
-                                    Задача
-                                    id=%s
-                                    не существует
-                                    
-                                    """, taskId));
-                            be.flush();
-                            continue;
-                        }
-                        if (tasksList.delTask(taskToDelete)) {
-                            bw.write(String.format("""
-                                    Задача
-                                    id=%s
-                                    успешно удалена
-                                    
-                                    """, taskId));
-                        } else {
-                            bw.write(String.format("""
-                                    Удаление задачи
-                                    id=%s
-                                    провалилось
-                                    
-                                    """, taskId));
+                        String taskId = "";
+                        while (taskId.trim().isEmpty()) {
+                            bw.write("Введи id задачи\n> ");
+                            bw.flush();
+                            taskId = br.readLine();
+                            if (taskId.trim().isEmpty()) {
+                                bw.write("Значение не может быть пустым\n\n");
+                                bw.flush();
+                                continue;
+                            }
+                            Task taskToDelete = tasksList.getTaskById(taskId);
+                            if (taskToDelete == null) {
+                                bw.write(String.format("""
+                                        Задача
+                                        id=%s
+                                        не существует
+                                                                            
+                                        """, taskId));
+                                bw.flush();
+                                continue;
+                            }
+                            if (tasksList.delTask(taskToDelete)) {
+                                bw.write(String.format("""
+                                        Задача
+                                        id=%s
+                                        успешно удалена
+                                                                            
+                                        """, taskId));
+                            } else {
+                                bw.write(String.format("""
+                                        Удаление задачи
+                                        id=%s
+                                        провалилось
+                                                                            
+                                        """, taskId));
+                            }
                         }
                     }
-
                 } else if ("write".equalsIgnoreCase(input)) {
                     if (tasksList.isEmpty()) {
                         bw.write("""
@@ -230,13 +257,16 @@ public class TaskTracker {
                             bw.flush();
                             fileName = br.readLine();
                             if (fileName.trim().isEmpty()) {
-                                be.write("Значение не может быть пустым\n\n");
-                                be.flush();
+                                bw.write("Значение не может быть пустым\n\n");
+                                bw.flush();
                                 continue;
                             }
                             tasksList.toStore(fileName);
 
-                            bw.write("Задачи записаны в файл " + fileName + "\n\n");
+                            bw.write(String.format("""
+                                Задачи записаны в файл '%s'
+                                
+                                """, fileName));
                         }
                     }
 
@@ -253,23 +283,23 @@ public class TaskTracker {
                         bw.flush();
                         fileName = br.readLine();
                         if (fileName.trim().isEmpty()) {
-                            be.write("Значение не может быть пустым\n\n");
-                            be.flush();
+                            bw.write("Значение не может быть пустым\n\n");
+                            bw.flush();
                             continue;
                         }
                         try {
                             tasksList.fromStore(fileName);
                         } catch (FileNotFoundException e) {
-                            be.write(String.format("""
-                                    Файл %s не найден
+                            bw.write(String.format("""
+                                    Файл '%s' не найден
                                     
                                     """, fileName));
-                            be.flush();
+                            bw.flush();
                             continue;
                         }
 
                         bw.write(String.format("""
-                                Добавлены задачи из файла %s
+                                Добавлены задачи из файла '%s'
                                 
                                 """, fileName));
                     }
@@ -280,107 +310,106 @@ public class TaskTracker {
                                 Список задач пуст
                                                             
                                 """);
-                        bw.flush();
-                        continue;
-                    }
+                    } else {
 
-                    bw.write("""
-                            
-                            Редактировать задачу
-                            
-                            """);
+                        bw.write("""
+                                                            
+                                Редактировать задачу
+                                                            
+                                """);
 
-                    String taskId = "";
-                    while (taskId.trim().isEmpty()) {
-                        bw.write("Введи id задачи\n> ");
-                        bw.flush();
-                        taskId = br.readLine();
-                        if (taskId.trim().isEmpty()) {
-                            be.write("Значение не может быть пустым\n\n");
-                            be.flush();
-                            continue;
-                        }
-                        Task taskToEdit = tasksList.getTaskById(taskId);
-                        if (taskToEdit == null) {
-                            be.write("Задача с id=" + taskId + " не существует");
-                            be.flush();
-                            continue;
-                        }
-
-                        bw.write(String.format("""
-                                Задача
-                                                                
-                                %s
-                                                                
-                                Поля для редактирования
-                                  definition - постановка
-                                  owner      - владелец
-                                  done       - выполнена/не выполнена
-                                                        
-                                """, taskToEdit));
-                        bw.flush();
-
-                        String fieldName = "";
-                        while (fieldName.trim().isEmpty()) {
-                            bw.write("Введи имя поля для редактирования\n> ");
+                        String taskId = "";
+                        while (taskId.trim().isEmpty()) {
+                            bw.write("Введи id задачи\n> ");
                             bw.flush();
-                            fieldName = br.readLine();
-                            if (fieldName.trim().isEmpty()) {
-                                be.write("Значение не может быть пустым\n\n");
-                                be.flush();
+                            taskId = br.readLine();
+                            if (taskId.trim().isEmpty()) {
+                                bw.write("Значение не может быть пустым\n\n");
+                                bw.flush();
+                                continue;
+                            }
+                            Task taskToEdit = tasksList.getTaskById(taskId);
+                            if (taskToEdit == null) {
+                                bw.write("Задача с id=" + taskId + " не существует");
+                                bw.flush();
                                 continue;
                             }
 
-                            if (fieldName.trim().equalsIgnoreCase("definition")) {
-                                String taskDefinition = "";
-                                while (taskDefinition.trim().isEmpty()) {
-                                    bw.write("Введи постановку задачи\n> ");
-                                    bw.flush();
-                                    taskDefinition = br.readLine();
-                                    if (taskDefinition.trim().isEmpty()) {
-                                        be.write("Значение не может быть пустым\n\n");
-                                        be.flush();
-                                    }
-                                }
-                                taskToEdit.setDefinition(taskDefinition);
+                            bw.write(String.format("""
+                                    Задача
+                                                                    
+                                    %s
+                                                                    
+                                    Поля для редактирования
+                                      definition - постановка
+                                      owner      - владелец
+                                      done       - выполнена/не выполнена
+                                                            
+                                    """, taskToEdit));
+                            bw.flush();
 
-                            } else if (fieldName.trim().equalsIgnoreCase("owner")) {
-                                String taskOwner = "";
-                                while (taskOwner.trim().isEmpty()) {
-                                    bw.write("Введи нового владельца задачи:\n> ");
-                                    bw.flush();
-                                    taskOwner = br.readLine();
-                                    if (taskOwner.trim().isEmpty()) {
-                                        be.write("Значение не может быть пустым\n\n");
-                                        be.flush();
-                                    }
-                                }
-                                taskToEdit.setDefinition(taskOwner);
-
-                            } else if (fieldName.trim().equalsIgnoreCase("done")) {
-                                String taskDone = "";
-                                while (taskDone.trim().isEmpty()) {
-                                    bw.write("""
-                                            Введи + для установки статуса Выполнено
-                                            Введи - для установки статуса Не выполнено
-                                            > """);
-                                    bw.flush();
-                                    taskDone = br.readLine();
-                                    if (!(taskDone.trim().equals("+") || taskDone.trim().equals("-"))) {
-                                        be.write("Получено некорректное значение\n\n");
-                                        be.flush();
-                                    }
-                                }
-                                if (taskDone.trim().equals("+")) {
-                                    taskToEdit.setDone(true);
-                                } else if (taskDone.trim().equals("-")) {
-                                    taskToEdit.setDone(false);
-                                }
-                                bw.write("""
-                                            Статус задачи изменен
-                                            
-                                            """);
+                            String fieldName = "";
+                            while (fieldName.trim().isEmpty()) {
+                                bw.write("Введи имя поля для редактирования\n> ");
                                 bw.flush();
+                                fieldName = br.readLine();
+                                if (fieldName.trim().isEmpty()) {
+                                    bw.write("Значение не может быть пустым\n\n");
+                                    bw.flush();
+                                    continue;
+                                }
+
+                                if (fieldName.trim().equalsIgnoreCase("definition")) {
+                                    String taskDefinition = "";
+                                    while (taskDefinition.trim().isEmpty()) {
+                                        bw.write("Введи постановку задачи\n> ");
+                                        bw.flush();
+                                        taskDefinition = br.readLine();
+                                        if (taskDefinition.trim().isEmpty()) {
+                                            bw.write("Значение не может быть пустым\n\n");
+                                            bw.flush();
+                                        }
+                                    }
+                                    taskToEdit.setDefinition(taskDefinition);
+
+                                } else if (fieldName.trim().equalsIgnoreCase("owner")) {
+                                    String taskOwner = "";
+                                    while (taskOwner.trim().isEmpty()) {
+                                        bw.write("Введи нового владельца задачи:\n> ");
+                                        bw.flush();
+                                        taskOwner = br.readLine();
+                                        if (taskOwner.trim().isEmpty()) {
+                                            bw.write("Значение не может быть пустым\n\n");
+                                            bw.flush();
+                                        }
+                                    }
+                                    taskToEdit.setDefinition(taskOwner);
+
+                                } else if (fieldName.trim().equalsIgnoreCase("done")) {
+                                    String taskDone = "";
+                                    while (taskDone.trim().isEmpty()) {
+                                        bw.write("""
+                                                Введи + для установки статуса Выполнено
+                                                Введи - для установки статуса Не выполнено
+                                                > """);
+                                        bw.flush();
+                                        taskDone = br.readLine();
+                                        if (!(taskDone.trim().equals("+") || taskDone.trim().equals("-"))) {
+                                            bw.write("Получено некорректное значение\n\n");
+                                            bw.flush();
+                                        }
+                                    }
+                                    if (taskDone.trim().equals("+")) {
+                                        taskToEdit.setDone(true);
+                                    } else if (taskDone.trim().equals("-")) {
+                                        taskToEdit.setDone(false);
+                                    }
+                                    bw.write("""
+                                            Статус задачи изменен
+                                                                                        
+                                            """);
+                                    bw.flush();
+                                }
                             }
                         }
                     }
@@ -406,14 +435,14 @@ public class TaskTracker {
                             bw.flush();
                             taskId = br.readLine();
                             if (taskId.trim().isEmpty()) {
-                                be.write("Значение не может быть пустым\n\n");
-                                be.flush();
+                                bw.write("Значение не может быть пустым\n\n");
+                                bw.flush();
                                 continue;
                             }
                             Task task = tasksList.getTaskById(taskId);
                             if (task == null) {
-                                be.write("Задача с id=" + taskId + " не существует\n\n");
-                                be.flush();
+                                bw.write("Задача с id=" + taskId + " не существует\n\n");
+                                bw.flush();
                                 continue;
                             }
                             Task taskToPrint = tasksList.getTaskById(taskId);
@@ -430,8 +459,11 @@ public class TaskTracker {
                     bw.flush();
 
                 } else {
-                    be.write("'" + input + "' не является командой\n\n");
-                    be.flush();
+                    bw.write(String.format("""
+                            '%s' не является командой
+                            
+                            """, input));
+                    bw.flush();
                 }
 
                 bw.write("Введи команду\n> ");
