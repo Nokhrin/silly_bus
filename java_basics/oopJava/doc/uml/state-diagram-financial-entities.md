@@ -4,13 +4,17 @@ title: Счет / Account
 ---
 
 stateDiagram-v2
-    [*] --> Created : создать счет
+    direction TB
+    classDef trueBranch fill:#00ff00,color:black,font-weight:bold,stroke-width:2px,stroke:yellow
+    classDef falseBranch fill:#f00,color:white,font-weight:bold,stroke-width:2px,stroke:yellow
+
+    [*] --> Active : создать счет
     
-    Created --> Closed : закрыть счет
-    Closed --> Created : открыть счет
+    Active --> Closed : закрыть счет
+    Closed --> Active : открыть счет
 
     %% Пополнение
-    Created --> Deposit
+    Active --> Deposit
 
     
     state Deposit {
@@ -27,11 +31,11 @@ stateDiagram-v2
         BalanceAfterDeposit --> [*] : сообщить об успехе операции
 
     }
-    Deposit --> Created
+    Deposit --> Active
 
 
     %% Снятие
-    Created --> Withdrawal
+    Active --> Withdrawal
     
 
     
@@ -53,11 +57,11 @@ stateDiagram-v2
         BalanceAfterWithdrawal --> [*] : сообщить об успехе операции
 
     }
-    Withdrawal --> Created
+    Withdrawal --> Active
 
 
     %% Перевод
-    Created --> Transfer
+    Active --> Transfer
     
     state Transfer {
 
@@ -83,8 +87,13 @@ stateDiagram-v2
         BalanceAfterTransfer --> [*] : сообщить об успехе операции
 
     }
-    Transfer --> Created
+    Transfer --> Active
 
 
     Closed --> [*]
+
+    %% Стили
+    class Active, DepositCompleted, WithdrawalCompleted, TransferCompleted trueBranch
+    class Closed falseBranch
+
 ```
