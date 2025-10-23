@@ -1,81 +1,84 @@
 ```mermaid
-
 ---
 title: Счет / Account
 ---
 
 stateDiagram-v2
-    direction LR
-    %%Created : создан, не активен
-    %%Active : активен, баланс > 0, операции возможны
-    %%Overdrawn : активен, баланс < 0, операции невозможны
-    %%Closed : закрыт
-
     [*] --> Created : создание
-    Created --> Active : активация
-
-    %% Операции
-
-    %% Пополнение
-    Active --> Deposit
     
-    state if_balance_positive_Deposit <<choice>>
-
+    %% Пополнение
+    Created --> Deposit
+    
     state Deposit {
-        direction LR
-        [*] --> performDeposit : выполнить пополнение
-        performDeposit --> updateBalanceDeposit
-        updateBalanceDeposit --> DepositCompleted
+        [*] --> DepositStarted : выполнить пополнение
+        DepositStarted --> BalanceAfterDeposit : обновить значение баланса
+        BalanceAfterDeposit --> DepositCompleted : завершить Пополнение
         DepositCompleted --> [*]
     }
-    Deposit --> if_balance_positive_Deposit
-    if_balance_positive_Deposit --> Active : if balance >= 0
-    if_balance_positive_Deposit --> Overdrawn: if balance < 0
+    Deposit --> Created
 
+    note left of DepositStarted
+        Пополнение начато
+    end note
+    note left of BalanceAfterDeposit
+        Обновление баланса после пополнения
+    end note
+    note left of DepositCompleted
+        Пополнение завершено
+    end note
 
     %% Снятие
-    Active --> Withdrawal
+    Created --> Withdrawal
     
-    state Withdrawal {
-        direction LR
-        [*] --> performWithdrawal : выполнить снятие
-        performWithdrawal --> updateBalanceWithdrawal
-        updateBalanceWithdrawal --> WithdrawalCompleted
-        WithdrawalCompleted --> [*]
-    }
 
     state if_balance_positive_Withdrawal <<choice>>
-    Withdrawal --> if_balance_positive_Withdrawal
-    if_balance_positive_Withdrawal --> Active : if balance >= 0
-    if_balance_positive_Withdrawal --> Overdrawn: if balance < 0
+    state Withdrawal {
+        [*] --> if_balance_positive_Withdrawal : проверка баланса
+        if_balance_positive_Withdrawal --> [*] : баланс <= 0, прервать Снятие
+
+        if_balance_positive_Withdrawal --> WithdrawalStarted : баланс > 0, выполнить Снятие
+        WithdrawalStarted --> BalanceAfterWithdrawal : обновить значение баланса
+        BalanceAfterWithdrawal --> WithdrawalCompleted : завершить Снятие
+        WithdrawalCompleted --> [*]
+    }
+    Withdrawal --> Created
+
+    note left of WithdrawalStarted
+        Пополнение начато
+    end note
+    note left of BalanceAfterWithdrawal
+        Обновление баланса после пополнения
+    end note
+    note left of WithdrawalCompleted
+        Пополнение завершено
+    end note
 
 
     %% Перевод
-    Active --> Transfer
-
-    state if_valid_recipient <<choice>>
-    state Transfer {
-        direction LR
-        [*] --> getRecipient : определить получателя
-        getRecipient --> if_valid_recipient
-        if_valid_recipient --> performTransfer : получатель подтвержден
-        performTransfer --> updateBalanceTransfer
-        updateBalanceTransfer --> TransferCompleted
-        if_valid_recipient --> TransferCompleted : получатель не подтвержден
-        TransferCompleted --> [*]
-    }
+    Created --> Transfer
 
     state if_balance_positive_Transfer <<choice>>
-    Transfer --> if_balance_positive_Transfer
-    if_balance_positive_Transfer --> Active : if balance >= 0
-    if_balance_positive_Transfer --> Overdrawn: if balance < 0
+    state Transfer {
+        [*] --> if_balance_positive_Transfer : проверка баланса
+        if_balance_positive_Transfer --> [*] : баланс <= 0, прервать Перевод
 
-    Overdrawn --> Active : пополнение до положительного баланса
+        if_balance_positive_Transfer --> TransferStarted : баланс > 0, начать Перевод
+        TransferStarted --> BalanceAfterTransfer : обновить значение баланса
+        BalanceAfterTransfer --> TransferCompleted : завершить Перевод
+        TransferCompleted --> [*]
+    }
+    Transfer --> Created
 
-    Created --> Closed : закрытие
-    Active --> Closed : закрытие
-    Overdrawn --> Closed : закрытие
+    note left of TransferStarted
+        Перевод начат
+    end note
+    note left of BalanceAfterTransfer
+        Обновление баланса после перевода
+    end note
+    note left of TransferCompleted
+        Перевод завершен
+    end note
 
-    Closed --> [*] : операции невозможны
+    Created --> [*] : закрытие
 
 ```
