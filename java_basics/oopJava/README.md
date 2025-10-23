@@ -14,13 +14,13 @@
      - Частичный доступ protected, default
      - интерфейсы
      - Под-типизация (Sub typing)
-   ▪ instance of
-   ▪ pattern matching (switch)
+   - instance of
+   - pattern matching (switch)
      - Не предвиденное поведение из-за наследования
-   ▪ Нарушение equals / hashcode
+   - Нарушение equals / hashcode
      - Ограничение наследования
-   ▪ final (record /classes)
-   ▪ sealed
+   - final (record /classes)
+   - sealed
    - pattern matching
 
 ## задачи
@@ -50,10 +50,6 @@
 ---
 
 ## Стартовая теория
-
-там задачи ООП вполне определенные
-но прям кидаться без понимания не надо
-надо разбратся
 
 1) создание классов
 2) наследование и виртуальные методы / полиморфизм
