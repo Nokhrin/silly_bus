@@ -9,7 +9,6 @@ stateDiagram-v2
     classDef falseBranch fill:#f00,color:white,font-weight:bold,stroke-width:2px,stroke:yellow
 
     [*] --> Active : создать счет
-    
     Active --> Closed : закрыть счет
     Closed --> Active : открыть счет
 
@@ -18,18 +17,17 @@ stateDiagram-v2
 
     
     state Deposit {
-        state if_account_exists_Deposit <<choice>>    
-        [*] --> if_account_exists_Deposit : проверить существование счета начисления
-        if_account_exists_Deposit --> [*] : счет начисления не существует, отменить операцию, сообщить об ошибке
+        [*] --> AccountValidDeposit : проверить существование счета начисления
+        AccountValidDeposit --> DepositFailed : счет начисления не существует, отменить операцию, сообщить об ошибке
 
-        state if_sum_positive_Deposit <<choice>>
-        if_account_exists_Deposit --> if_sum_positive_Deposit : счет начисления существует, проверить сумму
-        if_sum_positive_Deposit --> [*] : сумма <= 0, отменить операцию, сообщить об ошибке
+        AccountValidDeposit --> SumPositiveDeposit : счет начисления существует, проверить сумму
+        SumPositiveDeposit --> DepositFailed : сумма <= 0, отменить операцию, сообщить об ошибке
 
-        if_sum_positive_Deposit --> DepositCompleted : сумма > 0, выполнить операцию
+        SumPositiveDeposit --> DepositCompleted : сумма > 0, выполнить операцию
         DepositCompleted --> BalanceAfterDeposit : обновить значение баланса
         BalanceAfterDeposit --> [*] : сообщить об успехе операции
 
+        DepositFailed --> [*] : сообщить о провале операции
     }
     Deposit --> Active
 
@@ -40,22 +38,20 @@ stateDiagram-v2
 
     
     state Withdrawal {
-        state if_account_exists_Withdrawal <<choice>>  
-        [*] --> if_account_exists_Withdrawal : проверить существование счета списания
-        if_account_exists_Withdrawal --> [*] : счет списания не существует, отменить операцию, сообщить об ошибке
+        [*] --> AccountValidWithdrawal : проверить существование счета списания
+        AccountValidWithdrawal --> WithdrawalFailed : счет списания не существует, отменить операцию, сообщить об ошибке
 
-        state if_sum_positive_Withdrawal <<choice>>
-        if_account_exists_Withdrawal --> if_sum_positive_Withdrawal : счет списания существует, проверить сумму
-        if_sum_positive_Withdrawal --> [*] : сумма <= 0, отменить операцию, сообщить об ошибке
+        AccountValidWithdrawal --> SumPositiveWithdrawal : счет списания существует, проверить сумму
+        SumPositiveWithdrawal --> WithdrawalFailed : сумма <= 0, отменить операцию, сообщить об ошибке
         
-        state if_balance_positive_Withdrawal <<choice>>      
-        if_sum_positive_Withdrawal --> if_balance_positive_Withdrawal : проверить "баланс-сумма"
-        if_balance_positive_Withdrawal --> WithdrawalCompleted : "баланс-сумма" >= 0, выполнить операцию
-        if_balance_positive_Withdrawal --> [*] : "баланс-сумма" <= 0, отменить операцию, сообщить об ошибке
+        SumPositiveWithdrawal --> BalancePositiveWithdrawal : проверить "баланс-сумма"
+        BalancePositiveWithdrawal --> WithdrawalFailed : "баланс-сумма" <= 0, отменить операцию, сообщить об ошибке
+        BalancePositiveWithdrawal --> WithdrawalCompleted : "баланс-сумма" >= 0, выполнить операцию
 
         WithdrawalCompleted --> BalanceAfterWithdrawal : обновить значение баланса
         BalanceAfterWithdrawal --> [*] : сообщить об успехе операции
 
+        WithdrawalFailed --> [*] : сообщить о провале операции
     }
     Withdrawal --> Active
 
@@ -65,35 +61,43 @@ stateDiagram-v2
     
     state Transfer {
 
-        state if_source_account_exists_Transfer <<choice>>    
-        [*] --> if_source_account_exists_Transfer : проверить счет списания
-        if_source_account_exists_Transfer --> [*] : счет списания не существует, отменить операцию, сообщить об ошибке
+        [*] --> SourceAccountValid : проверить счет списания
+        SourceAccountValid --> TransferFailed : счет списания не существует, отменить операцию, сообщить об ошибке
 
-        state if_target_account_exists_Transfer <<choice>>    
-        if_source_account_exists_Transfer --> if_target_account_exists_Transfer : проверить счет начисления
-        if_target_account_exists_Transfer --> [*] : счет начисления не существует, отменить операцию, сообщить об ошибке
+        SourceAccountValid --> TargetAccountValid : проверить счет начисления
+        TargetAccountValid --> TransferFailed : счет начисления не существует, отменить операцию, сообщить об ошибке
 
-        state if_sum_positive_Transfer <<choice>>
-        if_target_account_exists_Transfer --> if_sum_positive_Transfer : счет списания существует, проверить сумму
-        if_sum_positive_Transfer --> [*] : сумма <= 0, отменить операцию, сообщить об ошибке
+        TargetAccountValid --> SumPositiveTransfer : счет списания существует, проверить сумму
+        SumPositiveTransfer --> TransferFailed : сумма <= 0, отменить операцию, сообщить об ошибке
 
-        state if_balance_positive_Transfer <<choice>>
-        if_sum_positive_Transfer --> if_balance_positive_Transfer : проверить "баланс-сумма"
-        if_balance_positive_Transfer --> [*] : "баланс-сумма" <= 0, отменить операцию, сообщить об ошибке
+        SumPositiveTransfer --> BalancePositiveTransfer : проверить "баланс-сумма"
+        BalancePositiveTransfer --> TransferFailed : "баланс-сумма" <= 0, отменить операцию, сообщить об ошибке
 
-        if_balance_positive_Transfer --> TransferCompleted : "баланс-сумма" >= 0, выполнить операцию
+        BalancePositiveTransfer --> TransferCompleted : "баланс-сумма" >= 0, выполнить операцию
 
         TransferCompleted --> BalanceAfterTransfer : обновить значение баланса на исходном и целевом счетах
         BalanceAfterTransfer --> [*] : сообщить об успехе операции
+
+        TransferFailed --> [*] : сообщить о провале операции
 
     }
     Transfer --> Active
 
 
-    Closed --> [*]
-
     %% Стили
+    %% Общие
     class Active, DepositCompleted, WithdrawalCompleted, TransferCompleted trueBranch
-    class Closed falseBranch
+    class Closed, DepositFailed, WithdrawalFailed, TransferFailed falseBranch
+
+    %% Пополнение
+    class AccountValidDeposit, SumPositiveDeposit, BalancePositiveDeposit trueBranch
+
+    %% Снятие
+    class AccountValidWithdrawal, SumPositiveWithdrawal, BalancePositiveWithdrawal trueBranch
+
+    %% Перевод
+    class SourceAccountValid, TargetAccountValid, SumPositiveTransfer, BalancePositiveTransfer trueBranch
+
+    Closed --> [*]
 
 ```
