@@ -10,12 +10,9 @@ classDiagram
     class Account{
         -final UUID id
         -BigInteger balance
-        -List~UUID~ operations
         +getId() UUID
         +getBalance() BigInteger
-        +getOperations() List~UUID~
-        +deposit(balance)
-        +withdraw(balance)
+        +setBalance(amount) BigInteger
     }
     
     class Operation{
@@ -23,7 +20,6 @@ classDiagram
         <<Abstract>>
         -final UUID id
         -BigInteger amount
-        -Currency currencyCode
         -LocalDateTime completionTime
         +getId() UUID
         +perform(amount)
