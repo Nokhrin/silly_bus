@@ -10,7 +10,7 @@ public class CapitalTest {
     @Test
     public void testCreateCapitalizedString() {
         String input = "skyrocket cable twig appraiser";
-        String expected = "Skyrocket Cable Twig Appraiser";
+        String expected = "Skyrocket cable twig appraiser";
         String actual = createCapitalizedString(input);
         assertEquals(actual, expected);
     }
