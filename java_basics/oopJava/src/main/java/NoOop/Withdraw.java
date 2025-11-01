@@ -2,6 +2,9 @@ package NoOop;
 
 import java.math.BigDecimal;
 
+/**
+ * Снятие
+ */
 public class Withdraw {
     private BigDecimal amount;
     private Account source;
@@ -28,6 +31,7 @@ public class Withdraw {
                         Счет-отправитель %s, баланс %.2f RUB
                         """, source, source.getBalance(),
                 System.lineSeparator());
+        System.out.println();
         System.out.flush();
     }
 }

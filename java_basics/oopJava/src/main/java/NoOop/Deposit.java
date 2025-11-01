@@ -2,6 +2,9 @@ package NoOop;
 
 import java.math.BigDecimal;
 
+/**
+ * Зачисление
+ */
 public class Deposit {
     private BigDecimal amount;
     private Account target;
@@ -28,6 +31,7 @@ public class Deposit {
                         Счет-получатель %s, баланс %.2f RUB
                         """, target, target.getBalance(),
                 System.lineSeparator());
+        System.out.println();
         System.out.flush();
     }
 }

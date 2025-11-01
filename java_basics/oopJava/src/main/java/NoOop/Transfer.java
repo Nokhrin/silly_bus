@@ -2,6 +2,9 @@ package NoOop;
 
 import java.math.BigDecimal;
 
+/**
+ * Перевод
+ */
 public class Transfer {
     private BigDecimal amount;
     private Account source;
@@ -13,7 +16,7 @@ public class Transfer {
         this.target = target;
     }
 
-    public void transferAmountFromTo() {
+    public void performTransfer() {
         System.out.printf("""
             Счет-отправитель %s, баланс %.2f RUB
             Счет-получатель %s, баланс %.2f RUB
@@ -33,6 +36,6 @@ public class Transfer {
             Счет-получатель %s, баланс %.2f RUB
             """, source, source.getBalance(), target, target.getBalance(),
                 System.lineSeparator());
-        System.out.flush();
-    }
+        System.out.println();
+        System.out.flush();    }
 }
