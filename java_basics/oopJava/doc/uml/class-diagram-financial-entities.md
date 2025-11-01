@@ -1,5 +1,4 @@
 ```mermaid
-
 ---
 title: Bank account management
 ---
@@ -9,19 +8,15 @@ classDiagram
 
     class Account{
         -final UUID id
-        -BigInteger balance
-        +getId() UUID
-        +getBalance() BigInteger
-        +setBalance(amount) BigInteger
+        -BigDecimal balance
+        +getBalance() BigDecimal
+        +setBalance(amount) BigDecimal
     }
     
     class Operation{
-        %% абстрактный - так как существует только в контексте операций-наследников
+        %% абстрактный - существует только в контексте операций-наследников
         <<Abstract>>
-        -final UUID id
-        -BigInteger amount
-        -LocalDateTime completionTime
-        +getId() UUID
+        -BigDecimal amount
         +perform(amount)
     }
 
@@ -32,7 +27,7 @@ classDiagram
     Operation <|-- Deposit : implements
     Deposit : -Account targetAccount
 
-    Account "1" o-- "0..*" Deposit : aggregation
+    Account "1" o-- "0..*" Deposit : aggregates
 
 
     %% Снятие
@@ -40,7 +35,7 @@ classDiagram
     %% Баланс >= сумма снятия
     Withdrawal : -Account sourceAccount
     
-    Account "1" o-- "0..*" Withdrawal : aggregation
+    Account "1" o-- "0..*" Withdrawal : aggregates
     
 
     %% Перевод
@@ -49,7 +44,7 @@ classDiagram
     Transfer : -Account sourceAccount
     Transfer : -Account targetAccount
     
-    Account "1" o-- "0..*" Transfer : aggregation
+    Account "1" o-- "0..*" Transfer : aggregates
 
     
     namespace Operations {
@@ -58,5 +53,4 @@ classDiagram
         class Transfer
         class Withdrawal
     }
-
 ```
