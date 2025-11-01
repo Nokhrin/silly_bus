@@ -9,8 +9,9 @@ public class Deposit {
         this.amount = amount;
     }
 
-    public void addMoneyToAccount(Account account) {
+    public void depositAccount(Account account) {
         account.deposit(this.amount);
+        System.out.println("Пополнил счет " + account + " на " + this.amount + " единиц");
     }
 }
 
