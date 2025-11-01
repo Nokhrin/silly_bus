@@ -3,25 +3,25 @@ package NoOop;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.math.BigDecimal;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Queue;
 
-public class OpsQueue {
+public class OpsQueueWithReflection {
     public static void main(String[] args) {
 
-        System.out.println("\nСоздать очередь операций\n");
-        Queue<Object> opsQueue = new LinkedList<>();
+        System.out.println("\nСоздать счета\n");
+        System.out.println("=".repeat(88));
 
         Account acc1 = new Account(BigDecimal.valueOf(5000.00)); // * - **Счет 1**: `1`, баланс: **5000.00 ₽**
         System.out.printf("создан счет %s, баланс %.2f ₽%n", acc1, acc1.getBalance());
-        System.out.flush();
-
         Account acc2 = new Account(BigDecimal.valueOf(3000.00)); // * - **Счет 2**: `2`, баланс: **3000.00 ₽**
         System.out.printf("создан счет %s, баланс %.2f ₽%n", acc2, acc2.getBalance());
-
         System.out.println("=".repeat(88));
         System.out.flush();
+
+        System.out.println("\nСоздать очередь операций\n");
+        Queue<Object> opsQueue = new LinkedList<>();
+        System.out.println("=".repeat(88));
 
         opsQueue.add(new Deposit(BigDecimal.valueOf(800.00), acc1)); // * | 1   | **Зачисление** | Сумма: 800.00, Счет-получатель: `1`            | Счет 1: **5800.00**                      |
         opsQueue.add(new Withdraw(BigDecimal.valueOf(600.00), acc2)); // * | 2   | **Снятие**     | Сумма: 600.00, Счет-источник: `2`              | Счет 2: **2400.00**                      |
@@ -47,21 +47,45 @@ public class OpsQueue {
             System.out.println("\nОперация: " + op.getClass().getSimpleName());
             System.out.flush();
 
-            Method[] methods = op.getClass().getDeclaredMethods(); // все методы операции
-            if (methods.length == 0) {
+            Method[] allMethods = op.getClass().getDeclaredMethods(); // все методы класса операции - без конструкторов
+
+            if (allMethods.length == 0) {
                 throw new IllegalStateException("Операция " + op.getClass().getSimpleName() + " не содержит методов");
             }
 
-            Method onlyPublicMethod = methods[0];
+            Method theOnlyPublicMethod = null;
+            for (Method m : allMethods) {
+                // проверяю метод на соответствие:
+                // - область видимости public
+                // - тип возвращаемого значения void
+                // - не принимает аргументов
+                if (
+                        Modifier.isPublic(m.getModifiers()) &&
+                                m.getReturnType().equals(Void.TYPE) &&
+                                m.getParameters().length == 0
+                ) {
+                    theOnlyPublicMethod = m;
+                    break; // требованиям отвечает только один метод, если theOnlyPublicMethod примет другой метод, то в реализации ошибка
+                }
+            }
+            if (theOnlyPublicMethod == null) {
+                throw new IllegalStateException("Операция не содержит метода, отвечающего требованиям");
+            }
 
             try {
-                onlyPublicMethod.invoke(op);
+                theOnlyPublicMethod.invoke(op);
             } catch (Exception e) {
-                throw new RuntimeException("Ошибка при вызове метода " + onlyPublicMethod.getName(), e);
+                throw new RuntimeException("Ошибка при вызове метода " + theOnlyPublicMethod.getName(), e);
             }
 
         }
         System.out.println("=".repeat(88));
+
+        System.out.println("\nИтоговый баланс\n");
+        System.out.printf("Счет %s, баланс %.2f ₽%n", acc1, acc1.getBalance());
+        System.out.printf("Счет %s, баланс %.2f ₽%n", acc2, acc2.getBalance());
+        System.out.println("=".repeat(88));
+
         System.out.println("\nВыполнение операций завершено успешно.\n");
         System.out.flush();
     }
