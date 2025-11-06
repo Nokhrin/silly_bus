@@ -6,8 +6,10 @@ public class MainPoly {
 
         c = new C();
         c.sayHello();
+        C.sayStatic();
 
         c = new D();
         c.sayHello();
+        D.sayStatic();  // sayStatic унаследован, не переопределен
     }
 }
