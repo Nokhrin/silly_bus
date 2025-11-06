@@ -303,29 +303,73 @@ After debugging the users environment, via a series of "back and forth"s over Gi
 
 A week later a user files an issue, the most recent release said that "now supports any addable type" but they have a bunch of classes that can only be implemented using __radd__ and the new release throws typing errors.
 
+> `__add__`, `__radd__` - публичные методы класса, выполняющие операцию сложения
+>  `__add__` выполняется, когда экземпляр класса, в котором опеределен `__add__`, предшествует оператору "+"
+>  `__radd__` выполняется, когда экземпляр класса, в котором опеределен `__radd__`, следует за оператором "+"
+
+```python
+class Account:
+    """Счет."""
+    def __init__(self, balance: int, account_id: str):
+        self._balance = balance
+        self._stash = 0
+        self._account_id = account_id
+
+    def __add__(self, amount):
+        if isinstance(amount, int):
+            self._balance += amount
+        else:
+            raise ValueError('сумма может быть int')
+
+    def __radd__(self, amount):
+        """Заначка."""
+        if isinstance(amount, int):
+            self._stash += amount
+        else:
+            raise ValueError('сумма может быть int')
+
+    def __repr__(self):
+        return f'баланс: {self._balance}\nзаначка: {self._stash}\n'
+
+
+if __name__ == '__main__':
+    acc = Account(balance=0, account_id="ACC1")
+
+    acc + 100
+    print(acc)
+    # баланс: 100
+    # заначка: 0
+
+    50 + acc
+    print(acc)
+    # баланс: 100
+    # заначка: 50
+```
+
+> проблема, обозначенная в тексте, - у пользователей, в классах которых реализован метод `__radd__` происходит ошибка при проверке типов метода `slow_add`
+
+> проверка
+
 You try a few approaches and find this seems to best solve it:
+> решение
 
-T = TypeVar("T")
-
+```python
 class Addable(Protocol):
-def __add__(self: T, other: T, /) -> T:
-...
+    def __add__(self: T, other: T, /) -> T: ...
 
 class RAddable(Protocol):
-def __radd__(self: T, other: Any, /) -> T:
-...
+    def __radd__(self: T, other: Any, /) -> T: ...
 
 @overload
-def slow_add(a: Addable, b: Addable) -> Addable:
-...
+def slow_add(a: Addable, b: Addable) -> Addable: ...
 
 @overload
-def slow_add(a: Any, b: RAddable) -> RAddable:
-...
+def slow_add(a: Any, b: RAddable) -> RAddable: ...
 
 def slow_add(a: Any, b: Any) -> Any:
-time.sleep(0.1)
-return a + b
+    time.sleep(0.1)
+    return a + b
+```
 
 Annoyingly there is now no consistent way for MyPy to do anything with the body of the function. Also you weren't able to fully express that when b is "RAddable" that "a" should not be the same type because Python type annotations don't yet support being able to exclude types.
 ### Sixth attempt at type hinting
