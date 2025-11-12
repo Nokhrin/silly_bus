@@ -1,5 +1,7 @@
 package DemoTyping.MultipleInheritance;
+/*
 
+ */
 public class Main {
     public static void main(String[] args) {
         Transaction transaction = new Transaction(100);
