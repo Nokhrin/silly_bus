@@ -34,9 +34,18 @@ public class Transaction implements Operation, Deposit, Withdrawal {
         System.out.println("выполняю ЗАЧИСЛЕНИЕ " + amount + " единиц");
     }
 
+    /*
+    1) как определить что объект o типа Transaction является пополением или списанием ?
+    2) может ли это определить компилятор до запуска программы ?
+    пополние может идти по другой "логике" нежели списание средств - так ли это ?
+     */
     @Override
     public boolean isDeposit() {
         return amount > 0;
+    }
+    @Override
+    public boolean isWithdrawal() {
+        return amount < 0;
     }
 
     @Override
@@ -45,8 +54,4 @@ public class Transaction implements Operation, Deposit, Withdrawal {
 
     }
 
-    @Override
-    public boolean isWithdrawal() {
-        return amount < 0;
-    }
 }
