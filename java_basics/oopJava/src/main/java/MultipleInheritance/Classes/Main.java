@@ -1,4 +1,4 @@
-package DemoTyping.DiamondProblem;
+package MultipleInheritance.Classes;
 
 public class Main {
     public static void main(String[] args) {
@@ -11,5 +11,9 @@ public class Main {
         // запрещено в Java
 //        D3 d3 = new D3();
 //        d3.method(); // B или C ?
+
+        // пробую наследовать от базового класса Object и от A
+        // запрещено
+//        D4 d4 = D4();
     }
 }

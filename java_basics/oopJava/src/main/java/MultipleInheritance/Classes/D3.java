@@ -1,4 +1,4 @@
-package DemoTyping.DiamondProblem;
+package MultipleInheritance.Classes;
 
 // попытка наследовать два класса
 //  проблема -

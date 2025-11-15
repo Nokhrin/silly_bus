@@ -1,4 +1,4 @@
-package DemoTyping.DiamondProblem;
+package MultipleInheritance.Classes;
 
 // допускается - одиночное наследование
 public class C extends A {
