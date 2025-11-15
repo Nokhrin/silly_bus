@@ -180,7 +180,7 @@ Haskell — исключает null на уровне типов, делая е�
 
 ---
 
-## [обзор свойств типизации в Java](../src/main/java/DemoTyping/TypingExamples.java)
+## [обзор свойств типизации в Java](../../src/main/java/DemoTyping/TypingExamples.java)
 
 --- 
 
