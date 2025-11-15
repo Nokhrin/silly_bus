@@ -14,20 +14,27 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
+    <repositories>
+        <repository>
+            <id>trusted</id>
+            <url>https://nexus.dev.ppod.cbr.ru/repository/ppod-maven-trusted</url>
+        </repository>
+    </repositories>
+
     <dependencies>
         <!-- Groovy -->
         <dependency>
             <groupId>org.codehaus.groovy</groupId>
             <artifactId>groovy</artifactId>
-            <version>4.0.14</version> <!-- или актуальная версия -->
+            <version>2.4.11</version>
             <scope>compile</scope>
         </dependency>
 
-        <!-- https://mvnrepository.com/artifact/org.testng/testng -->
+        <!-- TestNG -->
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
-            <version>7.11.0</version>
+            <version>6.9.10</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
