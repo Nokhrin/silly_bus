@@ -31,6 +31,7 @@
         - final (record /classes)
         - sealed
         - pattern matching
+4. [Компиляция](compilation.md)
 
 ## Ожидаемые результаты
 
