@@ -1,6 +1,6 @@
 ```mermaid
 ---
-title: Счет / Account
+title: Счет / FinancialOperationsDraft.Account
 ---
 
 stateDiagram-v2
@@ -13,10 +13,10 @@ stateDiagram-v2
     Closed --> Active : открыть счет
 
     %% Пополнение
-    Active --> Deposit
+    Active --> FinancialOperationsDraft.Deposit
 
     
-    state Deposit {
+    state FinancialOperationsDraft.Deposit {
         [*] --> AccountValidDeposit : проверить существование счета начисления
         AccountValidDeposit --> DepositFailed : счет начисления не существует, отменить операцию, сообщить об ошибке
 
@@ -29,15 +29,15 @@ stateDiagram-v2
 
         DepositFailed --> [*] : сообщить о провале операции
     }
-    Deposit --> Active
+    FinancialOperationsDraft.Deposit --> Active
 
 
     %% Снятие
-    Active --> Withdrawal
+    Active --> FinancialOperationsDraft.Withdrawal
     
 
     
-    state Withdrawal {
+    state FinancialOperationsDraft.Withdrawal {
         [*] --> AccountValidWithdrawal : проверить существование счета списания
         AccountValidWithdrawal --> WithdrawalFailed : счет списания не существует, отменить операцию, сообщить об ошибке
 
@@ -53,13 +53,13 @@ stateDiagram-v2
 
         WithdrawalFailed --> [*] : сообщить о провале операции
     }
-    Withdrawal --> Active
+    FinancialOperationsDraft.Withdrawal --> Active
 
 
     %% Перевод
-    Active --> Transfer
+    Active --> FinancialOperationsDraft.Transfer
     
-    state Transfer {
+    state FinancialOperationsDraft.Transfer {
 
         [*] --> SourceAccountValid : проверить счет списания
         SourceAccountValid --> TransferFailed : счет списания не существует, отменить операцию, сообщить об ошибке
@@ -81,7 +81,7 @@ stateDiagram-v2
         TransferFailed --> [*] : сообщить о провале операции
 
     }
-    Transfer --> Active
+    FinancialOperationsDraft.Transfer --> Active
 
 
     %% Стили

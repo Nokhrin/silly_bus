@@ -391,7 +391,7 @@ src/main/java/MultipleInheritance/Interfaces/InterfaceDefaultCheck.java:22: erro
 ```java
 import java.math.BigDecimal;
 
-abstract class Account {
+abstract class FinancialOperationsDraft.Account {
     private BigDecimal balance; // определили поле, это поле суть состояние
     
     void setBalance(BigDecimal amount) {
@@ -400,7 +400,7 @@ abstract class Account {
 }
 public class Main {
     public static void main(String[] args) {
-        Account account = Account();
+        FinancialOperationsDraft.Account account = FinancialOperationsDraft.Account();
         
         account.setBalance(BigDecimal.valueOf(100));
         // состояние экземпляра счета определено как значение баланса на данном шаге
@@ -421,9 +421,9 @@ public class Main {
  * следует добавить метод - или поведение - в интерфейс
  */
 public interface Payable {
-    void Deposit();
+    void FinancialOperationsDraft.Deposit();
     void Withdraw();
-    void Transfer();
+    void FinancialOperationsDraft.Transfer();
 }
 ```
 

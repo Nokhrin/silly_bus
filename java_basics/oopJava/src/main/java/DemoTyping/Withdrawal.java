@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 
 public class Withdrawal implements OperationInterface {
     // в Java класс не обязан использовать все поля, объявленные в интерфейсе
-    // класс `Withdrawal` не реализует поле `optionalMessage`
+    // класс `FinancialOperationsDraft.Withdrawal` не реализует поле `optionalMessage`
     BigDecimal amount = BigDecimal.valueOf(100);
     public void perform() {
         System.out.println("выполнить снятие " + amount + " единиц");

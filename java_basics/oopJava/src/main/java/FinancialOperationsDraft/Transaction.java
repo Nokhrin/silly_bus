@@ -1,3 +1,5 @@
+package FinancialOperationsDraft;
+
 import java.math.BigInteger;
 import java.util.HashSet;
 import java.util.Set;
@@ -55,7 +57,7 @@ public class Transaction {
 
     public static void main(String[] args) {
         /**
-         * 3. Создайте 3 объекта `Transaction`:
+         * 3. Создайте 3 объекта `FinancialOperationsDraft.Transaction`:
          *    - Один валидный (например, `id="TX1", amount=100, currency="USD"`),
          *    - Два невалидных (нарушение `amount` и `currency`),
          *    - Убедитесь, что невалидные объекты не создаются.

@@ -1,3 +1,5 @@
+package FinancialOperationsDraft;
+
 /**
  * ◦ Заем/Кредит
  *     ◦ Списание процентов по кредиту

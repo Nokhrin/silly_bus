@@ -13,14 +13,14 @@ public class SubTypes {
 
         List<Operation> ops = new ArrayList<>();
 
-        // очевидно по List<Operation>
-        // список допускает вхождение объектов типа Operation
+        // очевидно по List<FinancialOperationsDraft.Operation>
+        // список допускает вхождение объектов типа FinancialOperationsDraft.Operation
         ops.add(operation_1);
         ops.add(operation_2);
 
         // следствие ковариации
-        // - List<Operation> допускает включение подтипа - Deposit
-        // не требуется отдельный список List<Deposit>
+        // - List<FinancialOperationsDraft.Operation> допускает включение подтипа - FinancialOperationsDraft.Deposit
+        // не требуется отдельный список List<FinancialOperationsDraft.Deposit>
         ops.add(operation_3);
         ops.add(operation_4);
 
@@ -35,10 +35,10 @@ public class SubTypes {
         }
         /*
         Номер операции - Адрес объекта в памяти - Тип объекта
-        operation_1 = DemoTyping.Operation@8efb846 (тип: Operation)
-        operation_2 = DemoTyping.Operation@2a84aee7 (тип: Operation)
-        operation_3 = DemoTyping.Deposit@a09ee92 (тип: Deposit)
-        operation_4 = DemoTyping.Deposit@30f39991 (тип: Deposit)
+        operation_1 = DemoTyping.FinancialOperationsDraft.Operation@8efb846 (тип: FinancialOperationsDraft.Operation)
+        operation_2 = DemoTyping.FinancialOperationsDraft.Operation@2a84aee7 (тип: FinancialOperationsDraft.Operation)
+        operation_3 = DemoTyping.FinancialOperationsDraft.Deposit@a09ee92 (тип: FinancialOperationsDraft.Deposit)
+        operation_4 = DemoTyping.FinancialOperationsDraft.Deposit@30f39991 (тип: FinancialOperationsDraft.Deposit)
          */
     }
 }
