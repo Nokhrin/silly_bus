@@ -18,7 +18,7 @@
 import uuid
 
 
-class Account:
+class FinancialOperationsDraft.Account:
     """Счет."""
 
     def __init__(self, balance: int, account_id: str):
@@ -71,7 +71,7 @@ if __name__ == '__main__':
     x.upper()  # метод класса str, при статической типизации такой код не был бы скомпилирован, так как первое переменная иницилизирована для типа int
 
     # утиная типизация
-    acc_1 = Account(100, str(uuid.uuid4()))
+    acc_1 = FinancialOperationsDraft.Account(100, str(uuid.uuid4()))
     acc_2 = SilentAccount(100, str(uuid.uuid4()))
 
     # если метод для print реализован, выполнить его
