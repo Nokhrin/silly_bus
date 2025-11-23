@@ -17,19 +17,19 @@
 
 > как кодируется форма?
 - метод `perform` в классах
-  - [Deposit](../src/main/java/Deposit.java),
-  - [Withdrawal](../src/main/java/Withdrawal.java),
-  - [Transfer](../src/main/java/Transfer.java)
+  - [FinancialOperationsDraft.Deposit](../src/main/java/Deposit.java),
+  - [FinancialOperationsDraft.Withdrawal](../src/main/java/Withdrawal.java),
+  - [FinancialOperationsDraft.Transfer](../src/main/java/Transfer.java)
 - метод носит одинаковое имя в трех разных классах - отсюда понимаем метод `perform` как единую сущность
 - метод выполняет определенный для него в классе код - метод `perform` называется одним именем, но реализован по-разному
 - каждая уникальная реализация метода `perform` - есть _форма_ метода `perform`
 
 > как определить тип объекта, на который указывает ссылка?
 - если считать типом объекта А имя класса, экземпляром которого является объект А, то тип объекта можно определить
-  - выполнением оператора `isinstanceof` - пример: `operation isinstanceof Deposit`
-    - вернет `true`, если ссылка `operation` указывает на экземпляр класса `Deposit`
+  - выполнением оператора `isinstanceof` - пример: `operation isinstanceof FinancialOperationsDraft.Deposit`
+    - вернет `true`, если ссылка `operation` указывает на экземпляр класса `FinancialOperationsDraft.Deposit`
   - выполнением метода `Object.getClass()` - пример: `operation.getClass().getSimpleName()`
-    - вернет `Deposit`, если ссылка `operation` указывает на экземпляр класса `Deposit`
+    - вернет `FinancialOperationsDraft.Deposit`, если ссылка `operation` указывает на экземпляр класса `FinancialOperationsDraft.Deposit`
 
 ##### Применение полиморфизма в текущей задаче
 - есть класс Операции
@@ -42,12 +42,12 @@
 
 > Меня в этом описании, смущают общие слова. Мне прям описание требуется, механики
 
-`Operation` - абстрактный класс  
+`FinancialOperationsDraft.Operation` - абстрактный класс  
 абстракция здесь - общее для некоторых сущностей множество атрибутов  
-таким - общим - атрибутом в `Operation` яаляется метод `perform`  
+таким - общим - атрибутом в `FinancialOperationsDraft.Operation` яаляется метод `perform`  
 общим для кого?  
 для классов-наследников  
-классами-наследниками являются `Deposit`, `Withdrawal`, `Transfer`  
+классами-наследниками являются `FinancialOperationsDraft.Deposit`, `FinancialOperationsDraft.Withdrawal`, `FinancialOperationsDraft.Transfer`  
 класс-наследник переопределяет родительский метод `perform`
 - то есть реализует свой способ выполнения метода `perform`
 - `способ выполнения` [выше](README.md:411) был назван `формой`
@@ -55,39 +55,39 @@
   зачем наследовать, если реализация своя?  
   наследовать, чтобы гарантировать наличие метода `perform` в множестве классов и их экземплярах
 
-один метод - `perform` - разные реализации `Deposit.perform`, `Withdrawal.perform`, `Transfer.perform`
+один метод - `perform` - разные реализации `FinancialOperationsDraft.Deposit.perform`, `FinancialOperationsDraft.Withdrawal.perform`, `FinancialOperationsDraft.Transfer.perform`
 
 - Роль полиморфизма на этапе компиляции  
   на этапе компиляции выполняется проверка синтаксиса, проверка типов, проверка графа наследования, пример:  
-  `Operation op = new Deposit(BigDecimal.valueOf(500.00));`
+  `FinancialOperationsDraft.Operation op = new FinancialOperationsDraft.Deposit(BigDecimal.valueOf(500.00));`
 - компилятор проверяет
-  - Deposit наследует Operation
-  - конструктор Deposit существует и принимает аргументы, заявленые в компилируемом коде - в данном случае экземпляр класса BigDecimal  
+  - FinancialOperationsDraft.Deposit наследует FinancialOperationsDraft.Operation
+  - конструктор FinancialOperationsDraft.Deposit существует и принимает аргументы, заявленые в компилируемом коде - в данном случае экземпляр класса BigDecimal  
     `op.perform(account)`
 - компилятор проверяет
-  - класс Operation, экземпляром которого является объект `op`, содержит метод `perform`
+  - класс FinancialOperationsDraft.Operation, экземпляром которого является объект `op`, содержит метод `perform`
   - компилятор сверяет ожидаемый принимаемый тип аргумента `perform` с типом фактически переданного объекта `account`
 
-- компилятор записывает в байт-код метод `Operation.perform()`
+- компилятор записывает в байт-код метод `FinancialOperationsDraft.Operation.perform()`
 
 - проявление полиморфизма
   - на этапе выполнения (в райнтайме/runtime)
   - реализацию метода выберет JVM
-- Как JVM знает, что op - это Deposit?
+- Как JVM знает, что op - это FinancialOperationsDraft.Deposit?
   - для private методов - с помощью "статического связывания" - выбор реализации метода на этапе компиляции,  до выполнения программы
   - для public методов - методов, которые могут быть переопределены - с помощью "динамического связывания" - на основе знания типа объекта
   - динамическое связывание - это привязка ключ-значение, которые записываются в системную таблицу vtable
   - пример vtable
 
 ```text
-vtable для класса Deposit:
+vtable для класса FinancialOperationsDraft.Deposit:
 [0]  Object.hashCode()
 [1]  Object.equals()
 [2]  Object.toString()
-[3]  Operation.perform() → указатель на метод Deposit.perform()
+[3]  FinancialOperationsDraft.Operation.perform() → указатель на метод FinancialOperationsDraft.Deposit.perform()
 ```
 
-- при выполнении JVM читает имя класса - Deposit, находит в vtable связанный с ним метод Deposit.perform, выполняет Deposit.perform
+- при выполнении JVM читает имя класса - FinancialOperationsDraft.Deposit, находит в vtable связанный с ним метод FinancialOperationsDraft.Deposit.perform, выполняет FinancialOperationsDraft.Deposit.perform
 ---
 
 ##### Динамика VS Статика
