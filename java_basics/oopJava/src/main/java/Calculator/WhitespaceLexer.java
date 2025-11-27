@@ -1,5 +1,7 @@
 package Calculator;
 
+import java.util.Optional;
+
 /**
  * Пример оператор "пробел" 
  *
@@ -27,5 +29,30 @@ package Calculator;
  *
  * обрати внимание на последовательность действий - она совпадает с синтаксисом/правилом
  */
-public class ParseWhitespace {
+public class WhitespaceLexer {
+    // строка для поиска
+    private final String source;
+    // смещение === индекс символа в строке
+    private int offset;
+    
+    // конструктор принимает исходную строку
+    public WhitespaceLexer(String source) {
+        this.source = source;
+        this.offset = 0;
+    }
+
+    public String getSource() {
+        return source;
+    }
+
+    public int getOffset() {
+        return offset;
+    }
+    
+    // результат может быть null, 
+    // контейнер Optional подходит для ситуаций, когда лексема не распознана или не найдена
+    public Optional<ParseResult<String>> parseFrom(int start) {
+        // todo
+        return null;
+    }
 }
