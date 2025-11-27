@@ -297,7 +297,11 @@ them execute Lisp code on the fly as well. Why?
 
 [Грамматика](grammar.md)
 
+---
 
+# Практика
+
+## Калькулятор
 
 
 
