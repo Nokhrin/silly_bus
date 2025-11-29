@@ -1,7 +1,6 @@
 package Calculator;
 
 import java.util.Optional;
-import java.util.Spliterator;
 
 /**
  * Напиши функцию парсинга числа , целое
@@ -51,110 +50,27 @@ import java.util.Spliterator;
  *
  */
 public class IntegerLexer {
-    /*
-    Помещаем результат в контейнер Optional,
-    цель - не выполнять явной проверки на null
-    - null возможен в случае, когда лексема не найдена
+
     
-    Семантика Optional - 
-        если возвращаешь Optional.empty(), то значит - парсинг невозможен
-
-    Тип для value класса ParseResult - обобщение/дженерик
-    Дженерик заменяю на конкретный тип - в данном случае - Integer
-     */
-
-    /**
-     * главный метод
-     */
-    public Optional<ParseResult<Integer>> parseFrom(String source, int start) {
-        int offset = start;
+    public static void parseSignedInt(String source) {
         
-        // знак
-        Optional<Boolean> signContainer = parseSign(source, offset);
-        // смещение, если знак представлен символом
-        if (!signContainer.isEmpty()) {
-            offset++;
-        }
-        
-        // цифры
-        Optional<ParseResult<Integer>> digitsContainer = parseDigits(source, offset);
-
-        // цифр нет => парсинг не удался
-        if (digitsContainer.isEmpty()) { return Optional.empty(); }
-
-        int finalOffset = offset;  // временная переменная для лямбда-вызовов
-        return signContainer.flatMap(sign -> {
-            // если знак есть, сместить курсор
-            int flatOffset = finalOffset + 1;
-            return parseDigits(source, flatOffset).flatMap(digits -> {
-                int value = digits.value();
-                if (sign) {
-                    value = -value;
-                }
-                return Optional.of(new ParseResult<>(value, digits.start(), digits.end()));
-            });
-        });
     }
 
     /**
-     * парсинг знака
+     * Парсинг знака
+     * sign       ::= "+" | "-"
+     * 
+     * Используй результат Optional<ParseResult> для расчета offset
+     * Инкремент запрещен
+     * 
+     * используй комментирование регионов кода
+     * 
+     * @param source
+     * @return
      */
-    public Optional<Boolean> parseSign(String source, int offset) {
-        // + | -
-        char ch = source.charAt(offset);
-        // N >= 0 -> положительное -> true
-        // N < 0 -> отрицательное -> false
-        // знака нет => empty
-        return switch (ch) {
-            case '+' -> Optional.of(true);
-            case '-' -> Optional.of(false);
-            default -> Optional.empty();
-        };
-
-    }
-
-    /**
-     * ПОПЫТКА парсинга цифр
-     */
-    public Optional<ParseResult<Integer>> parseDigits(String source, int start) {
-        int offset = start;
-
-        // выход за пределы строки
-        if (offset >= source.length()) { return Optional.empty(); }
-        
-        // нет цифр
-        if (offset == source.length()) { return Optional.empty(); }
-
-        // цифры
-        while (offset < source.length() && Character.isDigit(source.charAt(offset))) {
-            offset++;
-        }
-        
-        //
-        // ??? использование parseInt допускается условиями задачи?
-        //
-        String numStr = source.substring(start, offset);
-        try {
-            Integer num = Integer.parseInt(numStr);
-            return Optional.of(new ParseResult<Integer>(num, start, offset - 1));
-        } catch (NumberFormatException e) {
-            return Optional.empty();
-        }
-
-    }
-
-    public static void main(String[] args) {
-        IntegerLexer integerLexer = new IntegerLexer();
-        Optional<ParseResult<Integer>> pr = integerLexer.parseFrom("123", 0);
-        System.out.println("psvm в классе IntegerLexer");
-        // получаем контейнер, вызываем геттер экземпляра, извлеченного из контейнера
-        System.out.println(pr.get()); // ParseResult[value=123, start=0, end=2]
-        System.out.println(pr.get().value()); // 123
-
-        pr = integerLexer.parseFrom("-123", 0);
-        System.out.println("psvm в классе IntegerLexer");
-        // получаем контейнер, вызываем геттер экземпляра, извлеченного из контейнера
-        System.out.println(pr.get()); // ParseResult[value=-123, start=0, end=2]
-        System.out.println(pr.get().value()); // -123
+    public static Optional<ParseResult<Boolean>> parseSign(String source) {
+        //region "+" | "-"
+        return null;
+        //endregion
     }
 }
