@@ -11,23 +11,18 @@
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
-        <groovy.version>2.4.11</groovy.version>
-        <testng.version>6.9.10</testng.version>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <groovy.version>4.0.26</groovy.version>
+        <testng.version>7.9.0</testng.version>
+        <checkstyle-plugin.version>3.4.0</checkstyle-plugin.version>
+        <guava.version>33.4.8-jre</guava.version>
+        <project.encoding>UTF-8</project.encoding>
     </properties>
-
-    <repositories>
-        <repository>
-            <id>trusted</id>
-            <url>https://nexus.dev.ppod.cbr.ru/repository/ppod-maven-trusted</url>
-        </repository>
-    </repositories>
 
     <dependencyManagement>
         <dependencies>
             <!-- Groovy -->
             <dependency>
-                <groupId>org.codehaus.groovy</groupId>
+                <groupId>org.apache.groovy</groupId>
                 <artifactId>groovy</artifactId>
                 <version>${groovy.version}</version>
                 <scope>compile</scope>
@@ -43,18 +38,58 @@
         </dependencies>
 
     </dependencyManagement>
-    
+
     <dependencies>
-        <!-- Groovy -->
         <dependency>
-            <groupId>org.codehaus.groovy</groupId>
+            <groupId>org.apache.groovy</groupId>
             <artifactId>groovy</artifactId>
         </dependency>
-
-        <!-- TestNG -->
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
         </dependency>
     </dependencies>
+
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-checkstyle-plugin</artifactId>
+                    <version>${checkstyle-plugin.version}</version>
+                    <dependencies>
+                        <dependency>
+                            <groupId>com.google.guava</groupId>
+                            <artifactId>guava</artifactId>
+                            <version>${guava.version}</version>
+                        </dependency>
+                    </dependencies>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <configuration>
+                    <configLocation>config/checks/sun_checks.xml</configLocation>
+                    <consoleOutput>true</consoleOutput>
+                    <failsOnError>true</failsOnError>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>validate</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+
 </project>
