@@ -9,7 +9,7 @@
     
     public class IntegerLexerTest {
     
-        private final IntegerLexer lexer = new IntegerLexer();
+        private final IntegerLexerDraft lexer = new IntegerLexerDraft();
     
         // Тест: положительное число
         @Test
