@@ -1,0 +1,31 @@
+---
+title: Arithmetic parser - Class Diagram
+---
+classDiagram
+    class Operation{
+        <<enumeration>>
+        ADD
+        SUB
+        MUL
+        DIV
+    }
+
+    class ParseResult {
+        T value
+        int start
+        int end
+    }
+
+    class CalcLexer {
+    + parseSign()
+    + parseInt()
+    + parseInt()
+    + parseOperation()
+    + parseMainExpr()
+    + parseMulExpr()
+    + parseAddExpr()
+    + parseExpr()
+    }
+
+    CalcLexer --> Operation: uses
+    CalcLexer --> ParseResult: uses, returns
