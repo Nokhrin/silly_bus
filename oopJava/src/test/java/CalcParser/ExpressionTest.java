@@ -1,4 +1,4 @@
-package CalcLexer;
+package CalcParser;
 
 import org.testng.annotations.Test;
 
@@ -43,25 +43,25 @@ public class ExpressionTest {
     //region BinOp Tests
     @Test(groups = "binOp", description = "Сложение: 1 + 2 = 3")
     public void testBinOpAdd() {
-        Expression expr = new BinOp(1, Parsers.Operation.ADD, 2);
+        Expression expr = new BinOp(1, Parser.Operation.ADD, 2);
         assertEquals(expr.evaluate(), 3.0);
     }
 
     @Test(groups = "binOp", description = "Вычитание: 5 - 3 = 2")
     public void testBinOpSub() {
-        Expression expr = new BinOp(5, Parsers.Operation.SUB, 3);
+        Expression expr = new BinOp(5, Parser.Operation.SUB, 3);
         assertEquals(expr.evaluate(), 2.0);
     }
 
     @Test(groups = "binOp", description = "Умножение: 3 * 4 = 12")
     public void testBinOpMul() {
-        Expression expr = new BinOp(3, Parsers.Operation.MUL, 4);
+        Expression expr = new BinOp(3, Parser.Operation.MUL, 4);
         assertEquals(expr.evaluate(), 12.0);
     }
 
     @Test(groups = "binOp", description = "Деление: 10 / 2 = 5")
     public void testBinOpDiv() {
-        Expression expr = new BinOp(10, Parsers.Operation.DIV, 2);
+        Expression expr = new BinOp(10, Parser.Operation.DIV, 2);
         assertEquals(expr.evaluate(), 5.0);
     }
 
@@ -71,7 +71,7 @@ public class ExpressionTest {
             description = "Проверка деления на ноль"
     )
     public void testDivideByZero() {
-        Expression expr = new BinOp(1, Parsers.Operation.DIV, 0);
+        Expression expr = new BinOp(1, Parser.Operation.DIV, 0);
         expr.evaluate(); // Должно выбросить ArithmeticException
     }
     //endregion BinOp

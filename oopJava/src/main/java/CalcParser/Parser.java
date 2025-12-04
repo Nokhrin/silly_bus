@@ -1,20 +1,9 @@
-package CalcLexer;
+package CalcParser;
 
 import java.util.Optional;
 import java.util.Set;
 
-/**
- * Требования
- * Используй результат Optional<ParseResult> для расчета offset
- *  ParseResult содержит 
- *      значение, 
- *      первый (включительно),
- *      последний (исключительно) индексы значения
- * Инкремент запрещен
- *
- * используй комментирование регионов кода
- */
-public class Parsers {
+public class Parser {
 
     //region Brackets enum
     /**
@@ -172,79 +161,123 @@ public class Parsers {
         if (source.isEmpty() || start < 0 || start >= source.length()) { return Optional.empty(); }
 
         int offset = start;
-        
-        if (isWhitespace(source.charAt(offset))) {
-            offset++;
-        } else {
-            return Optional.empty();
-        }
-        
+
         while (offset < source.length() && (isWhitespace(source.charAt(offset)))) {
             offset++;
         }
+        
+        if (offset == start) { return Optional.empty(); }
         
         return Optional.of(new ParseResult<>("", start, offset));
     }
     //endregion
 
+    //region parseMulDivOperation
+    /**
+     * Парсинг оператора умножения или деления  
+     * mul_div_operation ::= "*" | "/"  
+     */
+    public static Optional<ParseResult<Operation>> parseMulDivOperation(String source, int start) {
+        if (source.isEmpty() || start < 0 || start >= source.length()) {
+            return Optional.empty();
+        }
+
+        char op = source.charAt(start);
+
+        return switch (op) {
+            case '*' -> Optional.of(new ParseResult<>(Operation.MUL, start, start + 1));
+            case '/' -> Optional.of(new ParseResult<>(Operation.DIV, start, start + 1));
+            default -> Optional.empty();
+        };
+    }
+    //endregion
+
+    //region parseAddSubOperation
+    /**
+     * Парсинг оператора сложения или вычитания  
+     * add_sub_operator ::= "+" | "-"  
+     */
+    public static Optional<ParseResult<Operation>> parseAddSubOperation(String source, int start) {
+        if (source.isEmpty() || start < 0 || start >= source.length()) {
+            return Optional.empty();
+        }
+
+        char op = source.charAt(start);
+
+        return switch (op) {
+            case '+' -> Optional.of(new ParseResult<>(Operation.ADD, start, start + 1));
+            case '-' -> Optional.of(new ParseResult<>(Operation.SUB, start, start + 1));
+            default -> Optional.empty();
+        };
+    }
+    //endregion
+    
     //region mulDivExpression
 
     /**
      * Парсинг выражения умножения/деления
-     * синтаксис:
-     *  mul_div_expression ::= num_value { [ws] mul_div_operator [ws] num_value }
-     *  <p>
-     * вспомогательное разделение синтаксиса:
-     *  mul_div_expression ::= first_expression { second_expression }
-     *  first_expression ::= num_value
-     *  second_expression ::= { [ws] mul_div_operator [ws] num_value }
-     *  <p>
+     * <p> 
+     * mul_div_expression ::= num_value { [ws] mul_div_operation [ws] num_value }
+     *  mul_div_operation ::= "*" | "/"
+     *  add_sub_operation ::= "+" | "-"
+     *  num_value ::= [sign] digit {digit}
+     *  digit ::= "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
+     *  sign ::= "+" | "-"
+     *  ws ::= (" " | "\t" | "\n" | "\r") {" " | "\t" | "\n" | "\r"}
+     *  
      * @param source
      * @param start
      * @return
      */
     public static Optional<ParseResult<Expression>> parseMulDivExpression(String source, int start) {
-        //first_expression
+        //mul_div_expression ::= num_value { [ws] mul_div_operation [ws] num_value }
+        //
         //num_value
-        Optional<ParseResult<NumValue>> firstNumOptional = parseNumber(source, start);
-        if (firstNumOptional.isEmpty()) { return Optional.empty(); }
+        Optional<ParseResult<NumValue>> numValueOpt1 = parseNumber(source, start);
+        if (numValueOpt1.isEmpty()) { return Optional.empty(); }
         
-        //first_expression
-        Expression firstExpression = firstNumOptional.get().value();
-        int offset = firstNumOptional.get().end();
+        Expression numValue1 = numValueOpt1.get().value();
+        int offset = numValueOpt1.get().end();
         
-        //second_expression
+        //{ [ws] mul_div_operation [ws] num_value }
         while (offset < source.length()) {
-            //ws1
-            Optional<ParseResult<String>> ws1 = parseWhitespace(source, offset);
-            if (ws1.isPresent()) {
-                offset = ws1.get().end();
+            //[ws]
+            Optional<ParseResult<String>> ws = parseWhitespace(source, offset);
+            if (ws.isPresent()) {
+                offset = ws.get().end();
             }
             
-            //mul_div_operator
-            Optional<ParseResult<Operation>> opOpt = parseOperation(source, offset);
-            if (opOpt.isEmpty()) { break; }
+            //mul_div_operation
+            Optional<ParseResult<Operation>> opOpt = parseMulDivOperation(source, offset);
+            if (opOpt.isEmpty()) { 
+                //оператора нет, выражение { [ws] mul_div_operation [ws] num_value } невалидно
+                break; 
+            }
             Operation op = opOpt.get().value();
             offset = opOpt.get().end();
 
-            //ws2
-            Optional<ParseResult<String>> ws2 = parseWhitespace(source, offset);
-            if (ws2.isPresent()) {
-                offset = ws2.get().end();
+            //[ws]
+            ws = parseWhitespace(source, offset);
+            if (ws.isPresent()) {
+                offset = ws.get().end();
             }
 
             //num_value
-            Optional<ParseResult<NumValue>> secondNumOptional = parseNumber(source, offset);
-            if (secondNumOptional.isEmpty()) { break; }
+            Optional<ParseResult<NumValue>> numValueOpt2 = parseNumber(source, offset);
+            if (numValueOpt2.isEmpty()) { 
+                //числа нет, выражение { [ws] mul_div_operation [ws] num_value } невалидно
+                break; 
+            }
             
-            Expression secondExpression = secondNumOptional.get().value();
-            offset = secondNumOptional.get().end();
+            NumValue numValue2 = numValueOpt2.get().value();
+            offset = numValueOpt2.get().end();
             
-            //накапливаем значение second_expression в first_expression
-            firstExpression = new BinaryExpression(firstExpression, op, secondExpression);
+            //mul_div_expression ::= num_value { [ws] mul_div_operation [ws] num_value }
+            //накапливаем итог в первом num_value
+            numValue1 = new BinaryExpression(numValue1, op, numValue2);
         }
 
-        return Optional.of(new ParseResult<>(firstExpression, start, offset));
+        return Optional.of(new ParseResult<>(numValue1, start, offset));
     }
     //endregion mulDivExpression
 }

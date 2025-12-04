@@ -1,4 +1,4 @@
-package CalcLexer;
+package CalcParser;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
