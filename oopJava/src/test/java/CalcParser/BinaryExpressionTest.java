@@ -1,4 +1,4 @@
-package CalcLexer;
+package CalcParser;
 
 import org.testng.annotations.Test;
 
@@ -9,7 +9,7 @@ public class BinaryExpressionTest {
     //region TestName: One Number Expression
     @Test(groups = {"expression"}, description = "Проверка вычисления одного числа: 1")
     public void testOneNumber() {
-        Expression expr = new BinaryExpression(new NumValue(1.0), Parsers.Operation.ADD, new NumValue(0.0));
+        Expression expr = new BinaryExpression(new NumValue(1.0), Parser.Operation.ADD, new NumValue(0.0));
         // Используем ADD, чтобы использовать структуру, но результат должен быть 1.0
         // Альтернативно можно было бы сделать прямой вызов, но структура BinaryExpression позволяет только бинарные операции
         // Поэтому используем 1 + 0
@@ -18,7 +18,7 @@ public class BinaryExpressionTest {
 
     @Test(groups = {"expression"}, description = "Проверка вычисления одного числа: 42")
     public void testOneNumberWith42() {
-        Expression expr = new BinaryExpression(new NumValue(42.0), Parsers.Operation.ADD, new NumValue(0.0));
+        Expression expr = new BinaryExpression(new NumValue(42.0), Parser.Operation.ADD, new NumValue(0.0));
         assertEquals(expr.evaluate(), 42.0, "Ожидается 42.0 для выражения 42");
     }
     //endregion
@@ -29,7 +29,7 @@ public class BinaryExpressionTest {
     public void testSimpleAddition() {
         Expression expr = new BinaryExpression(
                 new NumValue(1.0),
-                Parsers.Operation.ADD,
+                Parser.Operation.ADD,
                 new NumValue(2.0)
         );
         assertEquals(expr.evaluate(), 3.0, "Ожидается 3.0 для 1+2");
@@ -40,12 +40,12 @@ public class BinaryExpressionTest {
         // 1+2+3 = (1+2)+3 = 6
         Expression inner = new BinaryExpression(
                 new NumValue(1.0),
-                Parsers.Operation.ADD,
+                Parser.Operation.ADD,
                 new NumValue(2.0)
         );
         Expression expr = new BinaryExpression(
                 inner,
-                Parsers.Operation.ADD,
+                Parser.Operation.ADD,
                 new NumValue(3.0)
         );
         assertEquals(expr.evaluate(), 6.0, "Ожидается 6.0 для 1+2+3");
@@ -58,13 +58,13 @@ public class BinaryExpressionTest {
                 new BinaryExpression(
                         new BinaryExpression(
                                 new NumValue(1.0),
-                                Parsers.Operation.ADD,
+                                Parser.Operation.ADD,
                                 new NumValue(2.0)
                         ),
-                        Parsers.Operation.ADD,
+                        Parser.Operation.ADD,
                         new NumValue(3.0)
                 ),
-                Parsers.Operation.SUB,
+                Parser.Operation.SUB,
                 new NumValue(4.0)
         );
         assertEquals(expr.evaluate(), 2.0, "Ожидается 2.0 для 1+2+3-4");

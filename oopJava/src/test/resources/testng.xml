@@ -8,7 +8,7 @@
             </run>
         </groups>
         <classes>
-            <class name="CalcLexer.ExpressionTest" />
+            <class name="CalcParser.ExpressionTest" />
         </classes>
     </test>
 
@@ -19,7 +19,7 @@
             </run>
         </groups>
         <classes>
-            <class name="CalcLexer.ExpressionTest" />
+            <class name="CalcParser.ExpressionTest" />
         </classes>
     </test>
 
@@ -30,7 +30,7 @@
             </run>
         </groups>
         <classes>
-            <class name="CalcLexer.NaryExpressionPriorityNoRightAssociativeTreeTest" />
+            <class name="CalcParser.NaryExpressionPriorityNoRightAssociativeTreeTest" />
         </classes>
     </test>
 

@@ -1,7 +1,7 @@
-package CalcLexer;
+package CalcParser;
 
 /**
- * Результат вычисления
+ * Числовой результат вычисления
  *
  * @param value 
  */
