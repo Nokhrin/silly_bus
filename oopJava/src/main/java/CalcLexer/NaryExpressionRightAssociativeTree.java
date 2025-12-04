@@ -12,7 +12,7 @@ import static CalcLexer.Parsers.*;
  *  дерево === AST === abstract syntax tree
  *  
  * см. реализацию левоассоциативного дерева
- * @see NaryExpression 
+ * @see NaryExpressionNoPriority 
  */
 public class NaryExpressionRightAssociativeTree {
     /**

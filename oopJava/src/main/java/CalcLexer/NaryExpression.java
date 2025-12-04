@@ -1,11 +1,9 @@
 package CalcLexer;
-
+import static CalcLexer.Parsers.*;
 import java.util.Optional;
 
-import static CalcLexer.Parsers.*;
 
-public class NaryExpression {
-    /**
+/**
      * Парсер многоместных операций
      * <p>
      * Требования:
@@ -16,13 +14,10 @@ public class NaryExpression {
      *      толкование:
      *      одно число, за которым следует 0 и более раз выражение 
      *      `[<ws>] <op> [<ws>] <number>`, которое содержит:
-     *      0 или 1 пробел|табу, один оператор, 0 или 1 пробел|табу, одно число
-     *
-     *      todo - вопрос
-     *      толкование верно?
+     *      
      * <p>
      * <p>
-     * Применяемые прицепы:
+     * Применяемые принципы:
      * <p>
      * Левоассоциативный порядок: 1 + 2 + 3 + 4 -> (1 + 2) + 3 + 4 -> ((1 + 2) + 3) + 4
      * Операторы: +, -, *, /
@@ -30,72 +25,117 @@ public class NaryExpression {
      * Знак - отрицательному числу предшествует `-`
      * Пробелы - разделяют оператор и операнд - в начале и конце строки допускаются
      * <p>
+     * <p>
      * Задача:
-     * - парсить любое количество операций
-     * - использовать левоассоциативность
-     * <p>
-     * 
-     *     
-     * <p>
-     *      todo - вопросы
-     *      
-     *      -1-
-     *      в постановке
-     *      <number> { [<ws>] <op> [<ws>] <number> }
-     *      меня смущает 0 или раз для ws - [<ws>] -  в { [<ws>] <op> [<ws>] <number> }
-     *      по условию число пробельных символов 0 и более, то есть {<ws>}
-     *      
-     *      мне кажется точнее запись { {<ws>} <op> {<ws>} <number> }
-     *      корректна ли такая запись? 
-     *      
-     *      
-     *      -2-
-     *     использую `wc` - whitespace character
-     *     вместо `ws` - whitespace
-     *     считаю, `wc` семантически точнее, так как описывает множество пробельных символов
-     *      корректно ли такое определение?
+     *            8) меняем грамматику / синтаксис так
+     *            addSub ::= mulDiv { mulDivOp mulDiv }  
+     *              //вопрос - выражение сложения/вычитания определение через выражение умножения/деления приоритет mulDiv выше
+     *              опечатка? 
+ *                  проверь трактовку в строке 49
      *
-     * 
-     *      -3-
-     *      следует ли дополнить требования условиями:
-     *      - для пробельных символов 0 и более вхождений
-     *      - в число пробельных лексем добавил /n, /r
-     *      ?
+     *            mulDiv ::= number { addSubOp number }
+     *              //вопрос - опечатка в определении? 
+ *                  проверь трактовку в строке 50
+     *            
+     *            mulDivOp ::= '+' | '-'
+     *            addSubOp ::= '*' | '/'
+     *            тут я не использую угловые скобки <rule> и опустил [<ws>]
+     *            получаем грамматику с поддержкой приоритетов
+     *            5 - 2 * 3
+     *            расчет корректный получается
+     * <p>
      * <p>
      * <p>
      * Синтаксическая грамматика в нотации eBNF:
      * <p>
-     * <p>
-     *     вариант для обсуждения
-     * <p>
-     *  nary_expression ::= {wc} num_value { {wc} op {wc} num_value } {wc}
+     *  add_sub_expression ::= mul_div_expression { add_sub_operator mul_div_expression }
+     *  mul_div_expression ::= num_value { mul_div_operator num_value }
+     *  mul_div_operator ::= "*" | "/"
+     *  add_sub_operator ::= "+" | "-"
      *  num_value ::= [sign] digit {digit}
      *  digit ::= "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
-     *  op ::= "+" | "-" | "*" | "/"
      *  sign ::= "+" | "-"
-     *  wc ::= " " | "\t" | "\n" | "\r"
-     * <p>
-     * <p>
-     *     вариант по условию - для решения
-     * <p>
-     *  nary_expression ::= num_value { [<ws>] <op> [<ws>] num_value }
-     *  num_value ::= [sign] digit {digit}
-     *  digit ::= "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
-     *  op ::= "+" | "-" | "*" | "/"
-     *  sign ::= "+" | "-"
-     *  ws ::= " " | "\t"
+     *  ws ::= " " | "\t" | "\n" | "\r"
      *  
-     *  // пояснение понимания: терминалы в этом выражении -
-     *      все символы в правилах digit, op, sign, ws: " ", "\t", "+", "5", ...
+     *  todo - понимание
+     *      add_sub_expression ::= mul_div_expression { [ws] add_sub_operator [ws] mul_div_expression }
+     *          //выражение операции сложения/вычитания:
+     *              1 выражение операции умножения/деления - это расположение определяет приоритет - приоритет умножение/деление вы сложение/вычитание
+     *                  0 или более выражений, состоящих из
+     *                      0 или 1 пробельный символ, 
+     *                      1 оператор сложения/вычитания,
+     *                      0 или 1 пробельный символ, 
+     *                      1 операции умножения/деления,
+     *      mul_div_expression ::= num_value { [ws] mul_div_operator [ws] num_value }
+     *          //выражение операции умножения/деления: 
+     *          //ПОСЛЕДОВАТЕЛЬНОСТЬ чисел, разделенных * и / , без учета скобок группировки
+     *              1 число, 
+     *                  0 или более выражений, состоящих из
+     *                      0 или 1 пробельный символ,
+     *                      1 оператор умножения/деления,
+     *                      0 или 1 пробельный символ,
+     *                      1 число
+     *      num_value ::= [sign] digit {digit}
+     *          //число с необязательным знаком: [sign] - 0 или 1 знак sign, digit - одна цифра, {digit} - 0 и более цифр
+     *      sign ::= "+" | "-"
+     *          //знак числа - символ sign обозначает один из терминалов: + или -
+     *      mul_div_operator ::= "*" | "/"
+     *          //оператор умножения/деления: символ "*" или "/" 
+     *      add_sub_operator ::= "+" | "-"
+     *          //оператор сложения/вычитания: символ "+" или "-"
+     *      digit ::= "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
+     *          //цифра - символ digit обозначает один из терминалов: цифры от 0 до 9 включительно
+     *      ws ::= " " | "\t" | "\n" | "\r" 
+     *          //пробельные символы - символ ws обозначает один из терминалов " " или "\t" или "\n" или "\r"
+     *  
+     *  todo - понимание соответствует действительности?
+     *  
+     *  
+     *  todo
+     *      1. "2" без явного знака - символы "1", "+", "2" считаны успешно
+     *      System.out.println(parseNaryExpression("1 + 2", 0));
+     *      Optional[ParseResult[value=BinaryExpression[left=NumValue[value=1.0], op=ADD, right=NumValue[value=2.0]], start=0, end=5]]
+     *      ---
+     *      2. "+2" с явным знаком - символы "1", "+", "2" считаны успешно
+     *      System.out.println(parseNaryExpression("1 + +2", 0));
+     *      Optional[ParseResult[value=BinaryExpression[left=NumValue[value=1.0], op=ADD, right=NumValue[value=2.0]], start=0, end=6]]
+     *      ---
+     *      3. "++2" с избыточным знаком - символ "1" считан успешно,
+     *               символы "+", "2" не считаны
+     *          - утверждение: парсинг реализован по требуемой грамматике, 
+     *            - при нарушении грамматики возвращается empty()
+     *            - empty() возвращается каждым методом парсинга
+     *            - при ошибке парсинга как в примере "1 + ++2" найти ошибку просто, 
+     *            - в выражении с большим числом символов "1 + 2 + 2 + 2 + 2 + 2 + 2 + 2 + +2 + -2 ++-2 + 2 + 2 + 2" найти ошибку будет сложнее
+     *            - ВОПРОС: следует ли реализовать вывод сообщения об ошибке в методах парсинга?
+     *              - цель - показать пользователю на каком индексе произошел сбой, упростить отладку
+     *          - следует ли реализовать сообщение об ошибке парсинга?
+     *      System.out.println(parseNaryExpression("1 + ++2", 0));
+     *      Optional[ParseResult[value=NumValue[value=1.0], start=0, end=4]]
+     *      ---
+     *  todo
+     *      задача не предусматривает скобки как инструмент группировки выражений
+     *      отсутствие скобок в постановке задачи сделано намеренно?
+     * @see Parsers
      */
+public class NaryExpression {
 
     /**
-     * Левоассоциативный парсинг выражения по правилу
-     * nary_expression ::= num_value { [<ws>] <op> [<ws>] num_value }
-     * 
-     * nary_expression ::= expression1 { expression2 }
-     * expression1 ::= num_value
-     * expression2 ::= { [<ws>] <op> [<ws>] num_value }
+     * Парсинг выражения с учетом свойств операций:
+     *  - приоритета операций - приоритет * / выше + -
+     *  - левоассоциативности операций - 1 + 2 + 3 -> (1 + 2) + 3
+     * <p>
+     * синтаксис:
+     *  add_sub_expression ::= mul_div_expression { [ws] add_sub_operator [ws] mul_div_expression }
+     *  <p>
+     * вспомогательное разделение синтаксиса:
+     * add_sub_expression ::= first_expression { second_expression }
+     * first_expression ::= mul_div_expression
+     * second_expression ::= { [ws] add_sub_operator [ws] mul_div_expression }
+     * <p></p>
+     * @param source исходная строка  
+     * @param start  стартовый индекс  
+     * @return ParseResult(Expression) или Optional.empty(), если парсинг не удался
      */
     public static Optional<ParseResult<Expression>> parseNaryExpression(String source, int start) {
         // проверка входных данных
@@ -103,87 +143,100 @@ public class NaryExpression {
             return Optional.empty();
         }
         
-        // num_value
-        var firstNum = parseNumber(source, start);
-        if (firstNum.isEmpty()) { return Optional.empty(); }
+        //first_expression
+        Optional<ParseResult<Expression>> firstExpressionOptional = parseMulDivExpression(source, start);
+        if (firstExpressionOptional.isEmpty()) { return Optional.empty(); }
         
-        // expression1 ::= num_value
-        Expression expression1 = firstNum.get().value();
-        int offset = firstNum.get().end();
+        Expression firstExpression = firstExpressionOptional.get().value();
+        int offset = firstExpressionOptional.get().end();
         
-        // expression2 ::= { [<ws>] <op> [<ws>] num_value }
-        // парсинг в цикле до получения невалидного символа или окончания строки
-        while (true) {
-            // ws1
-            var wsOpt1 = parseWhitespace(source, offset);
-            if (wsOpt1.isEmpty()) {
-                break;
-            }
-            offset = wsOpt1.get().end();
-
-            // op
-            var opOpt = parseOperation(source, offset);
-            if (opOpt.isEmpty()) {
-                break;
-            }
+        //second_expression
+        while (offset < source.length()) {
+            //ws
+            Optional<ParseResult<String>> ws1 = parseWhitespace(source, offset);
+            if (ws1.isPresent()) { offset = ws1.get().end(); }
+            
+            //add_sub_operator
+            Optional<ParseResult<Operation>> opOpt = parseOperation(source, offset);
+            if (opOpt.isEmpty()) { break; }
             Operation op = opOpt.get().value();
             offset = opOpt.get().end();
+            
+            //ws
+            Optional<ParseResult<String>> ws2 = parseWhitespace(source, offset);
+            if (ws2.isPresent()) { offset = ws2.get().end(); }
+            
+            //mul_div_expression
+            Optional<ParseResult<Expression>> secondExpressionOptional = parseMulDivExpression(source, offset);
+            if (secondExpressionOptional.isEmpty()) { break; }
+            
+            Expression secondExpression = secondExpressionOptional.get().value();
+            offset = secondExpressionOptional.get().end();
 
-            // ws2
-            var wsOpt2 = parseWhitespace(source, offset);
-            if (wsOpt2.isEmpty()) {
-            } else {
-                offset = wsOpt2.get().end();
-            }
-
-            // num_value
-            var secondNum = parseNumber(source, offset);
-            if (secondNum.isEmpty()) {
-                break;
-            }
-
-            // expression2
-            Expression expression2 = new BinaryExpression(expression1, op, secondNum.get().value());
-            expression1 = expression2;  // смещаем результат влево, левоассоциативность
-            offset = secondNum.get().end();
+            //накапливаем значение second_expression в first_expression
+            firstExpression = new BinaryExpression(firstExpression, op, secondExpression);
         }
 
-        return Optional.of(new ParseResult<>(expression1, start, offset));
+        return Optional.of(new ParseResult<>(firstExpression, start, offset));
+        
     }
 
     /**
-     * получаем лево ассоциированное дерево
-     *
-     * 1 + 2 + 3 + 4
-     * ----------------
-     *           +
-     *       +     4
-     *   +     3
-     * 1    2
-     *
-     *
-     * пишем тест
-     *
+     * получаем грамматику с поддержкой приоритетов
      * 5 - 2 * 3
-     *
-     * получаем косяк
-     *
-     * (( 5 - 2 ) * 3 )
-     *
-     * а должно быть
-     *
-     * (5 - (2 * 3))
+     * ----------
+     *                *
+     *            2       3
+     *      -
+     * 5
+     * 
      * @param args
      */
     public static void main(String[] args) {
-        System.out.println(parseNaryExpression("1", 0));
-        //Optional[ParseResult[value=NumValue[value=1.0], start=0, end=1]]
-        System.out.println(parseNaryExpression("1 + 2", 0));
-        //Optional[ParseResult[value=BinaryExpression[left=NumValue[value=1.0], op=ADD, right=NumValue[value=2.0]], start=0, end=5]]
-        System.out.println(parseNaryExpression("1 + 2 + 3", 0));
-        //Optional[ParseResult[value=BinaryExpression[left=BinaryExpression[left=NumValue[value=1.0], op=ADD, right=NumValue[value=2.0]], op=ADD, right=NumValue[value=3.0]], start=0, end=9]]
+        /*
+        получаем лево ассоциированное дерево 
+                   1 + 2 + 3 + 4
+                   ----------------
+                   1                          2                                                         
+                                  +                         +                                  
+                                                                                      +                
+                                                                              3                   4
+         */
         System.out.println(parseNaryExpression("1 + 2 + 3 + 4", 0));
-        //Optional[ParseResult[value=BinaryExpression[left=BinaryExpression[left=BinaryExpression[left=NumValue[value=1.0], op=ADD, right=NumValue[value=2.0]], op=ADD, right=NumValue[value=3.0]], op=ADD, right=NumValue[value=4.0]], start=0, end=13]]
+        //Optional[ParseResult[value=BinaryExpression[left=BinaryExpression[left=BinaryExpression[left=
+        // NumValue[value=1.0], op=ADD, right=
+        //                      NumValue[value=2.0]], op=ADD, right=
+        //                                                  NumValue[value=3.0]], op=ADD, right=
+        //                                                                      NumValue[value=4.0]], start=0, end=13]]
+        
+        // 5 - 2 * 3
+        //без приоритетов 
+        System.out.println(NaryExpressionNoPriority.parseNaryExpression("5 - 2 * 3", 0));
+        // 5.0                                               
+        //                          -
+        //                                                  2.0  
+        //                                                             *
+        //                        -                                                            3.0
+        //Optional[ParseResult[value=
+        // BinaryExpression[left=BinaryExpression[left=
+        // NumValue[value=5.0], op=SUB, right=NumValue[value=2.0]], op=MUL, right=NumValue[value=3.0]], start=0, end=9]]
+        //получаем косяк: (( 5 - 2 ) * 3 )
+        //должно быть: (5 - (2 * 3))
+
+        // 5 - 2 * 3
+        //с приоритетами 
+        System.out.println(parseNaryExpression("5 - 2 * 3", 0));
+        //               5.0                                                                                  
+        //                          -                                   
+        //                                                    2.0                  
+        //                                                                *
+        //                                                                                3.0
+        //Optional[ParseResult[value=BinaryExpression[left=BinaryExpression[left=
+        // NumValue[value=5.0], 
+    //                          op=SUB, 
+//                                      right=NumValue[value=2.0]], 
+//                                                                  op=MUL, 
+        //                                                                  right=NumValue[value=3.0]], start=0, end=9]]
     }
 
 }
