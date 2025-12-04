@@ -1,67 +1,25 @@
 package CalcParser;
 
-import static CalcParser.NaryExpression.parseAddSubExpression;
+import java.util.Optional;
+
+import static CalcParser.Parser.parseAddSubExpression;
 
 public class Main {
+public static void main(String[] args) {
+        Optional<ParseResult<Expression>> exp = parseAddSubExpression("9 / ( 6 - 3 * 3 )", 0);
+        System.out.println(exp);
+        // Optional[ParseResult[value=BinaryExpression[left=
+    // NumValue[value=9.0], op=DIV, 
+    //                              right=BinaryExpression[
+    //                                      left=NumValue[value=6.0], op=SUB, 
+    //                                                    right=BinaryExpression[
+    //                                                              left=NumValue[value=3.0], op=MUL, right=NumValue[value=3.0]]]], start=0, end=17]]
+    //                9.0               /
+    //                                                      6.0           -
+    //                                                                          3.0         *           3.0
 
-    /**
-     * получаем грамматику с поддержкой приоритетов
-     * 5 - 2 * 3
-     * ----------
-     *                *
-     *            2       3
-     *      -
-     * 5
-     *
-     * @param args
-     */
-    public static void main(String[] args) {
-        /*
-        получаем лево ассоциированное дерево 
-                   1 + 2 + 3 + 4
-                   ----------------
-                   1                          2                                                         
-                                  +                         +                                  
-                                                                                      +                
-                                                                              3                   4
-         */
-        System.out.println(parseAddSubExpression("1 + 2 + 3 + 4", 0));
-        //Optional[ParseResult[value=BinaryExpression[left=BinaryExpression[left=BinaryExpression[left=NumValue[value=1.0], op=ADD, right=NumValue[value=2.0]], op=ADD, right=NumValue[value=3.0]], op=ADD, right=NumValue[value=4.0]], start=0, end=13]]
+    System.out.println(exp.get().value().evaluate()); // -3.0
 
-        // =========================
-
-        // 5 - 2 * 3
-        //без приоритетов 
-//        System.out.println(NaryExpressionNoPriority.parseNaryExpression("5 - 2 * 3", 0));
-        //                       -                       
-        // 5.0                                             2.0  
-        //                                                                 *
-        //                        -                                                            3.0
-        //Optional[ParseResult[value=BinaryExpression[left=BinaryExpression[
-        //  left=NumValue[value=5.0], op=SUB, right=NumValue[value=2.0]
-        //  ], 
-        //                                                               op=MUL, 
-        //                                                                        right=NumValue[value=3.0]], 
-        // start=0, end=9]]
-        //получаем косяк: (( 5 - 2 ) * 3 )
-        //должно быть: (5 - (2 * 3))
-
-        // =========================
-
-        // 5 - 2 * 3
-        //с приоритетами 
-        System.out.println(parseAddSubExpression("5 - 2 * 3", 0));
-        //                                 -                                   
-        //                      5.0                                               *   
-        //                                                              2.0                 3.0
-        //Optional[ParseResult[value=BinaryExpression[
-        // left=NumValue[value=5.0], op=SUB, 
-        //                          right=BinaryExpression[
-        //                                           left=NumValue[value=2.0], op=MUL, 
-        //                                                              right=NumValue[value=3.0]
-        //                                                 ]
-        //                                           ], 
-        //  start=0, end=9]]
-    }
+}
 
 }
