@@ -46,12 +46,11 @@ public class Parsers {
      * Парсинг знака
      * sign ::= "+" | "-"
      */
-    public static Optional<ParseResult<Boolean>> parseSign(Optional<String> source, int start) {
+    public static Optional<ParseResult<Boolean>> parseSign(String source, int start) {
         // стандартная проверка исходной строки и индекса
-        if (source.isEmpty() || start < 0 || start >= source.get().length()) { return Optional.empty(); }
+        if (source.isEmpty() || start < 0 || start >= source.length()) { return Optional.empty(); }
 
-        String src = source.get();
-        char ch = src.charAt(start);
+        char ch = source.charAt(start);
 
         // смещение фиксирую в ParseResult
         return switch (ch) {
@@ -68,16 +67,15 @@ public class Parsers {
      * int ::= [sign] digit {digit}
      * digit  ::= "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
      */
-    public static Optional<ParseResult<NumValue>> parseInt(Optional<String> source, int start) {
+    public static Optional<ParseResult<NumValue>> parseInt(String source, int start) {
         // стандартная проверка исходной строки и индекса
-        if (source.isEmpty() || start < 0 || start >= source.get().length()) { return Optional.empty(); }
+        if (source.isEmpty() || start < 0 || start >= source.length()) { return Optional.empty(); }
 
-        String src = source.get();
         int offset = start;
         boolean negative = false;
 
         // знак с помощью parseSign
-        Optional<ParseResult<Boolean>> sign = parseSign(Optional.of(src), offset);
+        Optional<ParseResult<Boolean>> sign = parseSign(source, offset);
         if (sign.isPresent()) {
             negative = !sign.get().value();
             offset = sign.get().end(); // смещаю курсор на символ знака
@@ -85,16 +83,16 @@ public class Parsers {
 
         // цифры
         // курсор в пределах строки и после знака идет цифра
-        if (offset >= src.length() || !Character.isDigit(src.charAt(offset))) { return Optional.empty(); }
+        if (offset >= source.length() || !Character.isDigit(source.charAt(offset))) { return Optional.empty(); }
 
         // читаю цифры
         int num = 0;
         int initialOffset = offset;
 
-        while (offset < src.length() && Character.isDigit(src.charAt(offset))) {
+        while (offset < source.length() && Character.isDigit(source.charAt(offset))) {
             // `digitAsChar - '0'` - для преобразования в int
             // это выражение - неявно - выполняет игнорирование ведущих нулей
-            num = num * 10 + (src.charAt(offset) - '0');
+            num = num * 10 + (source.charAt(offset) - '0');
             offset++;
         }
 
@@ -115,12 +113,11 @@ public class Parsers {
      * Парсинг скобок
      * bracket ::= "(" | ")"
      */
-    public static Optional<ParseResult<Brackets>> parseBrackets(Optional<String> source, int start) {
+    public static Optional<ParseResult<Brackets>> parseBrackets(String source, int start) {
         // стандартная проверка исходной строки и индекса
-        if (source.isEmpty() || start < 0 || start >= source.get().length()) { return Optional.empty(); }
+        if (source.isEmpty() || start < 0 || start >= source.length()) { return Optional.empty(); }
 
-        String src = source.get();
-        char br = src.charAt(start);
+        char br = source.charAt(start);
 
         return switch (br) {
             case '(' -> Optional.of(new ParseResult<>(Brackets.OPENING, start, start + 1));
@@ -135,12 +132,11 @@ public class Parsers {
      * Парсинг оператора
      * op ::= "+" | "-" | "*" | "/"
      */
-    public static Optional<ParseResult<Operation>> parseOperation(Optional<String> source, int start) {
+    public static Optional<ParseResult<Operation>> parseOperation(String source, int start) {
         // стандартная проверка исходной строки и индекса
-        if (source.isEmpty() || start < 0 || start >= source.get().length()) { return Optional.empty(); }
+        if (source.isEmpty() || start < 0 || start >= source.length()) { return Optional.empty(); }
 
-        String src = source.get();
-        char op = src.charAt(start);
+        char op = source.charAt(start);
         
         return switch (op) {
             case '*' -> Optional.of(new ParseResult<>(Operation.MUL, start, start + 1));
@@ -157,16 +153,15 @@ public class Parsers {
      * Парсинг одного или более пробелов и/или табуляций
      * ws ::= (" " | "\t")+
      */
-    public static Optional<ParseResult<String>> parseWhitespace(Optional<String> source, int start) {
+    public static Optional<ParseResult<String>> parseWhitespace(String source, int start) {
         // стандартная проверка исходной строки и индекса
-        if (source.isEmpty() || start < 0 || start >= source.get().length()) { return Optional.empty(); }
+        if (source.isEmpty() || start < 0 || start >= source.length()) { return Optional.empty(); }
 
-        String src = source.get();
         int offset = start;
         
         // последовательность пробелов и табуляций
-        while (offset < src.length() &&
-                (src.charAt(offset) == ' ' || src.charAt(offset) == '\t')) {
+        while (offset < source.length() &&
+                (source.charAt(offset) == ' ' || source.charAt(offset) == '\t')) {
             offset++;
         }
         
@@ -182,32 +177,30 @@ public class Parsers {
     //region ENTRY POINT
     public static void main(String[] args) {
         // проверка парсинга числа
-        Optional<String> source = Optional.of("-456");
-        Optional<ParseResult<NumValue>> result = parseInt(source, 0);
+        Optional<ParseResult<NumValue>> result = parseInt("-456", 0);
         System.out.println(result); // Optional[ParseResult[value=-456, start=0, end=4]]
         
         // проверка парсинга знака
-        Optional<ParseResult<Boolean>> resultSign = parseSign(Optional.of("-"), 0);
+        Optional<ParseResult<Boolean>> resultSign = parseSign("-", 0);
         System.out.println(resultSign); // Optional[ParseResult[value=false, start=0, end=1]]
         
         // проверка парсинга операции
-        Optional<ParseResult<Operation>> resultOp = parseOperation(Optional.of("*"), 0);
+        Optional<ParseResult<Operation>> resultOp = parseOperation("*", 0);
         System.out.println(resultOp); // Optional[ParseResult[value=MUL, start=0, end=1]]
         
         // проверка парсинга скобки
-        Optional<ParseResult<Brackets>> resultBr = parseBrackets(Optional.of("("), 0);
+        Optional<ParseResult<Brackets>> resultBr = parseBrackets("(", 0);
         System.out.println(resultBr); // Optional[ParseResult[value=OPENING, start=0, end=1]]
-        resultBr = parseBrackets(Optional.of(")"), 0);
+        resultBr = parseBrackets(")", 0);
         System.out.println(resultBr); // Optional[ParseResult[value=CLOSING, start=0, end=1]]
         
         // проверка парсинга пробела
-        Optional<ParseResult<String>> resultWs = parseWhitespace(Optional.of("    hello"), 0);
+        Optional<ParseResult<String>> resultWs = parseWhitespace("    hello", 0);
         System.out.println(resultWs); // Optional[ParseResult[value=, start=0, end=4]]
         //
         // ??? такой способ проверки существования value в контейнере Optional - норм?
         //
         resultWs.ifPresent(wsParsed -> System.out.println(wsParsed.value()));
-        
         
     }
     //endregion
