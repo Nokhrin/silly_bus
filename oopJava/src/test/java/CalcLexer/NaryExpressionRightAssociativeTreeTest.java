@@ -8,7 +8,7 @@ import static CalcLexer.NaryExpression.parseNaryExpression;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
-public class NaryExpressionTest {
+public class NaryExpressionRightAssociativeTreeTest {
 
     //region Operations Chain
 
