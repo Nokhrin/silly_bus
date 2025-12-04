@@ -50,7 +50,7 @@ public class BinOpParser {
      *  Операторы: +, -, *, /
      * ??? Целые числа - десятичные, без ведущих нулей (т.е. 0 - допустимо, но 01, 00 - недопустимы)
      *  Знак - отрицательному числу предшествует `-`
-     * ??? Пробелы - только между частями - в начале и конце строки не допускаются
+     * ??? Пробелы - только между частями - в начале и конце строки не допускаются ?
      *
      * EBNF-грамматика бинарной операции
      * binOp ::= num {ws} op {ws} num
@@ -80,7 +80,9 @@ public class BinOpParser {
         
         //region пробелы после 1го числа
         Optional<ParseResult<String>> ws1 = parseWhitespace(source, offset);
-        if (ws1.isEmpty()) { return Optional.empty(); }
+        // по условию {ws}
+        //  => не проверяю ws1.isEmpty(), так как это значение удовлетворяет условию, 
+        //  продолжаю выполнение
         offset = ws1.get().end();
         //endregion пробелы после 1го числа
 
@@ -92,7 +94,9 @@ public class BinOpParser {
         
         //region пробелы после оператора
         Optional<ParseResult<String>> ws2 = parseWhitespace(source, offset);
-        if (ws2.isEmpty()) { return Optional.empty(); }
+        // по условию {ws}
+        //  => не проверяю ws2.isEmpty(), так как это значение удовлетворяет условию, 
+        //  продолжаю выполнение
         offset = ws2.get().end();
         //endregion пробелы после оператора
 
@@ -101,12 +105,11 @@ public class BinOpParser {
         if (numSecond.isEmpty()) { return Optional.empty() ; }
         int end = numSecond.get().end();
         //endregion 2е число
-
-        //region после 2го числа НЕТ символов
-        //endregion после 2го числа НЕТ символов
             
         return Optional.of(new ParseResult<>(
-                // BinOp - реализует Expression, поэтому типизация корректна
+                // BinOp - реализует Expression, поэтому типизация корректна:
+                //  метод возвращает Optional<ParseResult<Expression>>
+                //  метод возвращает Optional<ParseResult<Expression>>
                 new BinOp(numFirst.get().value(), op.get().value(), numSecond.get().value()),
                 offset,
                 end
