@@ -18,16 +18,16 @@ import org.testng.annotations.Test;
  *  ParseResult<T> корректно создается
  *  equals, hashCode, toString - сгенерированы, работают
  *  value, start, end - геттеры - сгенерированы, работают
- *  подстановка типа - ParseResult<Number> - это ParseResult<Integer>
+ *  подстановка типа - ParseResult<Number> - это ParseResult<NumValue>
  */
 public class ParseResultTest {
 
     // Проверка геттеров 1
     @Test
     public void testGetters1() {
-        ParseResult<Integer> result = new ParseResult<>(42, 0, 3);
+        ParseResult<NumValue> result = new ParseResult<>(new NumValue(42), 0, 3);
 
-        Assert.assertEquals(result.value(), 42);
+        Assert.assertEquals(result.value(), new NumValue(42));
         Assert.assertEquals(result.start(), 0);
         Assert.assertEquals(result.end(), 3);
     }
@@ -45,10 +45,10 @@ public class ParseResultTest {
     // equals, hashCode, toString - работают
     @Test
     public void testEqualsAndHashCodeToString() {
-        ParseResult<Integer> r1 = new ParseResult<>(42, 0, 3);
-        ParseResult<Integer> r2 = new ParseResult<>(42, 0, 3);
-        ParseResult<Integer> r3 = new ParseResult<>(43, 0, 3);
-        ParseResult<Integer> r4 = new ParseResult<>(42, 0, 4);
+        ParseResult<NumValue> r1 = new ParseResult<>(new NumValue(42), 0, 3);
+        ParseResult<NumValue> r2 = new ParseResult<>(new NumValue(42), 0, 3);
+        ParseResult<NumValue> r3 = new ParseResult<>(new NumValue(43), 0, 3);
+        ParseResult<NumValue> r4 = new ParseResult<>(new NumValue(42), 0, 4);
 
         // Проверка равенства
         Assert.assertEquals(r1, r2);
@@ -60,14 +60,14 @@ public class ParseResultTest {
         Assert.assertNotEquals(r1.hashCode(), r3.hashCode());
 
         // Проверка toString
-        String expected = "ParseResult[value=42, start=0, end=3]";
+        String expected = "ParseResult[value=NumValue[value=42.0], start=0, end=3]";
         Assert.assertEquals(r1.toString(), expected);
     }
 
     // Переопределение toString
     @Test
     public void testOverrideToString() {
-        ParseResult<Integer> result = new ParseResult<>(42, 0, 3);
+        ParseResult<NumValue> result = new ParseResult<>(new NumValue(42), 0, 3);
 
         // record автоматически генерирует toString - можно проверить
         String actual = result.toString();

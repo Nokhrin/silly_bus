@@ -7,8 +7,48 @@ package CalcLexer;
  * ограничивает область проверки для компилятора - компилятор может ограничить область допустимых наследников по сигнатуре sealed interface
  * - явно прослеживается на операторе switch - проверке всех возможных сопоставлений за счет их явно декларированного множества
  * как средство проектирования - блокирует непредусмотренное наследование
+ * 
+ * 
+ * todo - Вопрос области видимости
+ *
+ * 1
+ * code inspection IDEA 
+ *  для выражения `public static Optional<ParseResult<Expression>> parseNaryOperation(String source, int start) {`
+ * @see NaryExpression#parseNaryExpression
+ *  возвращает предупреждение `Class 'Expression' is exposed outside its defined visibility scope`
+ *  гипотеза о причине предупреждения - ложное срабатывание. 
+ *      баг в анализаторе IntelliJ IDEA  в части обработки sealed-интерфейсов
+ *   ошибочно считает, что sealed interface с package-private реализациями — это ошибка, 
+ *   потому что видит "экспорт" Expression за пределы пакета, но не может найти публичных реализаций. 
+ *
+ *  ответ: потому что не сделал public
+ *
+ *  сделал, предупреждение исчезло
+ *
+ *  однако интерфейс объявлен и реализуется в рамках одного пакета
+ *  по умолчанию он должен быть package-private 
+ *
+ * 2
+ *  вопрос - доступа package-private недостаточно в этом случае?
+ *
+ *  гипотеза:
+ *  
+ *  обоснование почему надо public
+ *     инвариант: "все реализации должны быть доступны для наследования"
+ *     В Java все публичные сущности, которые участвуют в иерархии (особенно абстрактные), должны быть public
+ *     Семантическая точность 
+ *     public sealed interface Expression - это контракт -
+ *     "Я предоставляю интерфейс для вычисления выражений. Любой класс указанный в permits может его реализовать" 
+ *     Если Expression не public, то он не может быть контрактом, потому что не может быть использован
+ *  
+ *  но я использую Expression в пределах package, зачем требовать public?
+ *  
+ *  должны ли класс, реализующие Expression, например, NumValue, быть public?
+ *    - предполагаю, нет, главное отличие public sealed interface - общее поведение для многих сущностей
+ *    + ограничение наследования, но без ограничения по отношению к наследователям
+ *  
  */
-public sealed interface Expression permits NumValue, BinOp, BinOpExpression {
+public sealed interface Expression permits NumValue, BinOp, BinaryExpression {
     double evaluate();  // абстрактный метод => наследники обязаны реализовать evaluate
 }
 
@@ -56,8 +96,31 @@ record BinOp(Number left, Parsers.Operation op, Number right) implements Express
  * Выполнение операции (op) над операндами left, right
  * <p>
  * Операнд - аргумент, участвующий в унарной или бинарной операции
+ * 
+ * todo - вопрос
+ * является ли класс record BinaryExpression(Expression left ...
+ * преемником класса  (Number left, ...  ?
+ * 
+ * интерпретирую семантику по имени классов record BinaryExpression и record BinOp
+ * BinaryExpression кажется избыточным по смыслу, так как включает понятия Операция и Выражение,
+ * где операция - подмножество выражения
+ * 
+ * однако BinOp описывает работу с Number, что, семантически, вижу как более точное и строгое описание
+ * при этом BinaryExpression - как менее строгое, но более емкое
+ * так как могу рассмотреть число как подмножество Выражений/Expressions
+ * 
+ * BinOp вижу как необходимый вспомогательный тип для парсинга числового значения
+ * 
+ * Верно ли , что один из этих классов избыточен?
+ * Если оба требуются, то почему?
+ * Как корректно отразить семантику в именах классов?
+ * 
+ * Допустимо ли преобразовать BinaryExpression в BinaryExpression ?
+ * BinaryExpression - потому что принимает 2 операнда, являющихся Expressions
+ * 
+ * @see BinOp
  */
-record BinOpExpression(Expression left, Parsers.Operation op, Expression right) implements Expression {
+record BinaryExpression(Expression left, Parsers.Operation op, Expression right) implements Expression {
     @Override
     public double evaluate() {
         double leftOperand = left.evaluate();

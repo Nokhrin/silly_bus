@@ -43,10 +43,10 @@ public class NaryExpressionTest {
         assertTrue(result.isPresent());
         Expression expr = result.get().value();
         assertEquals(expr.evaluate(), 3.0, 0.0001);
-        assertTrue(expr instanceof BinOpExpression);
-        assertEquals(((BinOpExpression) expr).left(), new NumValue(1));
-        assertEquals(((BinOpExpression) expr).op(), Parsers.Operation.ADD);
-        assertEquals(((BinOpExpression) expr).right(), new NumValue(2));
+        assertTrue(expr instanceof BinaryExpression);
+        assertEquals(((BinaryExpression) expr).left(), new NumValue(1));
+        assertEquals(((BinaryExpression) expr).op(), Parsers.Operation.ADD);
+        assertEquals(((BinaryExpression) expr).right(), new NumValue(2));
     }
 
     @Test(description = "Сложение двух чисел с пробелами: 1 + 2", groups = "ParseChain")
@@ -68,14 +68,14 @@ public class NaryExpressionTest {
         Optional<ParseResult<Expression>> result = parseNaryExpression("1+2+3", 0);
         assertTrue(result.isPresent());
         assertEquals(result.get().value().evaluate(), 6.0, 0.0001);
-        assertTrue(result.get().value() instanceof BinOpExpression);
-        BinOpExpression binOp = (BinOpExpression) result.get().value();
+        assertTrue(result.get().value() instanceof BinaryExpression);
+        BinaryExpression binOp = (BinaryExpression) result.get().value();
         assertEquals(binOp.left(), new NumValue(1));
         assertEquals(binOp.op(), Parsers.Operation.ADD);
-        assertTrue(binOp.right() instanceof BinOpExpression);
-        assertEquals(((BinOpExpression) binOp.right()).left(), new NumValue(2));
-        assertEquals(((BinOpExpression) binOp.right()).op(), Parsers.Operation.ADD);
-        assertEquals(((BinOpExpression) binOp.right()).right(), new NumValue(3));
+        assertTrue(binOp.right() instanceof BinaryExpression);
+        assertEquals(((BinaryExpression) binOp.right()).left(), new NumValue(2));
+        assertEquals(((BinaryExpression) binOp.right()).op(), Parsers.Operation.ADD);
+        assertEquals(((BinaryExpression) binOp.right()).right(), new NumValue(3));
     }
 
     @Test(description = "Сложение трех чисел с пробелами и табуляцией: 1 + 2 + 3", groups = "ParseChain")
@@ -105,8 +105,8 @@ public class NaryExpressionTest {
         assertTrue(result.isPresent());
         assertEquals(result.get().value().evaluate(), 3.0, 0.0001);
         // Проверка, что числа парсятся как целые, ведущие нули допустимы
-        assertEquals(((BinOpExpression) result.get().value()).left(), new NumValue(1));
-        assertEquals(((BinOpExpression) result.get().value()).right(), new NumValue(2));
+        assertEquals(((BinaryExpression) result.get().value()).left(), new NumValue(1));
+        assertEquals(((BinaryExpression) result.get().value()).right(), new NumValue(2));
     }
 
     @Test(description = "Сложение с ведущим нулем и пробелами: 01 + 02", groups = "ParseChain")

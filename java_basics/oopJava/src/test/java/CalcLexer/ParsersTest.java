@@ -40,30 +40,30 @@ public class ParsersTest {
     //region parseInt
     @Test(groups = "int", description = "Парсинг целого числа: 123")
     public void testParseIntPositive() {
-        Optional<ParseResult<Integer>> result = Parsers.parseInt(Optional.of("123"), 0);
+        Optional<ParseResult<NumValue>> result = Parsers.parseInt(Optional.of("123"), 0);
         Assert.assertTrue(result.isPresent());
-        ParseResult<Integer> parsed = result.get();
-        assertEquals(parsed.value(), 123);
+        ParseResult<NumValue> parsed = result.get();
+        assertEquals(parsed.value(), new NumValue(123));
         assertEquals(parsed.start(), 0);
         assertEquals(parsed.end(), 3);
     }
 
     @Test(groups = "int", description = "Парсинг целого числа: -456")
     public void testParseIntNegative() {
-        Optional<ParseResult<Integer>> result = Parsers.parseInt(Optional.of("-456"), 0);
+        Optional<ParseResult<NumValue>> result = Parsers.parseInt(Optional.of("-456"), 0);
         Assert.assertTrue(result.isPresent());
-        ParseResult<Integer> parsed = result.get();
-        assertEquals(parsed.value(), -456);
+        ParseResult<NumValue> parsed = result.get();
+        assertEquals(parsed.value(), new NumValue(-456));
         assertEquals(parsed.start(), 0);
         assertEquals(parsed.end(), 4);
     }
 
     @Test(groups = "int", description = "Парсинг целого числа: 0")
     public void testParseIntZero() {
-        Optional<ParseResult<Integer>> result = Parsers.parseInt(Optional.of("0"), 0);
+        Optional<ParseResult<NumValue>> result = Parsers.parseInt(Optional.of("0"), 0);
         Assert.assertTrue(result.isPresent());
-        ParseResult<Integer> parsed = result.get();
-        assertEquals(parsed.value(), 0);
+        ParseResult<NumValue> parsed = result.get();
+        assertEquals(parsed.value(), new NumValue(0));
         assertEquals(parsed.start(), 0);
         assertEquals(parsed.end(), 1);
     }
