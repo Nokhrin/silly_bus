@@ -1,0 +1,35 @@
+---
+title: Parsers - Class Diagram
+---
+classDiagram
+    class Operation{
+        <<enumeration>>
+        ADD
+        SUB
+        MUL
+        DIV
+    }
+
+    class Brackets{
+        <<enumeration>>
+        OPENING
+        CLOSING
+    }
+
+    class ParseResult {
+        T value
+        int start
+        int end
+    }
+
+    class Parsers {
+    + parseSign(Optional~String~, int) Optional~ParseResult~Boolean~~
+    + parseInt(Optional~String~, int) Optional~ParseResult~Integer~~
+    + parseBrackets(Optional~String~, int) Optional~ParseResult~Brackets~~
+    + parseOperation(Optional~String~, int) Optional~ParseResult~Operation~~
+    + parseWhitespace(Optional~String~, int) Optional~ParseResult~String~~
+    }
+
+    Parsers --> Operation: uses
+    Parsers --> ParseResult: uses, returns
+    Parsers --> Brackets: uses
