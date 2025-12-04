@@ -3,7 +3,7 @@ package CalcLexer;
 import java.util.Optional;
 
 /**
- *
+ * Требования
  * Используй результат Optional<ParseResult> для расчета offset
  *  ParseResult содержит 
  *      значение, 
@@ -27,10 +27,9 @@ public class Parsers {
     }
     //endregion
 
-    //region Brackets enum
+    //region Operation enum
     /**
-     * Скобки
-     * 
+     * Арифметические операторы
      * operations ::= "+" | "-" | "*" | "/"
      */
     public enum Operation {
@@ -153,8 +152,7 @@ public class Parsers {
     //region parseWhitespace
     /**
      * Парсинг одного или более пробелов и/или табуляций
-     * 
-     * ws ::= " " | "\t"
+     * ws ::= (" " | "\t")+
      */
     public static Optional<ParseResult<String>> parseWhitespace(Optional<String> source, int start) {
         // стандартная проверка исходной строки и индекса
@@ -202,7 +200,10 @@ public class Parsers {
         // проверка парсинга пробела
         Optional<ParseResult<String>> resultWs = parseWhitespace(Optional.of("    hello"), 0);
         System.out.println(resultWs); // Optional[ParseResult[value=, start=0, end=4]]
-        System.out.println(resultWs.get().value()); // ""
+        //
+        // ??? такой способ проверки существования value в контейнере Optional - норм?
+        //
+        resultWs.ifPresent(wsParsed -> System.out.println(wsParsed.value()));
         
         
     }

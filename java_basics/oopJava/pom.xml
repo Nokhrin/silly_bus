@@ -11,13 +11,16 @@
     <description>GeorStein - Programming course</description>
 
     <properties>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
+        <java.version>17</java.version>
+        <maven.compiler.source>${java.version}</maven.compiler.source>
+        <maven.compiler.target>${java.version}</maven.compiler.target>
         <groovy.version>4.0.26</groovy.version>
+        <logback-classic.version>1.5.18</logback-classic.version>
+        <slf4j-api.version>2.0.17</slf4j-api.version>
         <testng.version>7.9.0</testng.version>
         <checkstyle-plugin.version>3.4.0</checkstyle-plugin.version>
         <guava.version>33.4.8-jre</guava.version>
-        <project.encoding>UTF-8</project.encoding>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
     <dependencyManagement>
@@ -37,6 +40,18 @@
                 <version>${testng.version}</version>
                 <scope>test</scope>
             </dependency>
+            
+            <!-- Логирование -->
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>${slf4j-api.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-classic</artifactId>
+                <version>${logback-classic.version}</version>
+            </dependency>
         </dependencies>
 
     </dependencyManagement>
@@ -49,6 +64,15 @@
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <scope>runtime</scope>
         </dependency>
     </dependencies>
 
