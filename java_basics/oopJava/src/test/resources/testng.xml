@@ -30,7 +30,7 @@
             </run>
         </groups>
         <classes>
-            <class name="CalcLexer.BinOpParserTest" />
+            <class name="CalcLexer.NaryExpressionTest" />
         </classes>
     </test>
 
