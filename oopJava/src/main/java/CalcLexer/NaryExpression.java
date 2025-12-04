@@ -29,7 +29,8 @@ public class NaryExpression {
      * - использовать правоассоциативность
      * - использовать рекурсию
      * <p>
-     * EBNF-грамматика бинарной операции
+     * <p>
+     * EBNF-грамматика многоместной операции
      *  nary_expression ::= num_value {ws} op {ws} nary_expression | num_value
      *  num_value ::= [sign] digit {digit}
      *  digit ::= "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
@@ -41,7 +42,7 @@ public class NaryExpression {
     /**
      * Композиционный метод, реализующий правило
      * nary_expression ::= num_value {ws} op {ws} nary_expression | num_value
-     * 
+     * <p>
      * декомпозированное на 2 выражения
      * nary_expression ::= expression_1 | expression_2
      * expression_1 :== num_value {ws} op {ws} nary_expression
@@ -84,7 +85,11 @@ public class NaryExpression {
         
         return Optional.of(
                 new ParseResult(
-                        new BinaryExpression(num.get().value(), op.get().value(), expr.get().value()), start, expr.get().end()));
+                        new BinaryExpression(num.get().value(), op.get().value(), expr.get().value()), 
+                        start, 
+                        expr.get().end()
+                )
+        );
     }
 
     /**
