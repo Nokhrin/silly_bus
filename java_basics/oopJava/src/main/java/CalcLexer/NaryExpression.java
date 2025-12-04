@@ -47,24 +47,13 @@ public class NaryExpression {
         int offset = start;
 
         //region 1е число
-        Optional<ParseResult<NumValue>> firstExpression = parseInt(Optional.of(source), offset);
+        Optional<ParseResult<NumValue>> firstExpression = parseInt(source, offset);
         if (firstExpression.isEmpty()) { return Optional.empty(); }
         offset = firstExpression.get().end();
-
-        // выход из рекурсии - может ли выражение закончиться здесь - ветвление `| num_value`
-        // если конец строки, возвращаем это как базовый случай
-        if (offset >= source.length()) {
-            // Это базовый случай: просто число
-            return Optional.of(new ParseResult<>(
-                    new NumValue(firstExpression.get().value().evaluate()),
-                    firstExpression.get().start(),
-                    firstExpression.get().end()
-            ));
-        }
         //endregion 1е число
         
         //region пробелы после 1го числа
-        Optional<ParseResult<String>> ws1 = parseWhitespace(Optional.of(source), offset);
+        Optional<ParseResult<String>> ws1 = parseWhitespace(source, offset);
         // по условию {ws}
         //  => не проверяю ws1.isEmpty(), так как это значение удовлетворяет условию, 
         //  продолжаю выполнение
@@ -74,13 +63,13 @@ public class NaryExpression {
         //endregion пробелы после 1го числа
 
         //region оператор
-        Optional<ParseResult<Operation>> op = parseOperation(Optional.of(source), offset);
+        Optional<ParseResult<Operation>> op = parseOperation(source, offset);
         if (op.isEmpty()) { return Optional.empty(); }
         offset = op.get().end();
         //endregion оператор
         
         //region пробелы после оператора
-        Optional<ParseResult<String>> ws2 = parseWhitespace(Optional.of(source), offset);
+        Optional<ParseResult<String>> ws2 = parseWhitespace(source, offset);
         // по условию {ws}
         //  => не проверяю ws2.isEmpty(), так как это значение удовлетворяет условию, 
         //  продолжаю выполнение
@@ -94,10 +83,20 @@ public class NaryExpression {
         // пока выражение не завершилось, вызываем parseNaryOperation с актуального смещения
         Optional<ParseResult<Expression>> secondOperand = parseNaryExpression(source, offset);
         if (secondOperand.isEmpty()) { return Optional.empty() ; }
-        
         ParseResult<Expression> secondExpression = secondOperand.get();
         offset = secondExpression.end();
         //endregion nary_expression
+
+        // выход из рекурсии - может ли выражение закончиться здесь - ветвление `| num_value`
+        // если конец строки, возвращаем это как базовый случай
+        if (offset >= source.length()) {
+            // Это базовый случай: просто число
+            return Optional.of(new ParseResult<>(
+                    new NumValue(firstExpression.get().value().evaluate()),
+                    firstExpression.get().start(),
+                    firstExpression.get().end()
+            ));
+        }
         
         //region создание AST
         // правоассоциативное преобразование - формируем новый 2й операнд - a op b op c -> a op (b op c)
@@ -108,7 +107,7 @@ public class NaryExpression {
     }
 
     public static void main(String[] args) {
-        System.out.println(parseNaryExpression("1", 0));
+//        System.out.println(parseNaryExpression("1", 0));
         //Optional[ParseResult[value=NumValue[value=1.0], start=0, end=1]]
         System.out.println(parseNaryExpression("1 + 2", 0));
         //Optional[ParseResult[value=BinaryExpression[left=NumValue[value=1.0], op=ADD, right=NumValue[value=2.0]], start=0, end=5]]
