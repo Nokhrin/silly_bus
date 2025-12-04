@@ -9,7 +9,7 @@ import java.util.Optional;
  *
  * <p>Используется в парсерах для возврата:
  * <ul>
- *   <li>парсинга числа → {@code ParseResult<Integer>}</li>
+ *   <li>парсинга числа → {@code ParseResult<NumValue>}</li>
  *   <li>парсинга оператора → {@code ParseResult<Operation>}</li>
  *   <li>парсинга выражения → {@code ParseResult<Expression>}</li>
  *   <li>парсинга пробелов → {@code ParseResult<String>}</li>

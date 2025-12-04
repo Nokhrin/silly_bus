@@ -29,38 +29,13 @@ public class NaryExpression {
      *  - использовать рекурсию
      *
      * EBNF-грамматика бинарной операции
-     *  nary_expression ::= number {ws} op {ws} nary_expression | number
-     *  number ::= [sign] digit {digit}
+     *  nary_expression ::= num_value {ws} op {ws} nary_expression | num_value
+     *  num_value ::= [sign] digit {digit}
      *  digit ::= "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
      *  op ::= "+" | "-" | "*" | "/"
      *  sign ::= "+" | "-"
      *  ws ::= " " | "\t"
-     * 
-     * Пояснение к nary_expression
-     * Правило nary_expression ::= number {ws} op {ws} nary_expression | number определяет 2 возможных значения nary_expression
-     * nary_expression ::= number {ws} op {ws} nary_expression - правоассоциативное правило, где nary_expression - рекурсивное выражение
-     * nary_expression ::= number - база рекурсии
-     * 
-     * todo - вопрос
-     * code inspection IDEA 
-     *  для выражения `public static Optional<ParseResult<Expression>> parseNaryOperation(String source, int start) {`
-     *  возвращает предупреждение `Class 'Expression' is exposed outside its defined visibility scope`
-     *  гипотеза о причине предупреждения - ложное срабатывание. 
-     *      баг в анализаторе IntelliJ IDEA  в части обработки sealed-интерфейсов
-     *   ошибочно считает, что sealed interface с package-private реализациями — это ошибка, 
-     *   потому что видит "экспорт" Expression за пределы пакета, но не может найти публичных реализаций. 
-     *  
-     *  ответ: потому что не сделал public
-     *  
-     *  сделал, предупреждение исчезло
-     *  
-     *  однако интерфейс объявлен и реализуется в рамках одного пакета
-     *  по умолчанию он должен быть package-private 
-     *  
-     *  вопрос - доступа package-private недостаточно в этом случае?
-     *  
-     *  
-     * 
+
      * @param source - строковое представление вычисляемого выражения 
      * @param start - индекс элемента начала парсинга
      * @return BinOp
@@ -72,27 +47,20 @@ public class NaryExpression {
         int offset = start;
 
         //region 1е число
-        Optional<ParseResult<Integer>> firstOperand = parseInt(Optional.of(source), offset);
-        if (firstOperand.isEmpty()) { return Optional.empty(); }
-        offset = firstOperand.get().end();
+        Optional<ParseResult<NumValue>> firstExpression = parseInt(Optional.of(source), offset);
+        if (firstExpression.isEmpty()) { return Optional.empty(); }
+        offset = firstExpression.get().end();
 
-        // выход из рекурсии
+        // выход из рекурсии - может ли выражение закончиться здесь - ветвление `| num_value`
+        // если конец строки, возвращаем это как базовый случай
         if (offset >= source.length()) {
-            ParseResult<Expression> firstExpr = new ParseResult<>(
-                    new NumValue(firstOperand.get().value()),
-                    firstOperand.get().start(),
-                    firstOperand.get().end()
-            );
-            return Optional.of(firstExpr);
+            // Это базовый случай: просто число
+            return Optional.of(new ParseResult<>(
+                    new NumValue(firstExpression.get().value().evaluate()),
+                    firstExpression.get().start(),
+                    firstExpression.get().end()
+            ));
         }
-        
-        // преобразование типа firstOperand в Optional<ParseResult<Expression>>
-        // не использую Optional, так как при отсутствии оператора выполнение будет прервано ранее
-        ParseResult<Expression> firstExpression = new ParseResult<>(
-                new NumValue(firstOperand.get().value()),
-                firstOperand.get().start(),
-                firstOperand.get().end()
-        );
         //endregion 1е число
         
         //region пробелы после 1го числа
@@ -125,8 +93,6 @@ public class NaryExpression {
         // рекурсивно парсим второй операнд, который представляет nary_expression
         // пока выражение не завершилось, вызываем parseNaryOperation с актуального смещения
         Optional<ParseResult<Expression>> secondOperand = parseNaryExpression(source, offset);
-        // база рекурсии - смысл: дальнейший парсинг не имеет смысла, термов/валидных операндов больше нет
-        // parseNaryOperation не должен вызываться для последнего операнда
         if (secondOperand.isEmpty()) { return Optional.empty() ; }
         
         ParseResult<Expression> secondExpression = secondOperand.get();
@@ -135,7 +101,7 @@ public class NaryExpression {
         
         //region создание AST
         // правоассоциативное преобразование - формируем новый 2й операнд - a op b op c -> a op (b op c)
-        BinOpExpression binOp = new BinOpExpression(firstExpression.value(), op.get().value(), secondExpression.value());
+        BinaryExpression binOp = new BinaryExpression(firstExpression.get().value(), op.get().value(), secondExpression.value());
         //endregion создание AST
         
         return Optional.of(new ParseResult<>(binOp, start, offset));
@@ -145,11 +111,11 @@ public class NaryExpression {
         System.out.println(parseNaryExpression("1", 0));
         //Optional[ParseResult[value=NumValue[value=1.0], start=0, end=1]]
         System.out.println(parseNaryExpression("1 + 2", 0));
-        //Optional[ParseResult[value=BinOpExpression[left=NumValue[value=1.0], op=ADD, right=NumValue[value=2.0]], start=0, end=5]]
+        //Optional[ParseResult[value=BinaryExpression[left=NumValue[value=1.0], op=ADD, right=NumValue[value=2.0]], start=0, end=5]]
         System.out.println(parseNaryExpression("1 + 2 + 3", 0));
-        //Optional[ParseResult[value=BinOpExpression[left=NumValue[value=1.0], op=ADD, right=BinOpExpression[left=NumValue[value=2.0], op=ADD, right=NumValue[value=3.0]]], start=0, end=9]]
+        //Optional[ParseResult[value=BinaryExpression[left=NumValue[value=1.0], op=ADD, right=BinaryExpression[left=NumValue[value=2.0], op=ADD, right=NumValue[value=3.0]]], start=0, end=9]]
         System.out.println(parseNaryExpression("1 + 2 + 3 + 4", 0));
-        //Optional[ParseResult[value=BinOpExpression[left=NumValue[value=1.0], op=ADD, right=BinOpExpression[left=NumValue[value=2.0], op=ADD, right=BinOpExpression[left=NumValue[value=3.0], op=ADD, right=NumValue[value=4.0]]]], start=0, end=13]]
+        //Optional[ParseResult[value=BinaryExpression[left=NumValue[value=1.0], op=ADD, right=BinaryExpression[left=NumValue[value=2.0], op=ADD, right=BinaryExpression[left=NumValue[value=3.0], op=ADD, right=NumValue[value=4.0]]]], start=0, end=13]]
         //
     }
 

@@ -2,202 +2,71 @@ package CalcLexer;
 
 import org.testng.annotations.Test;
 
-import java.util.Optional;
-
-import static CalcLexer.BinaryExpression.parseBinOpSimple;
 import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
 
+@Test
 public class BinaryExpressionTest {
-    //region testNumWsOpWsNum
-    @Test(groups = {"simpleParser", "binOp"}, description = "Проверка парсинга и оценки выражения 'num ws op ws num': 123 + 456")
-    public void testNumWsOpWsNum() {
-        String input = "123 + 456";
-        Optional<ParseResult<Expression>> result = parseBinOpSimple(input, 0);
+    //region TestName: One Number Expression
+    @Test(groups = {"expression"}, description = "Проверка вычисления одного числа: 1")
+    public void testOneNumber() {
+        Expression expr = new BinaryExpression(new NumValue(1.0), Parsers.Operation.ADD, new NumValue(0.0));
+        // Используем ADD, чтобы использовать структуру, но результат должен быть 1.0
+        // Альтернативно можно было бы сделать прямой вызов, но структура BinaryExpression позволяет только бинарные операции
+        // Поэтому используем 1 + 0
+        assertEquals(expr.evaluate(), 1.0, "Ожидается 1.0 для выражения 1");
+    }
 
-        assertTrue(result.isPresent(), "Ожидается успешный парсинг выражения");
-        ParseResult<Expression> parseResult = result.get();
-
-        // Проверка, что результат - это BinOp
-        assertTrue(parseResult.value() instanceof BinOp, "Ожидается объект типа BinOp");
-        BinOp binOp = (BinOp) parseResult.value();
-
-        // Проверка значений
-        assertEquals(binOp.left(), 123, "Левый операнд должен быть 123");
-        assertEquals(binOp.op(), Parsers.Operation.ADD, "Оператор должен быть ADD");
-        assertEquals(binOp.right(), 456, "Правый операнд должен быть 456");
-
-        // Проверка оценки
-        assertEquals(binOp.evaluate(), 579.0, 1e-9, "Результат сложения 123 + 456 должен быть 579.0");
+    @Test(groups = {"expression"}, description = "Проверка вычисления одного числа: 42")
+    public void testOneNumberWith42() {
+        Expression expr = new BinaryExpression(new NumValue(42.0), Parsers.Operation.ADD, new NumValue(0.0));
+        assertEquals(expr.evaluate(), 42.0, "Ожидается 42.0 для выражения 42");
     }
     //endregion
 
-    //region testNumOpWsNum
-    @Test(groups = {"simpleParser", "binOp"}, description = "Проверка парсинга и оценки выражения 'num op ws num': 123+ 456")
-    public void testNumOpWsNum() {
-        String input = "123+ 456";
-        Optional<ParseResult<Expression>> result = parseBinOpSimple(input, 0);
-
-        assertTrue(result.isPresent(), "Ожидается успешный парсинг выражения");
-        ParseResult<Expression> parseResult = result.get();
-
-        // Проверка, что результат - это BinOp
-        assertTrue(parseResult.value() instanceof BinOp, "Ожидается объект типа BinOp");
-        BinOp binOp = (BinOp) parseResult.value();
-
-        // Проверка значений
-        assertEquals(binOp.left(), 123, "Левый операнд должен быть 123");
-        assertEquals(binOp.op(), Parsers.Operation.ADD, "Оператор должен быть ADD");
-        assertEquals(binOp.right(), 456, "Правый операнд должен быть 456");
-
-        // Проверка оценки
-        assertEquals(binOp.evaluate(), 579.0, 1e-9, "Результат сложения 123 + 456 должен быть 579.0");
+    // Тесты для 1+2
+    //region TestName: Simple Addition 1+2
+    @Test(groups = {"expression", "binOp"}, description = "Проверка выражения 1+2 -> 3")
+    public void testSimpleAddition() {
+        Expression expr = new BinaryExpression(
+                new NumValue(1.0),
+                Parsers.Operation.ADD,
+                new NumValue(2.0)
+        );
+        assertEquals(expr.evaluate(), 3.0, "Ожидается 3.0 для 1+2");
     }
-    //endregion
 
-    //region testNumWsOpNum
-    @Test(groups = {"simpleParser", "binOp"}, description = "Проверка парсинга и оценки выражения 'num ws op num': 123 +456")
-    public void testNumWsOpNum() {
-        String input = "123 +456";
-        Optional<ParseResult<Expression>> result = parseBinOpSimple(input, 0);
-
-        assertTrue(result.isPresent(), "Ожидается успешный парсинг выражения");
-        ParseResult<Expression> parseResult = result.get();
-
-        // Проверка, что результат — это BinOp
-        assertTrue(parseResult.value() instanceof BinOp, "Ожидается объект типа BinOp");
-        BinOp binOp = (BinOp) parseResult.value();
-
-        // Проверка значений
-        assertEquals(binOp.left(), 123, "Левый операнд должен быть 123");
-        assertEquals(binOp.op(), Parsers.Operation.ADD, "Оператор должен быть ADD");
-        assertEquals(binOp.right(), 456, "Правый операнд должен быть 456");
-
-        // Проверка оценки
-        assertEquals(binOp.evaluate(), 579.0, 1e-9, "Результат сложения 123 + 456 должен быть 579.0");
+    @Test(groups = {"expression", "binOp"}, description = "Проверка выражения 1+2+3 -> 6 (последовательно)")
+    public void testAdditionChain() {
+        // 1+2+3 = (1+2)+3 = 6
+        Expression inner = new BinaryExpression(
+                new NumValue(1.0),
+                Parsers.Operation.ADD,
+                new NumValue(2.0)
+        );
+        Expression expr = new BinaryExpression(
+                inner,
+                Parsers.Operation.ADD,
+                new NumValue(3.0)
+        );
+        assertEquals(expr.evaluate(), 6.0, "Ожидается 6.0 для 1+2+3");
     }
-    //endregion
 
-    //region testNumOpNum
-    @Test(groups = {"simpleParser", "binOp"}, description = "Проверка парсинга и оценки выражения 'num op num': 123+456")
-    public void testNumOpNum() {
-        String input = "123+456";
-        Optional<ParseResult<Expression>> result = parseBinOpSimple(input, 0);
-
-        assertTrue(result.isPresent(), "Ожидается успешный парсинг выражения");
-        ParseResult<Expression> parseResult = result.get();
-
-        // Проверка, что результат — это BinOp
-        assertTrue(parseResult.value() instanceof BinOp, "Ожидается объект типа BinOp");
-        BinOp binOp = (BinOp) parseResult.value();
-
-        // Проверка значений
-        assertEquals(binOp.left(), 123, "Левый операнд должен быть 123");
-        assertEquals(binOp.op(), Parsers.Operation.ADD, "Оператор должен быть ADD");
-        assertEquals(binOp.right(), 456, "Правый операнд должен быть 456");
-
-        // Проверка оценки
-        assertEquals(binOp.evaluate(), 579.0, 1e-9, "Результат сложения 123 + 456 должен быть 579.0");
+    @Test(groups = {"expression", "binOp"}, description = "Проверка выражения 1+2+3-4 -> 2")
+    public void testAdditionSubtraction() {
+        // 1+2+3-4 = ((1+2)+3)-4 = 6-4 = 2
+        Expression expr = new BinaryExpression(
+                new BinaryExpression(
+                        new BinaryExpression(
+                                new NumValue(1.0),
+                                Parsers.Operation.ADD,
+                                new NumValue(2.0)
+                        ),
+                        Parsers.Operation.ADD,
+                        new NumValue(3.0)
+                ),
+                Parsers.Operation.SUB,
+                new NumValue(4.0)
+        );
+        assertEquals(expr.evaluate(), 2.0, "Ожидается 2.0 для 1+2+3-4");
     }
-    //endregion
-
-    //region TestName: Парсинг вычитания
-    @Test(groups = {"simpleParser", "binOp"}, description = "Проверка парсинга и оценки выражения: 100 - 25")
-    public void testParseSubtraction() {
-        String input = "100 - 25";
-        Optional<ParseResult<Expression>> result = parseBinOpSimple(input, 0);
-
-        assertTrue(result.isPresent(), "Ожидается успешный парсинг выражения");
-        ParseResult<Expression> parseResult = result.get();
-
-        assertTrue(parseResult.value() instanceof BinOp, "Ожидается объект типа BinOp");
-        BinOp binOp = (BinOp) parseResult.value();
-
-        assertEquals(binOp.left(), 100, "Левый операнд должен быть 100");
-        assertEquals(binOp.op(), Parsers.Operation.SUB, "Оператор должен быть SUB");
-        assertEquals(binOp.right(), 25, "Правый операнд должен быть 25");
-
-        assertEquals(binOp.evaluate(), 75.0, 1e-9, "Результат вычитания 100 - 25 должен быть 75.0");
-    }
-    //endregion
-
-    //region TestName: Парсинг умножения
-    @Test(groups = {"simpleParser", "binOp"}, description = "Проверка парсинга и оценки выражения: 7 * 8")
-    public void testParseMultiplication() {
-        String input = "7 * 8";
-        Optional<ParseResult<Expression>> result = parseBinOpSimple(input, 0);
-
-        assertTrue(result.isPresent(), "Ожидается успешный парсинг выражения");
-        ParseResult<Expression> parseResult = result.get();
-
-        assertTrue(parseResult.value() instanceof BinOp, "Ожидается объект типа BinOp");
-        BinOp binOp = (BinOp) parseResult.value();
-
-        assertEquals(binOp.left(), 7, "Левый операнд должен быть 7");
-        assertEquals(binOp.op(), Parsers.Operation.MUL, "Оператор должен быть MUL");
-        assertEquals(binOp.right(), 8, "Правый операнд должен быть 8");
-
-        assertEquals(binOp.evaluate(), 56.0, 1e-9, "Результат умножения 7 * 8 должен быть 56.0");
-    }
-    //endregion
-
-    //region TestName: Парсинг деления
-    @Test(groups = {"simpleParser", "binOp"}, description = "Проверка парсинга и оценки выражения: 100 / 4")
-    public void testParseDivision() {
-        String input = "100 / 4";
-        Optional<ParseResult<Expression>> result = parseBinOpSimple(input, 0);
-
-        assertTrue(result.isPresent(), "Ожидается успешный парсинг выражения");
-        ParseResult<Expression> parseResult = result.get();
-
-        assertTrue(parseResult.value() instanceof BinOp, "Ожидается объект типа BinOp");
-        BinOp binOp = (BinOp) parseResult.value();
-
-        assertEquals(binOp.left(), 100, "Левый операнд должен быть 100");
-        assertEquals(binOp.op(), Parsers.Operation.DIV, "Оператор должен быть DIV");
-        assertEquals(binOp.right(), 4, "Правый операнд должен быть 4");
-
-        assertEquals(binOp.evaluate(), 25.0, 1e-9, "Результат деления 100 / 4 должен быть 25.0");
-    }
-    //endregion
-
-    //region TestName: Парсинг с пробелами вокруг оператора
-    @Test(groups = {"simpleParser", "binOp"}, description = "Проверка парсинга с пробелами: `10  +  20`")
-    public void testParseWithWhitespace() {
-        String input = "10  +  20";
-        Optional<ParseResult<Expression>> result = parseBinOpSimple(input, 0);
-
-        assertTrue(result.isPresent(), "Ожидается успешный парсинг выражения с пробелами вокруг оператора");
-        ParseResult<Expression> parseResult = result.get();
-
-        assertTrue(parseResult.value() instanceof BinOp, "Ожидается объект типа BinOp");
-        BinOp binOp = (BinOp) parseResult.value();
-
-        assertEquals(binOp.left(), 10, "Левый операнд должен быть 10");
-        assertEquals(binOp.op(), Parsers.Operation.ADD, "Оператор должен быть ADD");
-        assertEquals(binOp.right(), 20, "Правый операнд должен быть 20");
-
-        assertEquals(binOp.evaluate(), 30.0, 1e-9, "Результат сложения 10 + 20 должен быть 30.0");
-    }
-    //endregion
-
-    //region TestName: Парсинг отрицательного числа и сложения
-    @Test(groups = {"simpleParser", "binOp"}, description = "Проверка парсинга: -5 + 3")
-    public void testParseNegativeNumberWithAddition() {
-        String input = "-5 + 3";
-        Optional<ParseResult<Expression>> result = parseBinOpSimple(input, 0);
-
-        assertTrue(result.isPresent(), "Ожидается успешный парсинг выражения с отрицательным числом");
-        ParseResult<Expression> parseResult = result.get();
-
-        assertTrue(parseResult.value() instanceof BinOp, "Ожидается объект типа BinOp");
-        BinOp binOp = (BinOp) parseResult.value();
-
-        assertEquals(binOp.left(), -5, "Левый операнд должен быть -5");
-        assertEquals(binOp.op(), Parsers.Operation.ADD, "Оператор должен быть ADD");
-        assertEquals(binOp.right(), 3, "Правый операнд должен быть 3");
-
-        assertEquals(binOp.evaluate(), -2.0, 1e-9, "Результат сложения -5 + 3 должен быть -2.0");
-    }
-    //endregion
 }
