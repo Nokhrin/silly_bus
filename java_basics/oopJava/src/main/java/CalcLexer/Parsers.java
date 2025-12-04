@@ -68,7 +68,7 @@ public class Parsers {
      * int ::= [sign] digit {digit}
      * digit  ::= "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
      */
-    public static Optional<ParseResult<Integer>> parseInt(Optional<String> source, int start) {
+    public static Optional<ParseResult<NumValue>> parseInt(Optional<String> source, int start) {
         // стандартная проверка исходной строки и индекса
         if (source.isEmpty() || start < 0 || start >= source.get().length()) { return Optional.empty(); }
 
@@ -106,7 +106,7 @@ public class Parsers {
             num = -1 * num;
         }
 
-        return Optional.of(new ParseResult<>(num, start, offset));
+        return Optional.of(new ParseResult<>(new NumValue(num), start, offset));
     }
     //endregion
 
@@ -183,7 +183,7 @@ public class Parsers {
     public static void main(String[] args) {
         // проверка парсинга числа
         Optional<String> source = Optional.of("-456");
-        Optional<ParseResult<Integer>> result = parseInt(source, 0);
+        Optional<ParseResult<NumValue>> result = parseInt(source, 0);
         System.out.println(result); // Optional[ParseResult[value=-456, start=0, end=4]]
         
         // проверка парсинга знака
