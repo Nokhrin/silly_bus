@@ -64,17 +64,8 @@ public class BinOpParser {
      * @param start - индекс элемента начала парсинга
      * @return BinOp op
      */
-
-    /**
-     * record BinOp( Number left, Op op, Number right )
-     */
-    public record BinOp(
-        Number left,
-        Parsers.Operation op,
-        Number right
-    ) {}
     
-    public static Optional<ParseResult<BinOp>> parseBinOpSimple(Optional<String> source, int start) {
+    public static Optional<ParseResult<Expression>> parseBinOpSimple(Optional<String> source, int start) {
         // стандартная проверка исходной строки и индекса
         if (source.isEmpty() || start < 0 || start >= source.get().length()) { return Optional.empty(); }
 
@@ -115,6 +106,7 @@ public class BinOpParser {
         //endregion после 2го числа НЕТ символов
             
         return Optional.of(new ParseResult<>(
+                // BinOp - реализует Expression, поэтому типизация корректна
                 new BinOp(numFirst.get().value(), op.get().value(), numSecond.get().value()),
                 offset,
                 end
