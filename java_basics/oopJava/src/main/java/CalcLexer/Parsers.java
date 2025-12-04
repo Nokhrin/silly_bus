@@ -2,14 +2,24 @@ package CalcLexer;
 
 import java.util.Optional;
 
-
+/**
+ *
+ * Используй результат Optional<ParseResult> для расчета offset
+ *  ParseResult содержит 
+ *      значение, 
+ *      первый (включительно),
+ *      последний (исключительно) индексы значения
+ * Инкремент запрещен
+ *
+ * используй комментирование регионов кода
+ */
 public class Parsers {
 
     //region Brackets enum
     /**
-     * Арифметические операции
-     * 
+     * Скобки - группировка, определение вложенности выражений
      * brackets ::= "(" | ")"
+     * @see #parseBrackets
      */
     public enum Brackets {
         OPENING,
@@ -34,16 +44,7 @@ public class Parsers {
     //region parseSign
     /**
      * Парсинг знака
-     * sign       ::= "+" | "-"
-     *
-     * Используй результат Optional<ParseResult> для расчета offset
-     *  ParseResult содержит 
-     *      значение, 
-     *      первый (включительно),
-     *      последний (исключительно) индексы значения
-     * Инкремент запрещен
-     *
-     * используй комментирование регионов кода
+     * sign ::= "+" | "-"
      */
     public static Optional<ParseResult<Boolean>> parseSign(Optional<String> source, int start) {
         // стандартная проверка исходной строки и индекса
@@ -63,11 +64,9 @@ public class Parsers {
 
     //region parseInt
     /**
-     * Парсинг цифр
-     *
+     * Парсинг целого числа
+     * int ::= [sign] digit {digit}
      * digit  ::= "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
-     * digits ::= [sign] digit {digit}
-     *
      */
     public static Optional<ParseResult<Integer>> parseInt(Optional<String> source, int start) {
         // стандартная проверка исходной строки и индекса
@@ -112,12 +111,7 @@ public class Parsers {
     //region parseBrackets
     /**
      * Парсинг скобок
-     *
-     * рассматриваю правило
      * bracket ::= "(" | ")"
-     *  - говорит: bracket есть или открывающая скобка, или закрывающая скобка
-     *  - НЕ гарантирует парность
-     *  - НЕ описывает вложенность
      */
     public static Optional<ParseResult<Brackets>> parseBrackets(Optional<String> source, int start) {
         // стандартная проверка исходной строки и индекса
@@ -137,9 +131,7 @@ public class Parsers {
     //region parseOperation
     /**
      * Парсинг оператора
-     *
-     * whitespace ::= [ " " | "\t" ]+
-     *
+     * op ::= "+" | "-" | "*" | "/"
      */
     public static Optional<ParseResult<Operation>> parseOperation(Optional<String> source, int start) {
         // стандартная проверка исходной строки и индекса
@@ -161,7 +153,8 @@ public class Parsers {
     //region parseWhitespace
     /**
      * Парсинг одного или более пробелов и/или табуляций
-     *
+     * 
+     * ws ::= " " | "\t"
      */
     public static Optional<ParseResult<String>> parseWhitespace(Optional<String> source, int start) {
         // стандартная проверка исходной строки и индекса
