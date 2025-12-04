@@ -10,7 +10,8 @@ public class NaryExpression {
      * <p>  
      * Синтаксическая грамматика в нотации eBNF:
      *  add_sub_expression ::= mul_div_expression { [ws] add_sub_operation [ws] mul_div_expression }
-     *  mul_div_expression ::= num_value { [ws] mul_div_operation [ws] num_value }
+     *  mul_div_expression ::= atom_expression { [ws] mul_div_operation [ws] atom_expression }
+     *  atom_expression ::= num_value | '(' [ws] add_sub_operation [ws] ')'
      *  mul_div_operation ::= "*" | "/"
      *  add_sub_operation ::= "+" | "-"
      *  num_value ::= [sign] digit {digit}
@@ -23,14 +24,15 @@ public class NaryExpression {
      * @param start  стартовый индекс  
      * @return ParseResult(Expression) или Optional.empty(), если парсинг не удался
      */
-    public static Optional<ParseResult<Expression>> parseNaryExpression(String source, int start) {
+    public static Optional<ParseResult<Expression>> parseAddSubExpression(String source, int start) {
         // проверка входных данных
         if (source.isEmpty() || start < 0 || start >= source.length()) {
             return Optional.empty();
         }
         
         //add_sub_expression ::= mul_div_expression { [ws] add_sub_operation [ws] mul_div_expression }
-        //
+
+        //mul_div_expression
         Optional<ParseResult<Expression>> mulDivExpressionOpt = parseMulDivExpression(source, start);
         if (mulDivExpressionOpt.isEmpty()) { return Optional.empty(); }
         

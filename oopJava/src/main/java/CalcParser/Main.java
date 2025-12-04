@@ -1,6 +1,6 @@
 package CalcParser;
 
-import static CalcParser.NaryExpression.parseNaryExpression;
+import static CalcParser.NaryExpression.parseAddSubExpression;
 
 public class Main {
 
@@ -25,7 +25,7 @@ public class Main {
                                                                                       +                
                                                                               3                   4
          */
-        System.out.println(parseNaryExpression("1 + 2 + 3 + 4", 0));
+        System.out.println(parseAddSubExpression("1 + 2 + 3 + 4", 0));
         //Optional[ParseResult[value=BinaryExpression[left=BinaryExpression[left=BinaryExpression[left=NumValue[value=1.0], op=ADD, right=NumValue[value=2.0]], op=ADD, right=NumValue[value=3.0]], op=ADD, right=NumValue[value=4.0]], start=0, end=13]]
 
         // =========================
@@ -50,7 +50,7 @@ public class Main {
 
         // 5 - 2 * 3
         //с приоритетами 
-        System.out.println(parseNaryExpression("5 - 2 * 3", 0));
+        System.out.println(parseAddSubExpression("5 - 2 * 3", 0));
         //                                 -                                   
         //                      5.0                                               *   
         //                                                              2.0                 3.0

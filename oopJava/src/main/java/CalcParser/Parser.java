@@ -217,7 +217,9 @@ public class Parser {
     /**
      * Парсинг выражения умножения/деления
      * <p> 
-     * mul_div_expression ::= num_value { [ws] mul_div_operation [ws] num_value }
+     * Синтаксическая грамматика в нотации eBNF:
+     *  mul_div_expression ::= atom_expression { [ws] mul_div_operation [ws] atom_expression }
+     *  atom_expression ::= num_value | '(' [ws] add_sub_operation [ws] ')'
      *  mul_div_operation ::= "*" | "/"
      *  add_sub_operation ::= "+" | "-"
      *  num_value ::= [sign] digit {digit}
@@ -230,14 +232,19 @@ public class Parser {
      * @return
      */
     public static Optional<ParseResult<Expression>> parseMulDivExpression(String source, int start) {
-        //mul_div_expression ::= num_value { [ws] mul_div_operation [ws] num_value }
-        //
-        //num_value
-        Optional<ParseResult<NumValue>> numValueOpt1 = parseNumber(source, start);
-        if (numValueOpt1.isEmpty()) { return Optional.empty(); }
+        // Проверка входных данных
+        if (source.isEmpty() || start < 0 || start >= source.length()) {
+            return Optional.empty();
+        }
+
+        //mul_div_expression ::= atom_expression { [ws] mul_div_operation [ws] atom_expression }
         
-        Expression numValue1 = numValueOpt1.get().value();
-        int offset = numValueOpt1.get().end();
+        //atom_expression
+        Optional<ParseResult<AtomExpression>> atom_expressionOpt1 = parseAtom(source, start);
+        if (atom_expressionOpt1.isEmpty()) { return Optional.empty(); }
+        
+        Expression atom_expression1 = atom_expressionOpt1.get().value();
+        int offset = atom_expressionOpt1.get().end();
         
         //{ [ws] mul_div_operation [ws] num_value }
         while (offset < source.length()) {
@@ -263,22 +270,91 @@ public class Parser {
             }
 
             //num_value
-            Optional<ParseResult<NumValue>> numValueOpt2 = parseNumber(source, offset);
-            if (numValueOpt2.isEmpty()) { 
+            Optional<ParseResult<AtomExpression>> atom_expressionOpt2 = parseAtom(source, offset);
+            if (atom_expressionOpt2.isEmpty()) { 
                 //числа нет, выражение { [ws] mul_div_operation [ws] num_value } невалидно
                 break; 
             }
             
-            NumValue numValue2 = numValueOpt2.get().value();
-            offset = numValueOpt2.get().end();
+            Expression atom_expression2 = atom_expressionOpt2.get().value();
+            offset = atom_expressionOpt2.get().end();
             
             //mul_div_expression ::= num_value { [ws] mul_div_operation [ws] num_value }
             //накапливаем итог в первом num_value
-            numValue1 = new BinaryExpression(numValue1, op, numValue2);
+            atom_expression1 = new BinaryExpression(atom_expression1, op, atom_expression2);
         }
 
-        return Optional.of(new ParseResult<>(numValue1, start, offset));
+        return Optional.of(new ParseResult<>(atom_expression1, start, offset));
     }
     //endregion mulDivExpression
+
+    //region atom_expression
+    /**
+     * Парсинг атомарного выражения
+     * <p>
+     * Синтаксическая грамматика в нотации eBNF:
+     * atom_expression ::= num_value | '(' [ws] add_sub_operation [ws] ')'
+     * mul_div_operation ::= "*" | "/"
+     * add_sub_operation ::= "+" | "-"
+     * num_value ::= [sign] digit {digit}
+     * digit ::= "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
+     * sign ::= "+" | "-"
+     * ws ::= (" " | "\t" | "\n" | "\r") {" " | "\t" | "\n" | "\r"}
+     *
+     * @param source
+     * @param start
+     * @return
+     */
+    private static Optional<ParseResult<AtomExpression>> parseAtom(String source, int start) {
+        // Проверка входных данных
+        if (source.isEmpty() || start < 0 || start >= source.length()) {
+            return Optional.empty();
+        }
+
+        //atom_expression ::= num_value | '(' [ws] add_sub_operation [ws] ')'
+        
+        //num_value
+        Optional<ParseResult<NumValue>> numValueOpt1 = parseNumber(source, start);
+        if (numValueOpt1.isEmpty()) {
+            return Optional.empty();
+        }
+        Expression numValue = numValueOpt1.get().value();
+        int offset = numValueOpt1.get().end();
+
+        // ( [ws] add_sub_operation [ws] )
+        // '('
+        if (source.charAt(start) != '(') {
+            return Optional.empty();
+        }
+        offset++;
+
+        // [ws]
+        Optional<ParseResult<String>> wsOpt = parseWhitespace(source, offset);
+        if (wsOpt.isPresent()) {
+            offset = wsOpt.get().end();
+        }
+
+        // add_sub_operation
+        Optional<ParseResult<Operation>> opOpt = parseAddSubOperation(source, offset);
+        if (opOpt.isEmpty()) {
+            return Optional.empty();
+        }
+        offset = opOpt.get().end();
+
+        // [ws]
+        wsOpt = parseWhitespace(source, offset);
+        if (wsOpt.isPresent()) {
+            offset = wsOpt.get().end();
+        }
+
+        // ')'
+        if (offset >= source.length() || source.charAt(offset) != ')') {
+            return Optional.empty();
+        }
+        offset++;
+
+        return Optional.empty();
+    }
+    //endregion atom_expression
 }
 
