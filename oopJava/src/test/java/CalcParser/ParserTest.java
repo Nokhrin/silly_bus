@@ -440,4 +440,35 @@ public class ParserTest {
         assertFalse(result.isPresent());
     }
     //endregion parseAddSubOperationTest    
+
+    //region parseAtomExpressionTest
+    @Test
+    public void testParseAtomExpression_Number() {
+        Optional<ParseResult<Expression>> result = Parser.parseAtomExpression("42", 0);
+        assertTrue(result.isPresent());
+        assertEquals(result.get().value(), new NumValue(42));
+        assertEquals(result.get().end(), 2);
+    }
+
+    @Test
+    public void testParseAtomExpression_Parentheses() {
+        Optional<ParseResult<Expression>> result = Parser.parseAtomExpression("(1+2)", 0);
+        assertTrue(result.isPresent());
+        assertEquals(result.get().value().toString(), "BinaryExpression[left=NumValue[value=1.0], op=ADD, right=NumValue[value=2.0]]");
+        assertEquals(result.get().end(), 5);
+    }
+
+    @Test
+    public void testParseAtomExpression_WithSpaces() {
+        Optional<ParseResult<Expression>> result = Parser.parseAtomExpression("( 1 + 2 )", 0);
+        assertTrue(result.isPresent());
+        assertEquals(result.get().end(), 9);
+    }
+
+    @Test
+    public void testParseAtomExpression_Invalid() {
+        Optional<ParseResult<Expression>> result = Parser.parseAtomExpression("a", 0);
+        assertTrue(result.isEmpty());
+    }
+    //endregion parseAtomExpressionTest
 }   

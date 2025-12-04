@@ -3,6 +3,21 @@ package CalcParser;
 import java.util.Optional;
 import java.util.Set;
 
+
+/**
+ * Парсер
+ * 
+ * Синтаксические правила в нотации eBNF
+ *  add_sub_expression ::= mul_div_expression { [ws] add_sub_operation [ws] mul_div_expression }
+ *  mul_div_expression ::= atom_expression { [ws] mul_div_operation [ws] atom_expression }
+ *  atom_expression ::= num_value | '(' [ws] add_sub_expression [ws] ')'
+ *  mul_div_operation ::= "*" | "/"
+ *  add_sub_operation ::= "+" | "-"
+ *  num_value ::= [sign] digit {digit}
+ *  digit ::= "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
+ *  sign ::= "+" | "-"
+ *  ws ::= (" " | "\t" | "\n" | "\r") {" " | "\t" | "\n" | "\r"}
+ */
 public class Parser {
 
     //region Brackets enum
@@ -68,7 +83,6 @@ public class Parser {
     /**
      * Парсинг целого числа
      * int ::= [sign] digit {digit}
-     * digit  ::= "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
      */
     public static Optional<ParseResult<NumValue>> parseNumber(String source, int start) {
         // стандартная проверка исходной строки и индекса
@@ -153,7 +167,7 @@ public class Parser {
 
     //region parseWhitespace
     /**
-     * Парсинг одного или более пробелов и/или табуляций
+     * Парсинг пробельных символов
      * ws ::= (" " | "\t" | "\n" | "\r") {" " | "\t" | "\n" | "\r"}
      */
     public static Optional<ParseResult<String>> parseWhitespace(String source, int start) {
@@ -194,7 +208,7 @@ public class Parser {
 
     //region parseAddSubOperation
     /**
-     * Парсинг оператора сложения или вычитания  
+     * Парсинг оператора сложения/вычитания  
      * add_sub_operator ::= "+" | "-"  
      */
     public static Optional<ParseResult<Operation>> parseAddSubOperation(String source, int start) {
@@ -211,21 +225,75 @@ public class Parser {
         };
     }
     //endregion
+
+    //region parseAddSubExpression
+    /**
+     * Парсер выражения сложения/вычитания
+     *  add_sub_expression ::= mul_div_expression { [ws] add_sub_operation [ws] mul_div_expression }
+     *  
+     * @see Parser
+     * @param source исходная строка  
+     * @param start  стартовый индекс  
+     * @return ParseResult(Expression) или Optional.empty(), если парсинг не удался
+     */
+    public static Optional<ParseResult<Expression>> parseAddSubExpression(String source, int start) {
+        // проверка входных данных
+        if (source.isEmpty() || start < 0 || start >= source.length()) {
+            return Optional.empty();
+        }
+
+        //mul_div_expression
+        Optional<ParseResult<Expression>> mulDivExpressionOpt = parseMulDivExpression(source, start);
+        if (mulDivExpressionOpt.isEmpty()) { return Optional.empty(); }
+
+        Expression mulDivExpression1 = mulDivExpressionOpt.get().value();
+        int offset = mulDivExpressionOpt.get().end();
+
+        //{ [ws] add_sub_operation [ws] mul_div_expression }
+        while (offset < source.length()) {
+            //[ws]
+            Optional<ParseResult<String>> ws = parseWhitespace(source, offset);
+            if (ws.isPresent()) { offset = ws.get().end(); }
+
+            //add_sub_operation
+            Optional<ParseResult<Operation>> opOpt = parseAddSubOperation(source, offset);
+            if (opOpt.isEmpty()) {
+                // оператора нет, выражение { [ws] add_sub_operation [ws] mul_div_expression } невалидно
+                break;
+            }
+            Operation op = opOpt.get().value();
+            offset = opOpt.get().end();
+
+            //[ws]
+            ws = parseWhitespace(source, offset);
+            if (ws.isPresent()) { offset = ws.get().end(); }
+
+            //mul_div_expression
+            Optional<ParseResult<Expression>> mulDivExpressionOpt2 = parseMulDivExpression(source, offset);
+            if (mulDivExpressionOpt2.isEmpty()) {
+                // операции нет, выражение { [ws] add_sub_operation [ws] mul_div_expression } невалидно
+                break;
+            }
+
+            Expression mulDivExpression2 = mulDivExpressionOpt2.get().value();
+            offset = mulDivExpressionOpt2.get().end();
+
+            //add_sub_expression ::= mul_div_expression { [ws] add_sub_operation [ws] mul_div_expression }
+            //выполняем add_sub_operation
+            //накапливаем итог в первом mul_div_expression
+            mulDivExpression1 = new BinaryExpression(mulDivExpression1, op, mulDivExpression2);
+        }
+
+        return Optional.of(new ParseResult<>(mulDivExpression1, start, offset));
+
+    }
+    //endregion parseAddSubExpression
     
-    //region mulDivExpression
+    //region parseMulDivExpression
 
     /**
      * Парсинг выражения умножения/деления
-     * <p> 
-     * Синтаксическая грамматика в нотации eBNF:
      *  mul_div_expression ::= atom_expression { [ws] mul_div_operation [ws] atom_expression }
-     *  atom_expression ::= num_value | '(' [ws] add_sub_operation [ws] ')'
-     *  mul_div_operation ::= "*" | "/"
-     *  add_sub_operation ::= "+" | "-"
-     *  num_value ::= [sign] digit {digit}
-     *  digit ::= "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
-     *  sign ::= "+" | "-"
-     *  ws ::= (" " | "\t" | "\n" | "\r") {" " | "\t" | "\n" | "\r"}
      *  
      * @param source
      * @param start
@@ -236,11 +304,9 @@ public class Parser {
         if (source.isEmpty() || start < 0 || start >= source.length()) {
             return Optional.empty();
         }
-
-        //mul_div_expression ::= atom_expression { [ws] mul_div_operation [ws] atom_expression }
         
         //atom_expression
-        Optional<ParseResult<AtomExpression>> atom_expressionOpt1 = parseAtom(source, start);
+        Optional<ParseResult<Expression>> atom_expressionOpt1 = parseAtomExpression(source, start);
         if (atom_expressionOpt1.isEmpty()) { return Optional.empty(); }
         
         Expression atom_expression1 = atom_expressionOpt1.get().value();
@@ -270,7 +336,7 @@ public class Parser {
             }
 
             //num_value
-            Optional<ParseResult<AtomExpression>> atom_expressionOpt2 = parseAtom(source, offset);
+            Optional<ParseResult<Expression>> atom_expressionOpt2 = parseAtomExpression(source, offset);
             if (atom_expressionOpt2.isEmpty()) { 
                 //числа нет, выражение { [ws] mul_div_operation [ws] num_value } невалидно
                 break; 
@@ -288,73 +354,65 @@ public class Parser {
     }
     //endregion mulDivExpression
 
-    //region atom_expression
+    //region parseAtomExpression
     /**
      * Парсинг атомарного выражения
-     * <p>
-     * Синтаксическая грамматика в нотации eBNF:
-     * atom_expression ::= num_value | '(' [ws] add_sub_operation [ws] ')'
-     * mul_div_operation ::= "*" | "/"
-     * add_sub_operation ::= "+" | "-"
-     * num_value ::= [sign] digit {digit}
-     * digit ::= "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
-     * sign ::= "+" | "-"
-     * ws ::= (" " | "\t" | "\n" | "\r") {" " | "\t" | "\n" | "\r"}
+     * atom_expression ::= num_value | '(' [ws] add_sub_expression [ws] ')'
      *
      * @param source
      * @param start
      * @return
      */
-    private static Optional<ParseResult<AtomExpression>> parseAtom(String source, int start) {
+    public static Optional<ParseResult<Expression>> parseAtomExpression(String source, int start) {
         // Проверка входных данных
         if (source.isEmpty() || start < 0 || start >= source.length()) {
             return Optional.empty();
         }
 
-        //atom_expression ::= num_value | '(' [ws] add_sub_operation [ws] ')'
-        
-        //num_value
-        Optional<ParseResult<NumValue>> numValueOpt1 = parseNumber(source, start);
-        if (numValueOpt1.isEmpty()) {
-            return Optional.empty();
+        // num_value
+        Optional<ParseResult<NumValue>> numValueOpt = parseNumber(source, start);
+        if (numValueOpt.isPresent()) {
+            NumValue numValue = numValueOpt.get().value();
+            return Optional.of(new ParseResult<>(new NumValue(numValue.value()), start, numValueOpt.get().end()));
         }
-        Expression numValue = numValueOpt1.get().value();
-        int offset = numValueOpt1.get().end();
 
-        // ( [ws] add_sub_operation [ws] )
+        // '(' [ws] add_sub_expression [ws] ')'
         // '('
-        if (source.charAt(start) != '(') {
+        Optional<ParseResult<Brackets>> openBracketOpt = parseBrackets(source, start);
+        if (openBracketOpt.isEmpty() || openBracketOpt.get().value() != Brackets.OPENING) {
             return Optional.empty();
         }
-        offset++;
-
+        
+        int offset = openBracketOpt.get().end();
+        
         // [ws]
         Optional<ParseResult<String>> wsOpt = parseWhitespace(source, offset);
         if (wsOpt.isPresent()) {
             offset = wsOpt.get().end();
         }
 
-        // add_sub_operation
-        Optional<ParseResult<Operation>> opOpt = parseAddSubOperation(source, offset);
-        if (opOpt.isEmpty()) {
+        // add_sub_expression
+        Optional<ParseResult<Expression>> addSubExpressionOpt = parseAddSubExpression(source, offset);
+        if (addSubExpressionOpt.isEmpty()) {
             return Optional.empty();
         }
-        offset = opOpt.get().end();
+        Expression addSubExpression = addSubExpressionOpt.get().value();
+        offset = addSubExpressionOpt.get().end();
 
         // [ws]
         wsOpt = parseWhitespace(source, offset);
         if (wsOpt.isPresent()) {
             offset = wsOpt.get().end();
         }
-
+        
         // ')'
-        if (offset >= source.length() || source.charAt(offset) != ')') {
+        Optional<ParseResult<Brackets>> closeBracketOpt = parseBrackets(source, offset);
+        if (closeBracketOpt.isEmpty() || closeBracketOpt.get().value() != Brackets.CLOSING) {
             return Optional.empty();
         }
-        offset++;
-
-        return Optional.empty();
+        offset = closeBracketOpt.get().end();
+        
+        return Optional.of(new ParseResult<>(addSubExpression, start, offset));
     }
-    //endregion atom_expression
+    //endregion parseAtomExpression
 }
-
