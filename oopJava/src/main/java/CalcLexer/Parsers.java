@@ -1,7 +1,6 @@
 package CalcLexer;
 
 import java.util.Optional;
-import java.util.SplittableRandom;
 
 /**
  * Требования
@@ -67,7 +66,7 @@ public class Parsers {
      * int ::= [sign] digit {digit}
      * digit  ::= "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
      */
-    public static Optional<ParseResult<NumValue>> parseInt(String source, int start) {
+    public static Optional<ParseResult<NumValue>> parseNumber(String source, int start) {
         // стандартная проверка исходной строки и индекса
         if (source.isEmpty() || start < 0 || start >= source.length()) { return Optional.empty(); }
 
@@ -151,7 +150,7 @@ public class Parsers {
     //region parseWhitespace
     /**
      * Парсинг одного или более пробелов и/или табуляций
-     * ws ::= (" " | "\t")+
+     * ws ::= (" " | "\t") {" " | "\t"}
      */
     public static Optional<ParseResult<String>> parseWhitespace(String source, int start) {
         // стандартная проверка исходной строки и индекса
@@ -159,14 +158,15 @@ public class Parsers {
 
         int offset = start;
         
-        // последовательность пробелов и табуляций
-        while (offset < source.length() &&
-                (source.charAt(offset) == ' ' || source.charAt(offset) == '\t')) {
+        if (source.charAt(offset) == ' ' || source.charAt(offset) == '\t') {
             offset++;
+        } else {
+            return Optional.empty();
         }
         
-        // пробелов | табуляций нет
-        if (offset == start) return Optional.empty();
+        while (offset < source.length() && (source.charAt(offset) == ' ' || source.charAt(offset) == '\t')) {
+            offset++;
+        }
         
         return Optional.of(new ParseResult<>("", start, offset));
     }
@@ -177,7 +177,7 @@ public class Parsers {
     //region ENTRY POINT
     public static void main(String[] args) {
         // проверка парсинга числа
-        Optional<ParseResult<NumValue>> result = parseInt("-456", 0);
+        Optional<ParseResult<NumValue>> result = parseNumber("-456", 0);
         System.out.println(result); // Optional[ParseResult[value=-456, start=0, end=4]]
         
         // проверка парсинга знака

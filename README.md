@@ -1,7 +1,4 @@
-# Учебные проекты
+# Программирование на примере Java
 
-## Проект содержит результаты выполнения практических заданий
-
-#### Учебные материалы
-
-[Java](roadmaps/java/intro.md)
+## [Курс](https://github.com/gochaorg/blog/blob/master/itdocs/learn-java/readme.md)
+## [Автор курса](https://github.com/gochaorg)
