@@ -8,7 +8,7 @@ package CalcLexer;
  * - явно прослеживается на операторе switch - проверке всех возможных сопоставлений за счет их явно декларированного множества
  * как средство проектирования - блокирует непредусмотренное наследование
  */
-sealed interface Expression permits NumValue, BinOp, BinOpExpression {
+public sealed interface Expression permits NumValue, BinOp, BinOpExpression {
     double evaluate();  // абстрактный метод => наследники обязаны реализовать evaluate
 }
 
