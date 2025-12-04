@@ -14,7 +14,7 @@ package CalcLexer;
  * 1
  * code inspection IDEA 
  *  для выражения `public static Optional<ParseResult<Expression>> parseNaryOperation(String source, int start) {`
- * @see NaryExpression#parseNaryExpression
+ * @see NaryExpressionNoPriority#parseNaryExpression
  *  возвращает предупреждение `Class 'Expression' is exposed outside its defined visibility scope`
  *  гипотеза о причине предупреждения - ложное срабатывание. 
  *      баг в анализаторе IntelliJ IDEA  в части обработки sealed-интерфейсов
