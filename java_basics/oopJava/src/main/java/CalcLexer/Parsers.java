@@ -1,6 +1,7 @@
 package CalcLexer;
 
 import java.util.Optional;
+import java.util.SplittableRandom;
 
 /**
  * Требования
@@ -91,7 +92,9 @@ public class Parsers {
         int initialOffset = offset;
 
         while (offset < src.length() && Character.isDigit(src.charAt(offset))) {
-            num = num * 10 + (src.charAt(offset) - '0'); // прием с `- '0'` для преобразования в int
+            // `digitAsChar - '0'` - для преобразования в int
+            // это выражение - неявно - выполняет игнорирование ведущих нулей
+            num = num * 10 + (src.charAt(offset) - '0');
             offset++;
         }
 
