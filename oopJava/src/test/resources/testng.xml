@@ -30,7 +30,7 @@
             </run>
         </groups>
         <classes>
-            <class name="CalcLexer.NaryExpressionRightAssociativeTreeTest" />
+            <class name="CalcLexer.NaryExpressionPriorityNoRightAssociativeTreeTest" />
         </classes>
     </test>
 

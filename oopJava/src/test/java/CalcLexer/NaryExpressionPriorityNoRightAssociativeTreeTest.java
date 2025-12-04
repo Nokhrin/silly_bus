@@ -4,11 +4,11 @@ import org.testng.annotations.Test;
 
 import java.util.Optional;
 
-import static CalcLexer.NaryExpression.parseNaryExpression;
+import static CalcLexer.NaryExpressionNoPriority.parseNaryExpression;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
-public class NaryExpressionRightAssociativeTreeTest {
+public class NaryExpressionPriorityNoRightAssociativeTreeTest {
 
     //region Operations Chain
 

@@ -1,6 +1,7 @@
 package CalcLexer;
 
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * Требования
@@ -37,6 +38,20 @@ public class Parsers {
         SUB,
         MUL,
         DIV
+    }
+    //endregion
+
+    //region Whitespace
+    /**
+     * Пробельные символы
+     * ws ::= " " | "\t" | "\n" | "\r"
+     */
+    private static final Set<Character> WHITESPACES = Set.of(
+            ' ', '\t', '\n', '\r'
+    );
+    
+    public static boolean isWhitespace(char ch) {
+        return WHITESPACES.contains(ch);
     }
     //endregion
 
@@ -150,7 +165,7 @@ public class Parsers {
     //region parseWhitespace
     /**
      * Парсинг одного или более пробелов и/или табуляций
-     * ws ::= (" " | "\t") {" " | "\t"}
+     * ws ::= (" " | "\t" | "\n" | "\r") {" " | "\t" | "\n" | "\r"}
      */
     public static Optional<ParseResult<String>> parseWhitespace(String source, int start) {
         // стандартная проверка исходной строки и индекса
@@ -158,13 +173,13 @@ public class Parsers {
 
         int offset = start;
         
-        if (source.charAt(offset) == ' ' || source.charAt(offset) == '\t') {
+        if (isWhitespace(source.charAt(offset))) {
             offset++;
         } else {
             return Optional.empty();
         }
         
-        while (offset < source.length() && (source.charAt(offset) == ' ' || source.charAt(offset) == '\t')) {
+        while (offset < source.length() && (isWhitespace(source.charAt(offset)))) {
             offset++;
         }
         
@@ -172,36 +187,65 @@ public class Parsers {
     }
     //endregion
 
+    //region mulDivExpression
 
+    /**
+     * Парсинг выражения умножения/деления
+     * синтаксис:
+     *  mul_div_expression ::= num_value { [ws] mul_div_operator [ws] num_value }
+     *  <p>
+     * вспомогательное разделение синтаксиса:
+     *  mul_div_expression ::= first_expression { second_expression }
+     *  first_expression ::= num_value
+     *  second_expression ::= { [ws] mul_div_operator [ws] num_value }
+     *  <p>
+     * @param source
+     * @param start
+     * @return
+     */
+    public static Optional<ParseResult<Expression>> parseMulDivExpression(String source, int start) {
+        //first_expression
+        //num_value
+        Optional<ParseResult<NumValue>> firstNumOptional = parseNumber(source, start);
+        if (firstNumOptional.isEmpty()) { return Optional.empty(); }
+        
+        //first_expression
+        Expression firstExpression = firstNumOptional.get().value();
+        int offset = firstNumOptional.get().end();
+        
+        //second_expression
+        while (offset < source.length()) {
+            //ws1
+            Optional<ParseResult<String>> ws1 = parseWhitespace(source, offset);
+            if (ws1.isPresent()) {
+                offset = ws1.get().end();
+            }
+            
+            //mul_div_operator
+            Optional<ParseResult<Operation>> opOpt = parseOperation(source, offset);
+            if (opOpt.isEmpty()) { break; }
+            Operation op = opOpt.get().value();
+            offset = opOpt.get().end();
 
-    //region ENTRY POINT
-    public static void main(String[] args) {
-        // проверка парсинга числа
-        Optional<ParseResult<NumValue>> result = parseNumber("-456", 0);
-        System.out.println(result); // Optional[ParseResult[value=-456, start=0, end=4]]
-        
-        // проверка парсинга знака
-        Optional<ParseResult<Boolean>> resultSign = parseSign("-", 0);
-        System.out.println(resultSign); // Optional[ParseResult[value=false, start=0, end=1]]
-        
-        // проверка парсинга операции
-        Optional<ParseResult<Operation>> resultOp = parseOperation("*", 0);
-        System.out.println(resultOp); // Optional[ParseResult[value=MUL, start=0, end=1]]
-        
-        // проверка парсинга скобки
-        Optional<ParseResult<Brackets>> resultBr = parseBrackets("(", 0);
-        System.out.println(resultBr); // Optional[ParseResult[value=OPENING, start=0, end=1]]
-        resultBr = parseBrackets(")", 0);
-        System.out.println(resultBr); // Optional[ParseResult[value=CLOSING, start=0, end=1]]
-        
-        // проверка парсинга пробела
-        Optional<ParseResult<String>> resultWs = parseWhitespace("    hello", 0);
-        System.out.println(resultWs); // Optional[ParseResult[value=, start=0, end=4]]
-        //
-        // ??? такой способ проверки существования value в контейнере Optional - норм?
-        //
-        resultWs.ifPresent(wsParsed -> System.out.println(wsParsed.value()));
-        
+            //ws2
+            Optional<ParseResult<String>> ws2 = parseWhitespace(source, offset);
+            if (ws2.isPresent()) {
+                offset = ws2.get().end();
+            }
+
+            //num_value
+            Optional<ParseResult<NumValue>> secondNumOptional = parseNumber(source, offset);
+            if (secondNumOptional.isEmpty()) { break; }
+            
+            Expression secondExpression = secondNumOptional.get().value();
+            offset = secondNumOptional.get().end();
+            
+            //накапливаем значение second_expression в first_expression
+            firstExpression = new BinaryExpression(firstExpression, op, secondExpression);
+        }
+
+        return Optional.of(new ParseResult<>(firstExpression, start, offset));
     }
-    //endregion
+    //endregion mulDivExpression
 }
+
