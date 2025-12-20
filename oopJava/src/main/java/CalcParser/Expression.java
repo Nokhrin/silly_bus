@@ -3,7 +3,7 @@ package CalcParser;
 /**
  * Выражение
  */
-public sealed interface Expression permits Atom, BinaryExpression, NumValue {
+public sealed interface Expression permits Atom, BinaryExpression, NumValue, UnaryExpression {
     double evaluate();  // абстрактный метод => наследники обязаны реализовать evaluate
 }
 
@@ -55,5 +55,19 @@ record Atom() implements Expression {
     @Override
     public double evaluate() {
         return 0.0;
+    }
+}
+
+/**
+ * Унарное выражение: +n, -n
+ */
+record UnaryExpression(Parser.UnaryOperation unaryOperation, Expression operand) implements Expression {
+    @Override
+    public double evaluate() {
+        double value = operand.evaluate();
+        return switch (unaryOperation) {
+            case POS -> value;
+            case NEG -> -value;
+        };
     }
 }
