@@ -20,6 +20,13 @@ public class Main {
 
         System.out.println(exp.get().value().evaluate()); // -3.0
 
+
+        Optional<Expression> expr = Optional.of(new BinaryExpression(new NumValue(1.0), Parser.Operation.ADD, new NumValue(2.0)));
+        if (expr.isPresent()) {
+            System.out.println("значение выражения = " + expr.get().evaluate());
+        } else {
+            System.out.println("выражение отсутствует");
+        }
     }
 
 }
