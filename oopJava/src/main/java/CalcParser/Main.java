@@ -8,15 +8,24 @@ public class Main {
     public static void main(String[] args) {
         Optional<ParseResult<Expression>> exp;
         
+        exp = parseAddSubExpression("-1", 0);
+        System.out.println(exp.get().value().evaluate());
+        // -1.0
+        exp = parseAddSubExpression("--1", 0);
+        System.out.println(exp.get().value().evaluate());
+        // 1.0
+        exp = parseAddSubExpression("+-+2", 0);
+        System.out.println(exp.get().value().evaluate());
+        // -2.0
         exp = parseAddSubExpression("-1 + 2", 0);
         System.out.println(exp.get().value().evaluate());
-        //
+        // 1.0
         exp = parseAddSubExpression("--1 + 2", 0);
-        System.out.println(exp);
-        //
-        exp = parseAddSubExpression("--1 + +2", 0);
-        System.out.println(exp);
-        //
+        System.out.println(exp.get().value().evaluate());
+        // 3.0
+        exp = parseAddSubExpression("(1 +2)", 0);
+        System.out.println(exp.get().value().evaluate());
+        // StackOverflowError
     }
 
 }

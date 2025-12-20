@@ -14,8 +14,7 @@ atom_expression ::= num_value
 unary_operation ::= "+" | "-"
 mul_div_operation ::= "*" | "/"
 add_sub_operation ::= "+" | "-"
-num_value ::= [sign] digit {digit}
-sign ::= "+" | "-"
+num_value ::= digit {digit}
 digit ::= "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
 ws ::= (" " | "\t" | "\n" | "\r") {" " | "\t" | "\n" | "\r"}
 ```
