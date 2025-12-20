@@ -115,14 +115,14 @@ hello from A
 hello from B
 ```
 
-- дан [такой же - уже не рабочий - код на java](../src/main/java/DemoTyping/MainBroken.java)
+- дан [такой же - уже не рабочий - код на java](../../src/main/java/DemoTyping/MainBroken.java)
   дает ошибку компиляции
 ```text
 src/main/java/DemoTyping/MainBroken.java:6:11
 java: variable a is already defined in method main(java.lang.String[])
 ```
 
-- дан [похожий рабочий код на java](../src/main/java/DemoTyping/MainOperational.java)
+- дан [похожий рабочий код на java](../../src/main/java/DemoTyping/MainOperational.java)
 
 > задача - развернуто объяснить механику возникновения ошибки
 
@@ -208,11 +208,11 @@ public class MainBroken {
   - сохранить статическую типизацию,
   - сохранить имена методов
 
-[реализация](../src/main/java/DemoTyping/MainPoly.java)
+[реализация](../../src/main/java/DemoTyping/MainPoly.java)
 
 ---
 
-[Почему подсказки типов / аннотации типов в Python - отстой](why-type-hinting-sucks.md)
+[Почему подсказки типов / аннотации типов в Python - отстой](../typing/why-type-hinting-sucks.md)
 
 ---
 
