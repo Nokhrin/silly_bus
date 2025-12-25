@@ -1,0 +1,34 @@
+[user]
+	name = Aleksandr Nokhrin
+	email = a.v.nokhrin@yandex.ru
+	username = 65nokhrinav
+	signingkey = 0x048B34A784162A11!
+
+[alias]
+	co = checkout
+	br = branch
+	ci = commit
+	st = status
+	slog = log --graph --all --topo-order --name-only --pretty='format:%h %ai %s%d (%an)'
+
+[init]
+	defaultBranch = main
+
+[core]
+	editor = idea --wait
+	excludesFile = /home/region.cbr.ru/65nokhrinav/.gitignore
+
+[gpg]
+    program = /usr/bin/gpg
+	format = openpgp
+    # format = x509
+    # format = ssh
+
+[commit]
+	gpgsign = true
+
+[tag]
+	gpgsign = true
+
+[log]
+	showSignature = false
