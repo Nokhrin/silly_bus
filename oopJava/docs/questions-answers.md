@@ -2,9 +2,9 @@
 
 ### приведение типов
 какое техническое обоснование делать  
-`FinancialOperationsDraft.Transfer transfer = (FinancialOperationsDraft.Transfer) op.getValue();`  
+`FinCalc.Transfer transfer = (FinCalc.Transfer) op.getValue();`  
 а не  
-`FinancialOperationsDraft.Transfer transfer = op.getValue();`  - здесь уже объявлен тип, зачем еще кастить? Компилятор настолько не доверяет автору кода?
+`FinCalc.Transfer transfer = op.getValue();`  - здесь уже объявлен тип, зачем еще кастить? Компилятор настолько не доверяет автору кода?
 [пример в коде](../src/main/java/NoOop/OpsQueue.java#L57)  
 что это - процедура/метод/оператор/особенность?
 как это связано с компилятором - является его функциональностью?
