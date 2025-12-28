@@ -10,27 +10,18 @@ public sealed interface Expression permits Amount, Operation {
 }
 
 /**
- * Операция
- * @param type
- * @param amount
- * @param fromId
- * @param toId
+ * Сумма
+ * @param value
  */
-record Operation(String type, BigDecimal amount, Integer fromId, Integer toId) implements Expression {
+record Amount(BigDecimal value) implements Expression {
     @Override
     public BigDecimal perform() {
-        // Возвращает сумму, которую нужно зачесть/списать
-        // применение: валидация, баланс, логика
-        return amount;
+        return value;
     }
 
     @Override
     public String toString() {
-        return "Операция{" +
-                "тип='" + type + '\'' +
-                ", сумма=" + amount.toPlainString() +
-                ", отправитель=" + fromId +
-                ", получатель=" + toId +
-                '}';
+        return "Сумма{" + value.toPlainString() + "}";
     }
 }
+
