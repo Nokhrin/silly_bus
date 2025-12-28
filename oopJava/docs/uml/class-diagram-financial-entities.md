@@ -6,14 +6,14 @@ title: Bank account management
 classDiagram
     direction LR
 
-    class FinancialOperationsDraft.Account{
+    class FinCalc.Account{
         -final UUID id
         -BigDecimal balance
         +getBalance() BigDecimal
         +setBalance(amount) BigDecimal
     }
     
-    class FinancialOperationsDraft.Operation{
+    class FinCalc.Operation{
         %% абстрактный - существует только в контексте операций-наследников
         <<Abstract>>
         -BigDecimal amount
@@ -21,36 +21,36 @@ classDiagram
     }
 
     %% связь со счетом
-    FinancialOperationsDraft.Account --> "many" FinancialOperationsDraft.Operation : contains
+    FinCalc.Account --> "many" FinCalc.Operation : contains
 
     %% Пополнение    
-    FinancialOperationsDraft.Operation <|-- FinancialOperationsDraft.Deposit : implements
-    FinancialOperationsDraft.Deposit : -FinancialOperationsDraft.Account targetAccount
+    FinCalc.Operation <|-- FinCalc.Deposit : implements
+    FinCalc.Deposit : -FinCalc.Account targetAccount
 
-    FinancialOperationsDraft.Account "1" o-- "0..*" FinancialOperationsDraft.Deposit : aggregates
+    FinCalc.Account "1" o-- "0..*" FinCalc.Deposit : aggregates
 
 
     %% Снятие
-    FinancialOperationsDraft.Operation <|-- FinancialOperationsDraft.Withdrawal : implements
+    FinCalc.Operation <|-- FinCalc.Withdrawal : implements
     %% Баланс >= сумма снятия
-    FinancialOperationsDraft.Withdrawal : -FinancialOperationsDraft.Account sourceAccount
+    FinCalc.Withdrawal : -FinCalc.Account sourceAccount
     
-    FinancialOperationsDraft.Account "1" o-- "0..*" FinancialOperationsDraft.Withdrawal : aggregates
+    FinCalc.Account "1" o-- "0..*" FinCalc.Withdrawal : aggregates
     
 
     %% Перевод
-    FinancialOperationsDraft.Operation <|-- FinancialOperationsDraft.Transfer : implements
+    FinCalc.Operation <|-- FinCalc.Transfer : implements
     %% Баланс >= сумма снятия
-    FinancialOperationsDraft.Transfer : -FinancialOperationsDraft.Account sourceAccount
-    FinancialOperationsDraft.Transfer : -FinancialOperationsDraft.Account targetAccount
+    FinCalc.Transfer : -FinCalc.Account sourceAccount
+    FinCalc.Transfer : -FinCalc.Account targetAccount
     
-    FinancialOperationsDraft.Account "1" o-- "0..*" FinancialOperationsDraft.Transfer : aggregates
+    FinCalc.Account "1" o-- "0..*" FinCalc.Transfer : aggregates
 
     
     namespace Operations {
-        class FinancialOperationsDraft.Operation
-        class FinancialOperationsDraft.Deposit
-        class FinancialOperationsDraft.Transfer
-        class FinancialOperationsDraft.Withdrawal
+        class FinCalc.Operation
+        class FinCalc.Deposit
+        class FinCalc.Transfer
+        class FinCalc.Withdrawal
     }
 ```
