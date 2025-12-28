@@ -229,17 +229,17 @@ from typing import Protocol, TypeVar
 T = TypeVar("T")
 
 
-class FinancialOperationsDraft.Operation(Protocol[T]):
+class FinCalc.Operation(Protocol[T]):
     """Операция - интерфейс."""
     def perform(self) -> T: ...  # метод не возвращает значение явно, но скрыто вернет None
 
 
-def process_operation(operation: FinancialOperationsDraft.Operation[T]):
+def process_operation(operation: FinCalc.Operation[T]):
     operation.perform()
 
 
-class FinancialOperationsDraft.Deposit:
-    """Реализация интерфейса FinancialOperationsDraft.Operation."""
+class FinCalc.Deposit:
+    """Реализация интерфейса FinCalc.Operation."""
     def __init__(self, amount: float, account_id: str):
         self._amount = amount
         self._account_id = account_id
@@ -250,36 +250,36 @@ class FinancialOperationsDraft.Deposit:
 
 
 if __name__ == '__main__':
-    deposit = FinancialOperationsDraft.Deposit(amount=1000.50, account_id="ACC1")
+    deposit = FinCalc.Deposit(amount=1000.50, account_id="ACC1")
     result = process_operation(deposit)
     print(result)  # None
 ```
 
-> в классе FinancialOperationsDraft.Deposit нет прямого указания на связь с классом-интерфейсом FinancialOperationsDraft.Operation
+> в классе FinCalc.Deposit нет прямого указания на связь с классом-интерфейсом FinCalc.Operation
 > связь - единая сигнатура метода perform
 > связь - не по наследованию, 
->   FinancialOperationsDraft.Deposit не наследует класс FinancialOperationsDraft.Operation
+>   FinCalc.Deposit не наследует класс FinCalc.Operation
 > связь - по структуре
->   FinancialOperationsDraft.Deposit определяет метод, который определен в FinancialOperationsDraft.Operation
+>   FinCalc.Deposit определяет метод, который определен в FinCalc.Operation
 > статические анализаторы кода проверяют соответствие по структуре, не учитывают наследование
 
-`class FinancialOperationsDraft.Operation(Protocol[T])` - объявление класса, наследующего Protocol, понимается стат анализатором как источник информации для проверки интерфейса
+`class FinCalc.Operation(Protocol[T])` - объявление класса, наследующего Protocol, понимается стат анализатором как источник информации для проверки интерфейса
 ```python
-class FinancialOperationsDraft.Operation(Protocol[T]):
+class FinCalc.Operation(Protocol[T]):
     def perform(self) -> T: ...
 ```
-определяет, что каждый класс, реализующий метод perform, соответствует интерфейсу / реализует интерфейс FinancialOperationsDraft.Operation
+определяет, что каждый класс, реализующий метод perform, соответствует интерфейсу / реализует интерфейс FinCalc.Operation
 
 порядок проверки
 ```python
-class FinancialOperationsDraft.Deposit:
+class FinCalc.Deposit:
     def perform(self) -> None:
         ...
 ```
 1. есть метод perform
-2. сигнатура метода FinancialOperationsDraft.Deposit.perform соответствует сигнатуре метода FinancialOperationsDraft.Operation.perform
+2. сигнатура метода FinCalc.Deposit.perform соответствует сигнатуре метода FinCalc.Operation.perform
    - так как тип None входит в множество типа кастомного типа T
-3. вывод - FinancialOperationsDraft.Deposit реализует FinancialOperationsDraft.Operation, реализация валидна
+3. вывод - FinCalc.Deposit реализует FinCalc.Operation, реализация валидна
 
 ---
 
@@ -308,7 +308,7 @@ A week later a user files an issue, the most recent release said that "now suppo
 >  `__radd__` выполняется, когда экземпляр класса, в котором опеределен `__radd__`, следует за оператором "+"
 
 ```python
-class FinancialOperationsDraft.Account:
+class FinCalc.Account:
     """Счет."""
     def __init__(self, balance: int, account_id: str):
         self._balance = balance
@@ -333,7 +333,7 @@ class FinancialOperationsDraft.Account:
 
 
 if __name__ == '__main__':
-    acc = FinancialOperationsDraft.Account(balance=0, account_id="ACC1")
+    acc = FinCalc.Account(balance=0, account_id="ACC1")
 
     acc + 100
     print(acc)

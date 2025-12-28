@@ -487,20 +487,24 @@ src/main/java/MultipleInheritance/Interfaces/InterfaceDefaultCheck.java:22: erro
 - набор значений полей - членов класса - в определенный момент времени
 - абстрактный класс определяет набор таких полей, или, структуру состояния
 - дает структурированный подход при наследовании, за счет того, что поля заданы единожды, помогает избежать ошибки при создании подклассов
+
 ```java
 import java.math.BigDecimal;
 
-abstract class FinancialOperationsDraft.Account {
+abstract class FinancialOperationsDraft.
+
+Account {
     private BigDecimal balance; // определили поле, это поле суть состояние
-    
-    void setBalance(BigDecimal amount) {
+
+    void setBalance (BigDecimal amount){
         this.balance = amount;
     }
 }
+
 public class Main {
     public static void main(String[] args) {
-        FinancialOperationsDraft.Account account = FinancialOperationsDraft.Account();
-        
+        FinCalc.Account account = FinCalc.Account();
+
         account.setBalance(BigDecimal.valueOf(100));
         // состояние экземпляра счета определено как значение баланса на данном шаге
 
@@ -520,9 +524,9 @@ public class Main {
  * следует добавить метод - или поведение - в интерфейс
  */
 public interface Payable {
-    void FinancialOperationsDraft.Deposit();
+    void FinCalc.Deposit();
     void Withdraw();
-    void FinancialOperationsDraft.Transfer();
+    void FinCalc.Transfer();
 }
 ```
 
