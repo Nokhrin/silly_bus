@@ -6,24 +6,27 @@ import java.util.Set;
 
 /**
  * Парсер
- * 
- * Синтаксические правила в нотации eBNF
- *  add_sub_expression ::= mul_div_expression { [ws] add_sub_operation [ws] mul_div_expression }
- *  mul_div_expression ::= atom_expression { [ws] mul_div_operation [ws] atom_expression }
- *  atom_expression ::= num_value | '(' [ws] add_sub_expression [ws] ')'
- *  mul_div_operation ::= "*" | "/"
- *  add_sub_operation ::= "+" | "-"
- *  num_value ::= [sign] digit {digit}
- *  digit ::= "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
- *  sign ::= "+" | "-"
- *  ws ::= (" " | "\t" | "\n" | "\r") {" " | "\t" | "\n" | "\r"}
+ * Грамматика:
+ * add_sub_expression ::= mul_div_expression { [ws] add_sub_operation [ws] mul_div_expression }
+ * mul_div_expression ::= atom_expression { [ws] mul_div_operation [ws] atom_expression }
+ * atom_expression ::= num_value
+ *                     | [ws] unary_operation [ws] atom_expression [ws]
+ *                     | '(' [ws] add_sub_expression [ws] ')'
+ * unary_operation ::= "+" | "-"
+ * mul_div_operation ::= "*" | "/"
+ * add_sub_operation ::= "+" | "-"
+ * num_value ::= digit {digit}
+ * digit ::= "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
+ * ws ::= (" " | "\t" | "\n" | "\r") {" " | "\t" | "\n" | "\r"}
  */
 public class Parser {
 
     //region Brackets enum
+
     /**
      * Скобки - группировка, определение вложенности выражений
      * brackets ::= "(" | ")"
+     *
      * @see #parseBrackets
      */
     public enum Brackets {
@@ -33,6 +36,7 @@ public class Parser {
     //endregion
 
     //region Operation enum
+
     /**
      * Арифметические операторы
      * operations ::= "+" | "-" | "*" | "/"
@@ -45,6 +49,13 @@ public class Parser {
     }
     //endregion
 
+    //region UnaryOperation
+    public enum UnaryOperation {
+        POS,
+        NEG
+    }
+    //endregion
+
     //region Whitespace
     /**
      * Пробельные символы
@@ -53,54 +64,32 @@ public class Parser {
     private static final Set<Character> WHITESPACES = Set.of(
             ' ', '\t', '\n', '\r'
     );
-    
+
     public static boolean isWhitespace(char ch) {
         return WHITESPACES.contains(ch);
     }
     //endregion
 
-    //region parseSign
+    //region parseNumber
+
     /**
-     * Парсинг знака
-     * sign ::= "+" | "-"
-     */
-    public static Optional<ParseResult<Boolean>> parseSign(String source, int start) {
-        // стандартная проверка исходной строки и индекса
-        if (source.isEmpty() || start < 0 || start >= source.length()) { return Optional.empty(); }
-
-        char ch = source.charAt(start);
-
-        // смещение фиксирую в ParseResult
-        return switch (ch) {
-            case '+' -> Optional.of(new ParseResult<>(true, start, start + 1));
-            case '-' -> Optional.of(new ParseResult<>(false, start, start + 1));
-            default -> Optional.empty();
-        };
-    }
-    //endregion
-
-    //region parseInt
-    /**
-     * Парсинг целого числа
-     * int ::= [sign] digit {digit}
+     * Парсинг числа
+     * num_value ::= digit {digit}
      */
     public static Optional<ParseResult<NumValue>> parseNumber(String source, int start) {
         // стандартная проверка исходной строки и индекса
-        if (source.isEmpty() || start < 0 || start >= source.length()) { return Optional.empty(); }
+        if (source.isEmpty() || start < 0 || start >= source.length()) {
+            return Optional.empty();
+        }
 
         int offset = start;
         boolean negative = false;
 
-        // знак с помощью parseSign
-        Optional<ParseResult<Boolean>> sign = parseSign(source, offset);
-        if (sign.isPresent()) {
-            negative = !sign.get().value();
-            offset = sign.get().end(); // смещаю курсор на символ знака
-        }
-
         // цифры
         // курсор в пределах строки и после знака идет цифра
-        if (offset >= source.length() || !Character.isDigit(source.charAt(offset))) { return Optional.empty(); }
+        if (!Character.isDigit(source.charAt(offset))) {
+            return Optional.empty();
+        }
 
         // читаю цифры
         int num = 0;
@@ -114,11 +103,8 @@ public class Parser {
         }
 
         // цифр нет
-        if (offset == initialOffset) { return Optional.empty(); }
-
-        // применяю знак
-        if (negative) {
-            num = -1 * num;
+        if (offset == initialOffset) {
+            return Optional.empty();
         }
 
         return Optional.of(new ParseResult<>(new NumValue(num), start, offset));
@@ -126,13 +112,16 @@ public class Parser {
     //endregion
 
     //region parseBrackets
+
     /**
      * Парсинг скобок
      * bracket ::= "(" | ")"
      */
     public static Optional<ParseResult<Brackets>> parseBrackets(String source, int start) {
         // стандартная проверка исходной строки и индекса
-        if (source.isEmpty() || start < 0 || start >= source.length()) { return Optional.empty(); }
+        if (source.isEmpty() || start < 0 || start >= source.length()) {
+            return Optional.empty();
+        }
 
         char br = source.charAt(start);
 
@@ -143,18 +132,21 @@ public class Parser {
         };
     }
     //endregion
-    
+
     //region parseOperation
+
     /**
      * Парсинг оператора
      * op ::= "+" | "-" | "*" | "/"
      */
     public static Optional<ParseResult<Operation>> parseOperation(String source, int start) {
         // стандартная проверка исходной строки и индекса
-        if (source.isEmpty() || start < 0 || start >= source.length()) { return Optional.empty(); }
+        if (source.isEmpty() || start < 0 || start >= source.length()) {
+            return Optional.empty();
+        }
 
         char op = source.charAt(start);
-        
+
         return switch (op) {
             case '*' -> Optional.of(new ParseResult<>(Operation.MUL, start, start + 1));
             case '/' -> Optional.of(new ParseResult<>(Operation.DIV, start, start + 1));
@@ -166,30 +158,36 @@ public class Parser {
     //endregion
 
     //region parseWhitespace
+
     /**
      * Парсинг пробельных символов
      * ws ::= (" " | "\t" | "\n" | "\r") {" " | "\t" | "\n" | "\r"}
      */
     public static Optional<ParseResult<String>> parseWhitespace(String source, int start) {
         // стандартная проверка исходной строки и индекса
-        if (source.isEmpty() || start < 0 || start >= source.length()) { return Optional.empty(); }
+        if (source.isEmpty() || start < 0 || start >= source.length()) {
+            return Optional.empty();
+        }
 
         int offset = start;
 
         while (offset < source.length() && (isWhitespace(source.charAt(offset)))) {
             offset++;
         }
-        
-        if (offset == start) { return Optional.empty(); }
-        
+
+        if (offset == start) {
+            return Optional.empty();
+        }
+
         return Optional.of(new ParseResult<>("", start, offset));
     }
     //endregion
 
     //region parseMulDivOperation
+
     /**
-     * Парсинг оператора умножения или деления  
-     * mul_div_operation ::= "*" | "/"  
+     * Парсинг оператора умножения или деления
+     * mul_div_operation ::= "*" | "/"
      */
     public static Optional<ParseResult<Operation>> parseMulDivOperation(String source, int start) {
         if (source.isEmpty() || start < 0 || start >= source.length()) {
@@ -207,9 +205,10 @@ public class Parser {
     //endregion
 
     //region parseAddSubOperation
+
     /**
-     * Парсинг оператора сложения/вычитания  
-     * add_sub_operator ::= "+" | "-"  
+     * Парсинг оператора сложения/вычитания
+     * add_sub_operator ::= "+" | "-"
      */
     public static Optional<ParseResult<Operation>> parseAddSubOperation(String source, int start) {
         if (source.isEmpty() || start < 0 || start >= source.length()) {
@@ -227,14 +226,15 @@ public class Parser {
     //endregion
 
     //region parseAddSubExpression
+
     /**
      * Парсер выражения сложения/вычитания
-     *  add_sub_expression ::= mul_div_expression { [ws] add_sub_operation [ws] mul_div_expression }
-     *  
-     * @see Parser
-     * @param source исходная строка  
-     * @param start  стартовый индекс  
+     * add_sub_expression ::= mul_div_expression { [ws] add_sub_operation [ws] mul_div_expression }
+     *
+     * @param source исходная строка
+     * @param start  стартовый индекс
      * @return ParseResult(Expression) или Optional.empty(), если парсинг не удался
+     * @see Parser
      */
     public static Optional<ParseResult<Expression>> parseAddSubExpression(String source, int start) {
         // проверка входных данных
@@ -244,7 +244,9 @@ public class Parser {
 
         //mul_div_expression
         Optional<ParseResult<Expression>> mulDivExpressionOpt = parseMulDivExpression(source, start);
-        if (mulDivExpressionOpt.isEmpty()) { return Optional.empty(); }
+        if (mulDivExpressionOpt.isEmpty()) {
+            return Optional.empty();
+        }
 
         Expression mulDivExpression1 = mulDivExpressionOpt.get().value();
         int offset = mulDivExpressionOpt.get().end();
@@ -253,7 +255,9 @@ public class Parser {
         while (offset < source.length()) {
             //[ws]
             Optional<ParseResult<String>> ws = parseWhitespace(source, offset);
-            if (ws.isPresent()) { offset = ws.get().end(); }
+            if (ws.isPresent()) {
+                offset = ws.get().end();
+            }
 
             //add_sub_operation
             Optional<ParseResult<Operation>> opOpt = parseAddSubOperation(source, offset);
@@ -266,7 +270,9 @@ public class Parser {
 
             //[ws]
             ws = parseWhitespace(source, offset);
-            if (ws.isPresent()) { offset = ws.get().end(); }
+            if (ws.isPresent()) {
+                offset = ws.get().end();
+            }
 
             //mul_div_expression
             Optional<ParseResult<Expression>> mulDivExpressionOpt2 = parseMulDivExpression(source, offset);
@@ -288,13 +294,13 @@ public class Parser {
 
     }
     //endregion parseAddSubExpression
-    
+
     //region parseMulDivExpression
 
     /**
      * Парсинг выражения умножения/деления
-     *  mul_div_expression ::= atom_expression { [ws] mul_div_operation [ws] atom_expression }
-     *  
+     * mul_div_expression ::= atom_expression { [ws] mul_div_operation [ws] atom_expression }
+     *
      * @param source
      * @param start
      * @return
@@ -304,14 +310,16 @@ public class Parser {
         if (source.isEmpty() || start < 0 || start >= source.length()) {
             return Optional.empty();
         }
-        
+
         //atom_expression
         Optional<ParseResult<Expression>> atom_expressionOpt1 = parseAtomExpression(source, start);
-        if (atom_expressionOpt1.isEmpty()) { return Optional.empty(); }
-        
+        if (atom_expressionOpt1.isEmpty()) {
+            return Optional.empty();
+        }
+
         Expression atom_expression1 = atom_expressionOpt1.get().value();
         int offset = atom_expressionOpt1.get().end();
-        
+
         //{ [ws] mul_div_operation [ws] num_value }
         while (offset < source.length()) {
             //[ws]
@@ -319,12 +327,12 @@ public class Parser {
             if (ws.isPresent()) {
                 offset = ws.get().end();
             }
-            
+
             //mul_div_operation
             Optional<ParseResult<Operation>> opOpt = parseMulDivOperation(source, offset);
-            if (opOpt.isEmpty()) { 
+            if (opOpt.isEmpty()) {
                 //оператора нет, выражение { [ws] mul_div_operation [ws] num_value } невалидно
-                break; 
+                break;
             }
             Operation op = opOpt.get().value();
             offset = opOpt.get().end();
@@ -337,14 +345,14 @@ public class Parser {
 
             //num_value
             Optional<ParseResult<Expression>> atom_expressionOpt2 = parseAtomExpression(source, offset);
-            if (atom_expressionOpt2.isEmpty()) { 
+            if (atom_expressionOpt2.isEmpty()) {
                 //числа нет, выражение { [ws] mul_div_operation [ws] num_value } невалидно
-                break; 
+                break;
             }
-            
+
             Expression atom_expression2 = atom_expressionOpt2.get().value();
             offset = atom_expressionOpt2.get().end();
-            
+
             //mul_div_expression ::= num_value { [ws] mul_div_operation [ws] num_value }
             //накапливаем итог в первом num_value
             atom_expression1 = new BinaryExpression(atom_expression1, op, atom_expression2);
@@ -355,9 +363,12 @@ public class Parser {
     //endregion mulDivExpression
 
     //region parseAtomExpression
+
     /**
      * Парсинг атомарного выражения
-     * atom_expression ::= num_value | '(' [ws] add_sub_expression [ws] ')'
+     * atom_expression ::= num_value
+     *                     | [ws] unary_operation [ws] atom_expression [ws]
+     *                     | '(' [ws] add_sub_expression [ws] ')'
      *
      * @param source
      * @param start
@@ -368,6 +379,8 @@ public class Parser {
         if (source.isEmpty() || start < 0 || start >= source.length()) {
             return Optional.empty();
         }
+        
+        int offset = start;
 
         // num_value
         Optional<ParseResult<NumValue>> numValueOpt = parseNumber(source, start);
@@ -376,6 +389,45 @@ public class Parser {
             return Optional.of(new ParseResult<>(new NumValue(numValue.value()), start, numValueOpt.get().end()));
         }
 
+        // [ws] unary_operation [ws] atom_expression [ws]
+        // [ws]
+        Optional<ParseResult<String>> wsOpt = parseWhitespace(source, offset);
+        if (wsOpt.isPresent()) {
+            offset = wsOpt.get().end();
+        }
+        
+        // unary_operation
+        Optional<ParseResult<UnaryOperation>> unaryOperationOpt = parseUnaryOperation(source, offset);
+        if (unaryOperationOpt.isPresent()) {
+            UnaryOperation op = unaryOperationOpt.get().value();
+            offset = unaryOperationOpt.get().end();
+        
+            // [ws]
+            wsOpt = parseWhitespace(source, offset);
+            if (wsOpt.isPresent()) {
+                offset = wsOpt.get().end();
+            }
+    
+            // atom_expression
+            Optional<ParseResult<Expression>> atomUnaryExprOpt = parseAtomExpression(source, offset);
+            if (atomUnaryExprOpt.isEmpty()) {
+                return Optional.empty();
+            }
+            Expression atomUnaryExpr = atomUnaryExprOpt.get().value();
+            offset = atomUnaryExprOpt.get().end();
+
+            // [ws]
+            wsOpt = parseWhitespace(source, offset);
+            if (wsOpt.isPresent()) {
+                offset = wsOpt.get().end();
+            }
+
+            // вычисление значения унарного выражения
+            Expression unaryExpr = new UnaryExpression(op, atomUnaryExpr);
+            return Optional.of(new ParseResult<>(unaryExpr, start, offset));
+    
+        }
+        
         // '(' [ws] add_sub_expression [ws] ')'
         // '('
         Optional<ParseResult<Brackets>> openBracketOpt = parseBrackets(source, start);
@@ -383,10 +435,8 @@ public class Parser {
             return Optional.empty();
         }
         
-        int offset = openBracketOpt.get().end();
-        
         // [ws]
-        Optional<ParseResult<String>> wsOpt = parseWhitespace(source, offset);
+        wsOpt = parseWhitespace(source, offset);
         if (wsOpt.isPresent()) {
             offset = wsOpt.get().end();
         }
@@ -404,15 +454,42 @@ public class Parser {
         if (wsOpt.isPresent()) {
             offset = wsOpt.get().end();
         }
-        
+
         // ')'
         Optional<ParseResult<Brackets>> closeBracketOpt = parseBrackets(source, offset);
         if (closeBracketOpt.isEmpty() || closeBracketOpt.get().value() != Brackets.CLOSING) {
             return Optional.empty();
         }
         offset = closeBracketOpt.get().end();
-        
+
         return Optional.of(new ParseResult<>(addSubExpression, start, offset));
     }
     //endregion parseAtomExpression
+
+    //region parseUnaryOperation
+
+    /**
+     * Парсинг унарной операции
+     * unary_operation ::= "+" | "-"
+     *
+     * @param source
+     * @param start
+     * @return
+     */
+    public static Optional<ParseResult<UnaryOperation>> parseUnaryOperation(String source, int start) {
+        if (source.isEmpty() || start < 0 || start >= source.length()) {
+            return Optional.empty();
+        }
+
+        char ch = source.charAt(start);
+
+        return switch (ch) {
+            case '+' -> Optional.of(new ParseResult<>(UnaryOperation.POS, start, start + 1));
+            case '-' -> Optional.of(new ParseResult<>(UnaryOperation.NEG, start, start + 1));
+            default -> Optional.empty();
+        };
+    }
+    //endregion parseUnaryOperation
+
+
 }
