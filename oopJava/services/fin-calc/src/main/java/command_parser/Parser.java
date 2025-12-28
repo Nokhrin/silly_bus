@@ -1,5 +1,6 @@
 package command_parser;
 
+import java.math.BigDecimal;
 import java.util.Optional;
 import java.util.Set;
 
@@ -152,11 +153,23 @@ public class Parser {
      * account_id ::= digit { digit }
      */
     public static Optional<ParseResult<String>> parseAccountId(String source, int start) {
-        // стандартная проверка исходной строки и индекса
         if (source.isEmpty() || start < 0 || start >= source.length()) {
             return Optional.empty();
         }
-        return Optional.empty();
+
+        int offset = start;
+
+        while (offset < source.length() && Character.isDigit(source.charAt(offset))) {
+            offset++;
+        }
+
+        // нет цифр
+        if (offset == start) {
+            return Optional.empty();
+        }
+
+        String id = source.substring(start, offset);
+        return Optional.of(new ParseResult<>(id, start, offset));
     }
     //endregion
 
@@ -171,6 +184,60 @@ public class Parser {
         if (source.isEmpty() || start < 0 || start >= source.length()) {
             return Optional.empty();
         }
+        int offset = start;
+        boolean negative = false;
+
+        // [ '-' ]
+        if (source.charAt(offset) == '-') {
+            negative = true;
+            offset++;
+        } else if (source.charAt(offset) == '+') {
+            offset++;
+        }
+
+        // проверка, что еще есть символы
+        if (offset >= source.length()) {
+            return Optional.empty();
+        }
+
+        boolean hasDigits = false;
+        boolean hasDecimalPoint = false;
+        int digitsStart = offset;
+
+        // Собираем цифры до точки
+        while (offset < source.length() && Character.isDigit(source.charAt(offset))) {
+            hasDigits = true;
+            offset++;
+        }
+
+        // Точка
+        if (offset < source.length() && source.charAt(offset) == '.') {
+            hasDecimalPoint = true;
+            offset++;
+            while (offset < source.length() && Character.isDigit(source.charAt(offset))) {
+                offset++;
+            }
+        }
+
+        // Если нет цифр, а только точка — ошибка
+        if (!hasDigits && !hasDecimalPoint) {
+            return Optional.empty();
+        }
+
+        // Если только точка, например ".50"
+        if (hasDigits || hasDecimalPoint) {
+            String amountStr = source.substring(start, offset);
+            try {
+                BigDecimal value = new BigDecimal(amountStr);
+                if (negative) {
+                    value = value.negate();
+                }
+                return Optional.of(new ParseResult<>(new Amount(value), start, offset));
+            } catch (NumberFormatException e) {
+                return Optional.empty();
+            }
+        }
+
         return Optional.empty();
     }
     //endregion
@@ -188,11 +255,80 @@ public class Parser {
      * | balance <account_id>
      * | list
      */
-    public static Optional<ParseResult<Command>> parseCommand(String input) {
+    public static Optional<ParseResult<Parser.Command>> parseCommand(String input) {
         if (input == null || input.trim().isEmpty()) {
             return Optional.empty();
         }
+
         return Optional.empty();
     }
     //endregion
+    
+    // region parse
+
+    /**
+     * Парсинг всей команды
+     */
+    public static Optional<ParseResult<Operation>> parse(String input) {
+        if (input == null || input.trim().isEmpty()) {
+            return Optional.empty();
+        }
+
+        String trimmed = input.trim();
+        Optional<ParseResult<Command>> cmdResult = parseCommand(trimmed);
+        if (cmdResult.isEmpty()) {
+            return Optional.empty();
+        }
+
+        ParseResult<Command> cmd = cmdResult.get();
+        Command command = cmd.value();
+
+        // Обработка аргументов
+        String[] parts = trimmed.substring(cmd.end()).trim().split("\\s+", 3);
+        
+        switch (command) {
+            case OPEN -> {
+                return Optional.of(new ParseResult<>(new Operation("OPEN", BigDecimal.ZERO, null, null), 0, trimmed.length()));
+            }
+            case CLOSE -> {
+                if (parts.length == 0) return Optional.empty();
+                return Optional.of(new ParseResult<>(new Operation("CLOSE", BigDecimal.ZERO, Integer.parseInt(parts[0]), null), 0, trimmed.length()));
+            }
+            case DEPOSIT -> {
+                if (parts.length < 2) return Optional.empty();
+                Integer id = Integer.parseInt(parts[0]);
+                Optional<ParseResult<Amount>> amountResult = parseAmount(trimmed, cmd.end());
+                if (amountResult.isEmpty()) return Optional.empty();
+                Amount amount = amountResult.get().value();
+                return Optional.of(new ParseResult<>(new Operation("DEPOSIT", amount.value(), id, null), 0, trimmed.length()));
+            }
+            case WITHDRAW -> {
+                if (parts.length < 2) return Optional.empty();
+                Integer id = Integer.parseInt(parts[0]);
+                Optional<ParseResult<Amount>> amountResult = parseAmount(trimmed, cmd.end());
+                if (amountResult.isEmpty()) return Optional.empty();
+                Amount amount = amountResult.get().value();
+                return Optional.of(new ParseResult<>(new Operation("WITHDRAW", amount.value(), id, null), 0, trimmed.length()));
+            }
+            case TRANSFER -> {
+                if (parts.length < 3) return Optional.empty();
+                Integer fromId = Integer.parseInt(parts[0]);
+                Integer toId = Integer.parseInt(parts[1]);
+                Optional<ParseResult<Amount>> amountResult = parseAmount(trimmed, cmd.end());
+                if (amountResult.isEmpty()) return Optional.empty();
+                Amount amount = amountResult.get().value();
+                return Optional.of(new ParseResult<>(new Operation("TRANSFER", amount.value(), fromId, toId), 0, trimmed.length()));
+            }
+            case BALANCE -> {
+                if (parts.length < 1) return Optional.empty();
+                Integer id = Integer.parseInt(parts[0]);
+                return Optional.of(new ParseResult<>(new Operation("BALANCE", BigDecimal.ZERO, id, null), 0, trimmed.length()));
+            }
+            case LIST -> {
+                return Optional.of(new ParseResult<>(new Operation("LIST", BigDecimal.ZERO, null, null), 0, trimmed.length()));
+            }
+        }
+        return Optional.empty();
+    }
+    // endregion
 }
