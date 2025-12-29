@@ -1,4 +1,4 @@
-package account_system;
+package account.system;
 
 /**
  * ◦ Заем/Кредит

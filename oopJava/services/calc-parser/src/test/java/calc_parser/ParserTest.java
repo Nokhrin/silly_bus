@@ -233,7 +233,7 @@ public class ParserTest {
     //endregion
 
     //region parseMulDivOperationTest
-    
+
     @Test(description = "Парсинг умножения: *")
     public void testParseMulDivOperation_Multiply() {
         var result = Parser.parseMulDivOperation("*", 0);
@@ -319,7 +319,7 @@ public class ParserTest {
     }
 
     //endregion parseMulDivOperationTest
-    
+
     //region parseAddSubOperationTest
     @Test(description = "Парсинг сложения: +")
     public void testParseAddSubOperation_Add() {
@@ -498,6 +498,6 @@ public class ParserTest {
     }
 
     //endregion
-    
-    
+
+
 }   

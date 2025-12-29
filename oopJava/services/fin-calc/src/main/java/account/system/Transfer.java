@@ -1,16 +1,28 @@
-package account_system;
+package account.system;
 
 import java.math.BigDecimal;
 
+/**
+ * Класс для перевода средств между счетами.
+ */
 public class Transfer extends Operation {
+    /**
+     * Сумма перевода.
+     */
     private BigDecimal amount;
+
+    /**
+     * Счет-отправитель.
+     */
     private Account source;
+
+    /**
+     * Счет-получатель.
+     */
     private Account target;
 
     @Override
     public void perform() {
-        
-
         System.out.printf("""
             Счет-отправитель %s, баланс %.2f RUB
             Счет-получатель %s, баланс %.2f RUB
@@ -31,6 +43,6 @@ public class Transfer extends Operation {
             """, source, source.getBalance(), target, target.getBalance(),
                 System.lineSeparator());
         System.out.println();
-        System.out.flush(); 
+        System.out.flush();
     }
 }
