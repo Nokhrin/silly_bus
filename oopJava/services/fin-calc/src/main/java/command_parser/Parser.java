@@ -39,26 +39,27 @@ public class Parser {
     //endregion
 
     //region Command enum
-
-    /**
-     * Команды
-     * command ::= open
-     * | close <account_id>
-     * | deposit <account_id> <amount>
-     * | withdraw <account_id> <amount>
-     * | transfer <account_id> <account_id> <amount>
-     * | balance <account_id>
-     * | list
-     */
-    public enum Command {
-        OPEN,
-        CLOSE,
-        DEPOSIT,
-        WITHDRAW,
-        TRANSFER,
-        BALANCE,
-        LIST
-    }
+// назначение?
+//    /**
+//     * Команды
+//     * command ::= 
+//     *   open
+//     * | close <account_id>
+//     * | deposit <account_id> <amount>
+//     * | withdraw <account_id> <amount>
+//     * | transfer <account_id> <account_id> <amount>
+//     * | balance <account_id>
+//     * | list
+//     */
+//    public enum Command {
+//        open,
+//        close,
+//        deposit,
+//        withdraw,
+//        transfer,
+//        balance,
+//        list
+//    }
     //endregion
 
     //region Whitespace Set
@@ -82,7 +83,6 @@ public class Parser {
      * bracket ::= "(" | ")"
      */
     public static Optional<ParseResult<Brackets>> parseBrackets(String source, int start) {
-        // стандартная проверка исходной строки и индекса
         if (source.isEmpty() || start < 0 || start >= source.length()) {
             return Optional.empty();
         }
@@ -104,7 +104,6 @@ public class Parser {
      * sign ::= "+" | "-"
      */
     public static Optional<ParseResult<Boolean>> parseSign(String source, int start) {
-        // стандартная проверка исходной строки и индекса
         if (source.isEmpty() || start < 0 || start >= source.length()) {
             return Optional.empty();
         }
@@ -127,7 +126,6 @@ public class Parser {
      * ws ::= (" " | "\t" | "\n" | "\r") {" " | "\t" | "\n" | "\r"}
      */
     public static Optional<ParseResult<String>> parseWhitespace(String source, int start) {
-        // стандартная проверка исходной строки и индекса
         if (source.isEmpty() || start < 0 || start >= source.length()) {
             return Optional.empty();
         }
@@ -180,31 +178,28 @@ public class Parser {
      * amount ::= [ '-' ] ( digit { digit } | digit { digit } '.' digit { digit } | '.' digit { digit } )
      * | digit { digit } '.' digit { digit }
      */
-    public static Optional<ParseResult<Amount>> parseAmount(String source, int start) {
+    public static Optional<ParseResult<BigDecimal>> parseAmount(String source, int start) {
         if (source.isEmpty() || start < 0 || start >= source.length()) {
             return Optional.empty();
         }
+
         int offset = start;
         boolean negative = false;
 
-        // [ '-' ]
         if (source.charAt(offset) == '-') {
             negative = true;
             offset++;
-        } else if (source.charAt(offset) == '+') {
-            offset++;
         }
 
-        // проверка, что еще есть символы
         if (offset >= source.length()) {
             return Optional.empty();
         }
 
         boolean hasDigits = false;
         boolean hasDecimalPoint = false;
-        int digitsStart = offset;
+        boolean hasAfterPoint = false;
 
-        // Собираем цифры до точки
+        // Цифры до точки
         while (offset < source.length() && Character.isDigit(source.charAt(offset))) {
             hasDigits = true;
             offset++;
@@ -215,38 +210,269 @@ public class Parser {
             hasDecimalPoint = true;
             offset++;
             while (offset < source.length() && Character.isDigit(source.charAt(offset))) {
+                hasAfterPoint = true;
                 offset++;
             }
         }
 
-        // Если нет цифр, а только точка — ошибка
-        if (!hasDigits && !hasDecimalPoint) {
+        // Проверка: если есть точка, то либо до, либо после — цифры
+        if (hasDecimalPoint && !hasDigits && !hasAfterPoint) {
             return Optional.empty();
         }
 
-        // Если только точка, например ".50"
-        if (hasDigits || hasDecimalPoint) {
-            String amountStr = source.substring(start, offset);
-            try {
-                BigDecimal value = new BigDecimal(amountStr);
-                if (negative) {
-                    value = value.negate();
-                }
-                return Optional.of(new ParseResult<>(new Amount(value), start, offset));
-            } catch (NumberFormatException e) {
-                return Optional.empty();
-            }
+        // Проверка на остаток
+        if (offset < source.length() && !Character.isDigit(source.charAt(offset)) && source.charAt(offset) != '.') {
+            return Optional.empty();
         }
 
-        return Optional.empty();
+        String amountStr = source.substring(start, offset);
+
+        try {
+            BigDecimal value = new BigDecimal(amountStr);
+            if (negative) {
+                value = value.negate();
+            }
+            return Optional.of(new ParseResult<>(value, start, offset));
+        } catch (NumberFormatException e) {
+            return Optional.empty();
+        }
     }
     //endregion
 
+    
+    
+    //region parseCommandName
+    public static Optional<ParseResult<String>> parseCommandName(String source, int start) {
+        if (source.isEmpty() || start < 0 || start >= source.length()) {
+            return Optional.empty();
+        }
+
+        int offset = start;
+        while (offset < source.length() && !Character.isWhitespace(source.charAt(offset))) {
+            offset++;
+        }
+
+        if (offset == start) {
+            return Optional.empty();
+        }
+
+        return Optional.of(new ParseResult<>(source.substring(start, offset), start, offset));
+    }
+    //endregion parseCommandName
+
+
+    //region Commands
+
+    public static Optional<ParseResult<Command>> parseOpen(String source, int start) {
+        if (source.isEmpty() || start < 0 || start > source.length()) {
+            return Optional.empty();
+        }
+
+        // команда
+        if (!source.startsWith("open", 0)) {
+            return Optional.empty();
+        }
+
+        int end = start + 4;
+
+        // ws
+        Optional<ParseResult<String>> ws = parseWhitespace(source, end);
+        if (ws.isEmpty()) {
+            return Optional.of(new ParseResult<>(new Open(), start, end));
+        }
+        end = ws.get().end();
+
+        // аргументов не ожидается
+        if (end < source.length()) {
+            return Optional.empty();
+        }
+
+
+        return Optional.of(new ParseResult<>(new Open(), start, end));
+    }
+
+    public static Optional<ParseResult<Command>> parseClose(String source, int start) {
+        if (source.isEmpty() || start < 0 || start > source.length()) {
+            return Optional.empty();
+        }
+    
+        // команда
+        if (!source.startsWith("close", 0)) {
+            return Optional.empty();
+        }
+
+        int end = start + 5;
+        
+        // ws
+        Optional<ParseResult<String>> ws = parseWhitespace(source, end);
+        if (ws.isPresent()) {
+            end = ws.get().end();
+        }
+
+        // accountId
+        Optional<ParseResult<String>> idResult = parseAccountId(source, end);
+        if (idResult.isEmpty()) {
+            return Optional.empty();
+        }
+
+        return Optional.of(new ParseResult<>(new Close(), start, idResult.get().end()));
+
+    }
+
+    public static Optional<ParseResult<Command>> parseDeposit(String source, int start) {
+        if (source.isEmpty() || start < 0 || start >= source.length()) {
+            return Optional.empty();
+        }
+
+        // команда
+        if (!source.startsWith("deposit", 0)) {
+            return Optional.empty();
+        }
+
+        int end = start + 7;
+
+        // ws
+        Optional<ParseResult<String>> ws = parseWhitespace(source, end);
+        if (ws.isPresent()) {
+            end = ws.get().end();
+        }
+
+
+        // accountId
+        Optional<ParseResult<String>> idResult = parseAccountId(source, end);
+        if (idResult.isEmpty()) {
+            return Optional.empty();
+        }
+
+        // amount
+        Optional<ParseResult<BigDecimal>> amountResult = parseAmount(source, idResult.get().end());
+        if (amountResult.isEmpty()) {
+            return Optional.empty();
+        }
+
+        return Optional.of(new ParseResult<>(new Deposit(), start, amountResult.get().end()));
+    }
+
+    public static Optional<ParseResult<Command>> parseWithdraw(String source, int start) {
+        if (source.isEmpty() || start < 0 || start >= source.length()) {
+            return Optional.empty();
+        }
+
+        // команда
+        if (!source.startsWith("withdraw", 0)) {
+            return Optional.empty();
+        }
+
+        int end = start + 7;
+        
+        // ws
+        Optional<ParseResult<String>> ws = parseWhitespace(source, end);
+        if (ws.isPresent()) {
+            end = ws.get().end();
+        }
+
+        
+        // accountId
+        Optional<ParseResult<String>> idResult = parseAccountId(source, end);
+        if (idResult.isEmpty()) {
+            return Optional.empty();
+        }
+
+        // amount
+        Optional<ParseResult<BigDecimal>> amountResult = parseAmount(source, idResult.get().end());
+        if (amountResult.isEmpty()) {
+            return Optional.empty();
+        }
+
+        return Optional.of(new ParseResult<>(new Withdraw(), start, amountResult.get().end()));
+    }
+
+    public static Optional<ParseResult<Command>> parseTransfer(String source, int start) {
+        if (source.isEmpty() || start < 0 || start >= source.length()) {
+            return Optional.empty();
+        }
+
+        // команда
+        if (!source.startsWith("transfer", 0)) {
+            return Optional.empty();
+        }
+
+        int end = start + 8;
+
+        // ws
+        Optional<ParseResult<String>> ws = parseWhitespace(source, end);
+        if (ws.isPresent()) {
+            end = ws.get().end();
+        }
+
+
+        // accountIdSource
+        Optional<ParseResult<String>> accountIdSource = parseAccountId(source, end);
+        if (accountIdSource.isEmpty()) {
+            return Optional.empty();
+        }
+
+        // accountIdTarget
+        Optional<ParseResult<String>> accountIdTarget = parseAccountId(source, accountIdSource.get().end());
+        if (accountIdTarget.isEmpty()) {
+            return Optional.empty();
+        }
+
+        Optional<ParseResult<BigDecimal>> amountResult = parseAmount(source, accountIdTarget.get().end());
+        if (amountResult.isEmpty()) {
+            return Optional.empty();
+        }
+
+        return Optional.of(new ParseResult<>(new Transfer(), start, amountResult.get().end()));
+    }
+
+    public static Optional<ParseResult<Command>> parseBalance(String source, int start) {
+        if (source.isEmpty() || start < 0 || start >= source.length()) {
+            return Optional.empty();
+        }
+
+        // команда
+        if (!source.startsWith("balance", 0)) {
+            return Optional.empty();
+        }
+
+        int end = start + 6;
+        
+        // ws
+        Optional<ParseResult<String>> ws = parseWhitespace(source, end);
+        if (ws.isPresent()) {
+            end = ws.get().end();
+        }
+
+
+        // accountId
+        Optional<ParseResult<String>> accountId = parseAccountId(source, end);
+        if (accountId.isEmpty()) {
+            return Optional.empty();
+        }
+
+        return Optional.of(new ParseResult<>(new Balance(), start, accountId.get().end()));
+    }
+
+    public static Optional<ParseResult<Command>> parseList(String source, int start) {
+        if (source.isEmpty() || start < 0 || start >= source.length()) {
+            return Optional.empty();
+        }
+
+        if (!source.startsWith("list", 0)) {
+            return Optional.empty();
+        }
+
+        int end = start + 4;
+        if (end < source.length() && !isWhitespace(source.charAt(end))) {
+            return Optional.empty();
+        }
+
+        return Optional.of(new ParseResult<>(new List(), start, end));
+    }
 
     //region parseCommand
-
     /**
-     * Парсер команды
      * command ::= open
      * | close <account_id>
      * | deposit <account_id> <amount>
@@ -254,81 +480,32 @@ public class Parser {
      * | transfer <account_id> <account_id> <amount>
      * | balance <account_id>
      * | list
+     * @param source
+     * @param start
+     * @return
      */
-    public static Optional<ParseResult<Parser.Command>> parseCommand(String input) {
-        if (input == null || input.trim().isEmpty()) {
+    public static Optional<ParseResult<Command>> parseCommand(String source, int start) {
+        if (source.isEmpty() || start < 0 || start > source.length()) {
             return Optional.empty();
         }
 
-        return Optional.empty();
+        int offset = start;
+
+        Optional<ParseResult<String>> commandName = parseCommandName(source, offset);
+        if (commandName.isEmpty()) {
+            return Optional.empty();
+        }
+
+        return switch (commandName.get().value().toLowerCase()) {
+            case "open" -> parseOpen(source, commandName.get().end());
+            case "close" -> parseClose(source, commandName.get().end());
+            case "deposit" -> parseDeposit(source, commandName.get().end());
+            case "withdraw" -> parseWithdraw(source, commandName.get().end());
+            case "transfer" -> parseTransfer(source, commandName.get().end());
+            case "balance" -> parseBalance(source, commandName.get().end());
+            case "list" -> parseList(source, commandName.get().end());
+            default -> Optional.empty();
+        };
     }
-    //endregion
-    
-    // region parse
-
-    /**
-     * Парсинг всей команды
-     */
-    public static Optional<ParseResult<Operation>> parse(String input) {
-        if (input == null || input.trim().isEmpty()) {
-            return Optional.empty();
-        }
-
-        String trimmed = input.trim();
-        Optional<ParseResult<Command>> cmdResult = parseCommand(trimmed);
-        if (cmdResult.isEmpty()) {
-            return Optional.empty();
-        }
-
-        ParseResult<Command> cmd = cmdResult.get();
-        Command command = cmd.value();
-
-        // Обработка аргументов
-        String[] parts = trimmed.substring(cmd.end()).trim().split("\\s+", 3);
-        
-        switch (command) {
-            case OPEN -> {
-                return Optional.of(new ParseResult<>(new Operation("OPEN", BigDecimal.ZERO, null, null), 0, trimmed.length()));
-            }
-            case CLOSE -> {
-                if (parts.length == 0) return Optional.empty();
-                return Optional.of(new ParseResult<>(new Operation("CLOSE", BigDecimal.ZERO, Integer.parseInt(parts[0]), null), 0, trimmed.length()));
-            }
-            case DEPOSIT -> {
-                if (parts.length < 2) return Optional.empty();
-                Integer id = Integer.parseInt(parts[0]);
-                Optional<ParseResult<Amount>> amountResult = parseAmount(trimmed, cmd.end());
-                if (amountResult.isEmpty()) return Optional.empty();
-                Amount amount = amountResult.get().value();
-                return Optional.of(new ParseResult<>(new Operation("DEPOSIT", amount.value(), id, null), 0, trimmed.length()));
-            }
-            case WITHDRAW -> {
-                if (parts.length < 2) return Optional.empty();
-                Integer id = Integer.parseInt(parts[0]);
-                Optional<ParseResult<Amount>> amountResult = parseAmount(trimmed, cmd.end());
-                if (amountResult.isEmpty()) return Optional.empty();
-                Amount amount = amountResult.get().value();
-                return Optional.of(new ParseResult<>(new Operation("WITHDRAW", amount.value(), id, null), 0, trimmed.length()));
-            }
-            case TRANSFER -> {
-                if (parts.length < 3) return Optional.empty();
-                Integer fromId = Integer.parseInt(parts[0]);
-                Integer toId = Integer.parseInt(parts[1]);
-                Optional<ParseResult<Amount>> amountResult = parseAmount(trimmed, cmd.end());
-                if (amountResult.isEmpty()) return Optional.empty();
-                Amount amount = amountResult.get().value();
-                return Optional.of(new ParseResult<>(new Operation("TRANSFER", amount.value(), fromId, toId), 0, trimmed.length()));
-            }
-            case BALANCE -> {
-                if (parts.length < 1) return Optional.empty();
-                Integer id = Integer.parseInt(parts[0]);
-                return Optional.of(new ParseResult<>(new Operation("BALANCE", BigDecimal.ZERO, id, null), 0, trimmed.length()));
-            }
-            case LIST -> {
-                return Optional.of(new ParseResult<>(new Operation("LIST", BigDecimal.ZERO, null, null), 0, trimmed.length()));
-            }
-        }
-        return Optional.empty();
-    }
-    // endregion
+    //endregion parseCommand
 }
