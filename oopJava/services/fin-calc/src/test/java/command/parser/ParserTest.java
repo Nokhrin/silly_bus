@@ -1,10 +1,11 @@
 package command.parser;
 
 import org.testng.annotations.Test;
-
+import java.util.List;
 import java.math.BigDecimal;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import java.util.regex.Pattern;
 
 import static org.testng.Assert.*;
@@ -394,6 +395,64 @@ public class ParserTest {
         Optional<ParseResult<Command>> result = Parser.parseCommand(input, start);
 
         // then
+    }
+    //endregion
+    
+    //region parseCommandsFromString
+    @Test
+    public void testParseSingleOpenCommand() {
+        String input = "open";
+        List<Command> commands = Parser.parseCommandsFromString(input);
+
+        assertEquals(commands.size(), 1);
+        assertTrue(commands.get(0) instanceof Open);
+    }
+
+    @Test
+    public void testParseMultipleCommands() {
+        String input = "open deposit 123e4567-e89b-12d3-a456-426614174000 100.00 withdraw 123e4567-e89b-12d3-a456-426614174000 50.00";
+        List<Command> commands = Parser.parseCommandsFromString(input);
+
+        assertEquals(commands.size(), 3);
+        assertTrue(commands.get(0) instanceof Open);
+        assertTrue(commands.get(1) instanceof Deposit);
+        assertTrue(commands.get(2) instanceof Withdraw);
+
+        Deposit depositCmd = (Deposit) commands.get(1);
+        assertEquals(depositCmd.accountId(), UUID.fromString("123e4567-e89b-12d3-a456-426614174000"));
+        assertEquals(depositCmd.amount(), new BigDecimal("100.00"));
+
+        Withdraw withdrawCmd = (Withdraw) commands.get(2);
+        assertEquals(withdrawCmd.accountId(), UUID.fromString("123e4567-e89b-12d3-a456-426614174000"));
+        assertEquals(withdrawCmd.amount(), new BigDecimal("50.00"));
+    }
+
+    @Test
+    public void testParseTransferCommand() {
+        String input = "transfer 123e4567-e89b-12d3-a456-426614174000 87654321-e89b-12d3-a456-426614174000 250.50";
+        List<Command> commands = Parser.parseCommandsFromString(input);
+
+        assertEquals(commands.size(), 1);
+        assertTrue(commands.get(0) instanceof Transfer);
+
+        Transfer transferCmd = (Transfer) commands.get(0);
+        assertEquals(transferCmd.sourceId(), UUID.fromString("123e4567-e89b-12d3-a456-426614174000"));
+        assertEquals(transferCmd.targetId(), UUID.fromString("87654321-e89b-12d3-a456-426614174000"));
+        assertEquals(transferCmd.amount(), new BigDecimal("250.50"));
+    }
+
+    @Test
+    public void testParseCommandsWithWhitespace() {
+        String input = "  open   \t\n  deposit 123e4567-e89b-12d3-a456-426614174000 100.00  ";
+        List<Command> commands = Parser.parseCommandsFromString(input);
+
+        assertEquals(commands.size(), 2);
+        assertTrue(commands.get(0) instanceof Open);
+        assertTrue(commands.get(1) instanceof Deposit);
+
+        Deposit depositCmd = (Deposit) commands.get(1);
+        assertEquals(depositCmd.accountId(), UUID.fromString("123e4567-e89b-12d3-a456-426614174000"));
+        assertEquals(depositCmd.amount(), new BigDecimal("100.00"));
     }
     //endregion
 }

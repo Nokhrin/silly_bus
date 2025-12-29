@@ -32,7 +32,7 @@ import java.util.UUID;
  *
  * @since 1.0
  */
-sealed interface Command permits Balance, Close, Deposit, List, Open, Transfer, Withdraw {
+sealed public interface Command permits Balance, Close, Deposit, List, Open, Transfer, Withdraw {
     /**
      * Выполняет команду.
      */

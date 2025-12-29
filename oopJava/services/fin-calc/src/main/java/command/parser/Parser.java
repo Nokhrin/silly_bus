@@ -1,9 +1,8 @@
 package command.parser;
 
 import java.math.BigDecimal;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.util.List;
+import java.util.*;
 import java.util.regex.Pattern;
 
 /**
@@ -455,11 +454,27 @@ public class Parser {
                     offset = wsAfterList.get().end();
                 }
 
-                yield Optional.of(new ParseResult<>(new List(), start, offset));
+                yield Optional.of(new ParseResult<>(new command.parser.List(), start, offset));
             }
 
             default -> Optional.empty(); // неизвестная команда
         };
+    }
+    
+    public static List<Command> parseCommandsFromString(String source) {
+        List<Command> commandsList = new ArrayList<>();
+        int start = 0;
+        
+        while (start < source.length()) {
+            Optional<ParseResult<Command>> commandOpt = parseCommand(source, start);
+            if (commandOpt.isPresent()) {
+                commandsList.add(commandOpt.get().value());
+                start = commandOpt.get().end();
+            } else {
+                break;
+            }
+        }
+        return commandsList;
     }
 
 }
