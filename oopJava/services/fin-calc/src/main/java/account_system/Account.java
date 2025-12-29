@@ -39,4 +39,8 @@ public class Account {
     public void withdraw(BigDecimal amount) {
         this.balance = this.balance.subtract(amount);
     }
+
+    public UUID getId() {
+        return id;
+    }
 }
