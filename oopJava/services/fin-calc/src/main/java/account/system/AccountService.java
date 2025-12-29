@@ -19,7 +19,7 @@ public class AccountService {
      * @param initialBalance начальный баланс
      * @return ID нового счета
      */
-    public UUID openAccount(final BigDecimal initialBalance) {
+    public UUID openAccount(final Amount initialBalance) {
         Account account = new Account(initialBalance);
         accounts.put(account.getId(), account);
         return account.getId();
