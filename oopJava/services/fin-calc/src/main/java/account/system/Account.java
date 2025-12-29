@@ -24,7 +24,7 @@ public class Account {
     private final UUID id = UUID.randomUUID();
     private BigDecimal balance = BigDecimal.ZERO;
 
-    public Account(BigDecimal amount) {
+    public Account(Amount amount) {
         this.balance = amount;
     }
 
