@@ -1,5 +1,7 @@
 package command.parser;
 
+import java.util.UUID;
+
 /**
  * Команда.
  * Выполняется.
@@ -62,7 +64,7 @@ record Open() implements Command {
  *
  * @param accountId идентификатор счёта
  */
-record Close(String accountId) implements Command {
+record Close(UUID accountId) implements Command {
     @Override
     public void execute() {
         System.out.printf("""
@@ -84,7 +86,7 @@ record Close(String accountId) implements Command {
  * @param accountId идентификатор счёта
  * @param amount    сумма зачисления
  */
-record Deposit(String accountId, java.math.BigDecimal amount) implements Command {
+record Deposit(UUID accountId, java.math.BigDecimal amount) implements Command {
     @Override
     public void execute() {
         System.out.printf("""
@@ -107,7 +109,7 @@ record Deposit(String accountId, java.math.BigDecimal amount) implements Command
  * @param accountId идентификатор счёта
  * @param amount    сумма снятия
  */
-record Withdraw(String accountId, java.math.BigDecimal amount) implements Command {
+record Withdraw(UUID accountId, java.math.BigDecimal amount) implements Command {
     @Override
     public void execute() {
         System.out.printf("""
@@ -132,7 +134,7 @@ record Withdraw(String accountId, java.math.BigDecimal amount) implements Comman
  * @param targetId идентификатор счёта получателя
  * @param amount   сумма перевода
  */
-record Transfer(String sourceId, String targetId, java.math.BigDecimal amount) implements Command {
+record Transfer(UUID sourceId, UUID targetId, java.math.BigDecimal amount) implements Command {
     @Override
     public void execute() {
         System.out.printf("""
@@ -154,7 +156,7 @@ record Transfer(String sourceId, String targetId, java.math.BigDecimal amount) i
  *
  * @param accountId идентификатор счёта
  */
-record Balance(String accountId) implements Command {
+record Balance(UUID accountId) implements Command {
     @Override
     public void execute() {
         System.out.printf("""
@@ -165,7 +167,7 @@ record Balance(String accountId) implements Command {
     }
 
     // Вспомогательный метод (на практике — из account_system)
-    private java.math.BigDecimal getBalance(String accountId) {
+    private java.math.BigDecimal getBalance(UUID accountId) {
         return java.math.BigDecimal.ZERO; // эмуляция
     }
 }
