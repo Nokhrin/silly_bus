@@ -1,4 +1,4 @@
-package account_system;
+package account.system;
 
 import java.math.BigDecimal;
 import java.util.UUID;
