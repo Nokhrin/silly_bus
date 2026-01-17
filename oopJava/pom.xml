@@ -10,8 +10,8 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>services/calc-parser</module>
-        <module>services/fin-calc</module>
+        <module>assignments/calc-parser</module>
+        <module>assignments/fin-calc</module>
     </modules>
     
     <properties>
