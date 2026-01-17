@@ -293,7 +293,7 @@ public class ParserTest {
 
         // then
         assertTrue(result.isPresent());
-        assertTrue(result.get().value() instanceof Open);
+        assertTrue(result.get().value() instanceof OpenAccount);
         assertEquals(result.get().start(), 0);
         assertEquals(result.get().end(), 4);
     }
@@ -309,14 +309,14 @@ public class ParserTest {
 
         // then
         assertTrue(result.isPresent());
-        assertTrue(result.get().value() instanceof Open);
+        assertTrue(result.get().value() instanceof OpenAccount);
         assertEquals(result.get().end(), 7); // "open   " — пробелы после
     }
 
     @Test
     public void testParseCommand_Close_ValidId() {
         // given
-        String input = "close 1a2b3c4d-5e6f-7890-1234-567890abcdef";
+        String input = "closeAccount 1a2b3c4d-5e6f-7890-1234-567890abcdef";
         int start = 0;
 
         // when
@@ -324,9 +324,9 @@ public class ParserTest {
 
         // then
         assertTrue(result.isPresent());
-        assertTrue(result.get().value() instanceof Close);
-        Close close = (Close) result.get().value();
-        assertEquals(close.accountId().toString(), "1a2b3c4d-5e6f-7890-1234-567890abcdef");
+        assertTrue(result.get().value() instanceof CloseAccount);
+        CloseAccount closeAccount = (CloseAccount) result.get().value();
+        assertEquals(closeAccount.accountId().toString(), "1a2b3c4d-5e6f-7890-1234-567890abcdef");
         assertEquals(result.get().end(), 42); // длина строки
     }
 
@@ -405,7 +405,7 @@ public class ParserTest {
         List<Command> commands = Parser.parseCommandsFromString(input);
 
         assertEquals(commands.size(), 1);
-        assertTrue(commands.get(0) instanceof Open);
+        assertTrue(commands.get(0) instanceof OpenAccount);
     }
 
     @Test
@@ -414,7 +414,7 @@ public class ParserTest {
         List<Command> commands = Parser.parseCommandsFromString(input);
 
         assertEquals(commands.size(), 3);
-        assertTrue(commands.get(0) instanceof Open);
+        assertTrue(commands.get(0) instanceof OpenAccount);
         assertTrue(commands.get(1) instanceof Deposit);
         assertTrue(commands.get(2) instanceof Withdraw);
 
@@ -447,7 +447,7 @@ public class ParserTest {
         List<Command> commands = Parser.parseCommandsFromString(input);
 
         assertEquals(commands.size(), 2);
-        assertTrue(commands.get(0) instanceof Open);
+        assertTrue(commands.get(0) instanceof OpenAccount);
         assertTrue(commands.get(1) instanceof Deposit);
 
         Deposit depositCmd = (Deposit) commands.get(1);

@@ -1,0 +1,161 @@
+# Чек-лист для проекта fin-calc
+
+## 1. Парсинг команд
+- [ ] Все команды из спецификации корректно парсятся ([src/test/java/command/parser/ParserTest.java](src/test/java/command/parser/ParserTest.java))
+- [ ] Обработка ошибок парсинга (неверный формат команды) ([src/test/java/command/parser/ParserTest.java](src/test/java/command/parser/ParserTest.java))
+- [ ] Множество команд передано одной строкой - команды парсятся и выполняются последовательно
+
+### Демонстрация:
+```bash
+# Запуск CLI
+java -cp target/classes account.system.cli.Main
+
+# Пример команд
+open-account 123e4567-e89b-12d3-a456-426614174000
+deposit 123e4567-e89b-12d3-a456-426614174000 100.50
+withdraw 123e4567-e89b-12d3-a456-426614174000 50.25
+transfer 123e4567-e89b-12d3-a456-426614174000 123e4567-e89b-12d3-a456-426614174001 25.00
+close-account 123e4567-e89b-12d3-a456-426614174000
+balance 123e4567-e89b-12d3-a456-426614174000
+list-accounts
+```
+
+## 2. Выполнение исходных команд
+- [ ] CLI принимает команды из stdin или файлов
+- [ ] Команды обрабатываются последовательно
+- [ ] Результаты выводятся в stdout
+- [ ] Обработка команд из файла (`cat commands.txt | java -cp ...`)
+
+## 3. Результат выполнения команд
+- [ ] Каждая команда возвращает результат
+- [ ] Вывод в формате, соответствующем спецификации
+- [ ] Ошибки отображаются читаемо
+  - [ ] Сообщения об ошибках содержат понятный текст (содержат информативный текст, описывающий проблему в терминах пользователя, например "Недостаточно средств на счете 123e4567-e89b-12d3-a456-426614174000")
+  - [ ] Указывается тип ошибки (например, "Недостаточно средств")
+  - [ ] Указывается контекст ошибки (ID счета, сумма)
+  - [ ] Не отображаются внутренние стеки трейсы без необходимости (только если это критическая ошибка для отладки)
+  - [ ] Ошибки имеют коды или категории для автоматической обработки (например, "ERROR_INSUFFICIENT_FUNDS", "ERROR_ACCOUNT_NOT_FOUND")
+- [ ] Состояние системы отражается после каждой операции
+
+## 4. Ошибки отображаются читаемо
+- [ ] Сообщения об ошибках содержат понятный текст (содержат информативный текст, описывающий проблему в терминах пользователя, например "Недостаточно средств на счете 123e4567-e89b-12d3-a456-426614174000")
+- [ ] Указывается тип ошибки (например, "Недостаточно средств")
+- [ ] Указывается контекст ошибки (ID счета, сумма)
+- [ ] Не отображаются внутренние стеки трейсы без необходимости (только если это критическая ошибка для отладки)
+- [ ] Ошибки имеют коды или категории для автоматической обработки (например, "ERROR_INSUFFICIENT_FUNDS", "ERROR_ACCOUNT_NOT_FOUND")
+
+## 5. Ошибки при недостатке средств обрабатываются
+- [ ] При попытке снятия суммы превышающей баланс, выводится сообщение "Недостаточно средств"
+- [ ] При попытке перевода с недостаточными средствами, выводится сообщение "Недостаточно средств"
+- [ ] Система не позволяет завершить операцию в случае недостатка средств
+- [ ] Состояние счета остается неизменным после ошибки (баланс счета не изменяется)
+
+## 6. Счета создаются корректно
+- [ ] При команде `open-account <UUID>` создается новый счет с начальным балансом 0
+- [ ] UUID счета уникален и соответствует переданному значению
+- [ ] Счет добавляется в реестр счетов
+- [ ] При повторном открытии существующего счета возвращается ошибка "Счет уже существует"
+- [ ] Счет не может быть открыт с нулевым или отрицательным балансом
+
+## 7. Переводы работают корректно
+- [ ] Команда `transfer <from_id> <to_id> <amount>` выполняет последовательно: Сумма списывается со счета отправителя, Сумма зачисляется на счет получателя
+- [ ] Сумма списывается со счета отправителя
+- [ ] Сумма зачисляется на счет получателя
+- [ ] Балансы обоих счетов обновляются корректно
+- [ ] При недостатке средств на счете отправителя перевод не выполняется
+- [ ] Перевод не возможен между одним и тем же счетом
+
+## 8. Балансы обновляются правильно
+- [ ] После депозита сумма на счете увеличивается на указанную сумму
+- [ ] После снятия сумма на счете уменьшается на указанную сумму
+- [ ] После перевода сумма снимается с одного счета и зачисляется на другой
+- [ ] Балансы проверяются на корректность (не отрицательные значения)
+- [ ] Точность вычислений сохраняется (используется BigDecimal)
+
+## 9. Состояние системы сохраняется между операциями
+- [ ] Все открытые счета остаются в памяти между командами
+- [ ] Балансы счетов сохраняются после каждой операции
+- [ ] Счета не исчезают после выполнения команд
+- [ ] При перезапуске приложения (в рамках одной сессии) состояние сохраняется
+- [ ] Команды обрабатываются в правильном порядке (последовательно)
+
+## 10. Строгая типизация типов операций
+- [ ] Используется sealed interface `Operation` для типов операций
+- [ ] Классы `Deposit`, `Withdrawal`, `Transfer` реализуют `Operation`
+- [ ] Используется pattern matching для обработки разных типов операций
+- [ ] Каждый тип операции имеет строго определенную сигнатуру
+
+### Пример в коде:
+```java
+// src/main/java/account/system/Operation.java
+public sealed interface Operation permits Deposit, Withdrawal, Transfer {
+    void execute(AccountRegistry registry);
+}
+
+// src/main/java/account/system/Deposit.java
+public record Deposit(UUID accountId, Amount amount) implements Operation {
+    @Override
+    public void execute(AccountRegistry registry) {
+        registry.deposit(accountId, amount.toBigDecimal());
+    }
+}
+
+// src/main/java/account/system/Withdrawal.java
+public record Withdrawal(UUID accountId, Amount amount) implements Operation {
+    @Override
+    public void execute(AccountRegistry registry) {
+        registry.withdraw(accountId, amount.toBigDecimal());
+    }
+}
+
+// Использование pattern matching
+public class OperationHandler {
+    public void handle(Operation operation) {
+        switch (operation) {
+            case Deposit d -> d.execute(registry);
+            case Withdrawal w -> w.execute(registry);
+            case Transfer t -> t.execute(registry);
+            default -> throw new IllegalArgumentException("Неизвестная операция");
+        }
+    }
+}
+```
+
+## 11. Тестирование
+- [x] Все юнит-тесты проходят ([src/test/java/command/parser/ParserTest.java](src/test/java/command/parser/ParserTest.java))
+- [x] Интеграционные тесты покрывают основные сценарии ([src/test/java/account/system/AccountRegistryTest.java](src/test/java/account/system/AccountRegistryTest.java))
+- [x] Тесты на граничные условия находятся в ([src/test/java/account/system/AccountRegistryTest.java](src/test/java/account/system/AccountRegistryTest.java))
+- [x] Тесты на ошибочные ситуации находятся в ([src/test/java/account/system/AccountRegistryTest.java](src/test/java/account/system/AccountRegistryTest.java))
+
+## 12. UML диаграммы представлены
+- [ ] Класс-диаграмма: [src/main/resources/docs/uml/class-diagram-financial-entities.md](src/main/resources/docs/uml/class-diagram-financial-entities.md)
+- [ ] Диаграмма состояний: [src/main/resources/docs/uml/state-diagram-financial-entities.md](src/main/resources/docs/uml/state-diagram-financial-entities.md)
+- [ ] Термины и определения: [src/main/resources/docs/uml/terms-financial-entities.md](src/main/resources/docs/uml/terms-financial-entities.md)
+
+## 13. Применение наследования на примере Amount
+- [ ] Класс `Amount` наследуется от `BigDecimal`
+- [ ] Конструкторы класса `Amount` валидируют входные значения
+- [ ] Значение всегда больше нуля (строго положительное)
+- [ ] Класс `Amount` предоставляет методы для математических операций
+- [ ] Пример использования в [src/main/java/account/system/Amount.java](src/main/java/account/system/Amount.java)
+
+## 14. Демонстрация
+1. Запуск проекта:
+```bash
+mvn clean compile exec:java -Dexec.mainClass="account.system.cli.Main"
+```
+
+2. Пример выполнения команд:
+```bash
+open-account 123e4567-e89b-12d3-a456-426614174000
+deposit 123e4567-e89b-12d3-a456-426614174000 100.50
+balance 123e4567-e89b-12d3-a456-426614174000
+transfer 123e4567-e89b-12d3-a456-426614174000 123e4567-e89b-12d3-a456-426614174001 50.25
+close-account 123e4567-e89b-12d3-a456-426614174000
+list-accounts
+```
+
+3. Запуск тестов:
+```bash
+mvn test
+```
