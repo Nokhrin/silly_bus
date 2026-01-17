@@ -4,35 +4,8 @@ import java.util.UUID;
 
 /**
  * Команда.
- * Выполняется.
- *
- * <p>
- * Требования:
- * <ul>
- *   <li>Команды реализуют интерфейс {@link Command}.</li>
- *   <li>Команда — это неизменяемый record (или класс), содержащий данные.</li>
- *   <li>Команды неизменяемы (immutable).</li>
- * </ul>
- *
- * <p>
- * Команды — это инструкции, которые знают, какие действия нужно выполнить.
- * Реализация действий делегирована системе управления счетами.
- *
- * <p>
- * Поддерживаемые команды:
- * <ul>
- *   <li><code>open</code> — создать новый счёт (возвращает номер).</li>
- *   <li><code>close &lt;account_id&gt;</code> — закрыть счёт.</li>
- *   <li><code>deposit &lt;account_id&gt; &lt;amount&gt;</code> — пополнить счёт.</li>
- *   <li><code>withdraw &lt;account_id&gt; &lt;amount&gt;</code> — снять со счёта.</li>
- *   <li><code>transfer &lt;source_id&gt; &lt;target_id&gt; &lt;amount&gt;</code> — перевести со счёта на счёт.</li>
- *   <li><code>balance &lt;account_id&gt;</code> — посмотреть баланс.</li>
- *   <li><code>list</code> — вывести список всех открытых счётов.</li>
- * </ul>
- *
- * @since 1.0
  */
-sealed public interface Command permits Balance, Close, Deposit, List, Open, Transfer, Withdraw {
+sealed public interface Command permits Balance, CloseAccount, Deposit, ListAccounts, OpenAccount, Transfer, Withdraw {
     /**
      * Выполняет команду.
      */
@@ -41,11 +14,11 @@ sealed public interface Command permits Balance, Close, Deposit, List, Open, Tra
 
 /**
  * Создать новый счёт (возвращает номер).
- * <p>
- * Используется в команде <code>open</code>.
  */
-record Open() implements Command {
+record OpenAccount() implements Command {
     @Override
+    
+    // todo - вернуть номер открытого счета
     public void execute() {
         System.out.printf("""
                 Открытие счёта:
@@ -64,13 +37,29 @@ record Open() implements Command {
  *
  * @param accountId идентификатор счёта
  */
-record Close(UUID accountId) implements Command {
+record CloseAccount(UUID accountId) implements Command {
     @Override
     public void execute() {
         System.out.printf("""
                 Закрытие счёта:
                 закрываемый счёт=%s
                 %n""", accountId);
+    }
+}
+
+/**
+ * Вывести список всех открытых счётов.
+ * <p>
+ * Требуется доступ к реестру счётов.
+ *
+ * @since 1.0
+ */
+record ListAccounts() implements Command {
+    @Override
+    public void execute() {
+        System.out.printf("""
+                Существуют открытые счёта ...
+                %n""");
     }
 }
 
@@ -163,27 +152,11 @@ record Balance(UUID accountId) implements Command {
                 Баланс
                   счёт=%s
                 , сумма=%s
-                %n""", accountId, getBalance(accountId));
+                %n""", accountId, get(accountId));
     }
 
     // Вспомогательный метод (на практике — из account_system)
-    private java.math.BigDecimal getBalance(UUID accountId) {
+    private java.math.BigDecimal get(UUID accountId) {
         return java.math.BigDecimal.ZERO; // эмуляция
-    }
-}
-
-/**
- * Вывести список всех открытых счётов.
- * <p>
- * Требуется доступ к реестру счётов.
- *
- * @since 1.0
- */
-record List() implements Command {
-    @Override
-    public void execute() {
-        System.out.printf("""
-                Существуют открытые счёта ...
-                %n""");
     }
 }
