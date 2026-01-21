@@ -1,0 +1,16 @@
+# Подтверждение соответствия
+
+### Демонстрация:
+```bash
+# Запуск CLI
+java -cp target/classes account.system.cli.Main
+
+# Пример команд
+open-account 123e4567-e89b-12d3-a456-426614174000
+deposit 123e4567-e89b-12d3-a456-426614174000 100.50
+withdraw 123e4567-e89b-12d3-a456-426614174000 50.25
+transfer 123e4567-e89b-12d3-a456-426614174000 123e4567-e89b-12d3-a456-426614174001 25.00
+close-account 123e4567-e89b-12d3-a456-426614174000
+balance 123e4567-e89b-12d3-a456-426614174000
+list-accounts
+```
