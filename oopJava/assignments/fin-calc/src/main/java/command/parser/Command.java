@@ -5,7 +5,7 @@ import java.util.UUID;
 /**
  * Команда.
  */
-sealed public interface Command permits Balance, Close, Deposit, List, Open, Transfer, Withdraw {
+sealed public interface Command permits Balance, CloseAccount, Deposit, ListAccounts, OpenAccount, Transfer, Withdraw {
     /**
      * Выполняет команду.
      */
@@ -15,7 +15,7 @@ sealed public interface Command permits Balance, Close, Deposit, List, Open, Tra
 /**
  * Создать новый счёт (возвращает номер).
  */
-record Open() implements Command {
+record OpenAccount() implements Command {
     @Override
     
     // todo - вернуть номер открытого счета
@@ -37,7 +37,7 @@ record Open() implements Command {
  *
  * @param accountId идентификатор счёта
  */
-record Close(UUID accountId) implements Command {
+record CloseAccount(UUID accountId) implements Command {
     @Override
     public void execute() {
         System.out.printf("""
@@ -54,7 +54,7 @@ record Close(UUID accountId) implements Command {
  *
  * @since 1.0
  */
-record List() implements Command {
+record ListAccounts() implements Command {
     @Override
     public void execute() {
         System.out.printf("""

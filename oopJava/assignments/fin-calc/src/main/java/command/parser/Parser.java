@@ -276,7 +276,7 @@ public class Parser {
                     offset = wsAfter.get().end();
                 }
 
-                yield Optional.of(new ParseResult<>(new Open(), start, offset));
+                yield Optional.of(new ParseResult<>(new OpenAccount(), start, offset));
             }
             case "close" -> {
                 // close <account_id>
@@ -299,7 +299,7 @@ public class Parser {
                     offset = wsAfterAccountId.get().end();
                 }
 
-                yield Optional.of(new ParseResult<>(new Close(accountId), start, offset));
+                yield Optional.of(new ParseResult<>(new CloseAccount(accountId), start, offset));
             }
 
             case "deposit" -> {
@@ -434,7 +434,7 @@ public class Parser {
                     offset = wsAfterList.get().end();
                 }
 
-                yield Optional.of(new ParseResult<>(new List(), start, offset));
+                yield Optional.of(new ParseResult<>(new ListAccounts(), start, offset));
             }
 
             default -> Optional.empty(); // неизвестная команда
