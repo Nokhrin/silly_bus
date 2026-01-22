@@ -1,7 +1,6 @@
 package command.parser;
 
 import java.math.BigDecimal;
-import java.util.List;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -240,7 +239,7 @@ public class Parser {
      * | withdraw <account_id> <amount>
      * | transfer <account_id> <account_id> <amount>
      * | balance <account_id>
-     * | list-accounts
+     * | list
      */
     public static Optional<ParseResult<Command>> parseCommand(final String source, final int start) {
         // проверка входных параметров    
@@ -269,18 +268,18 @@ public class Parser {
 
         // Шаг 3: Парсим команду
         return switch (commandText) {
-            case "open-account" -> {
-                // open-account - без аргументов
+            case "open" -> {
+                // open - без аргументов
                 Optional<ParseResult<String>> wsAfter = parseWhitespace(source, offset);
                 if (wsAfter.isPresent()) {
                     // Допускается пробел после open, но не обязательно
                     offset = wsAfter.get().end();
                 }
 
-                yield Optional.of(new ParseResult<>(new OpenAccount(), start, offset));
+                yield Optional.of(new ParseResult<>(new Open(), start, offset));
             }
             case "close" -> {
-                // close-account <account_id>
+                // close <account_id>
                 Optional<ParseResult<String>> wsAfterClose = parseWhitespace(source, offset);
                 if (wsAfterClose.isEmpty()) {
                     yield Optional.empty(); // нет места для account_id
@@ -300,7 +299,7 @@ public class Parser {
                     offset = wsAfterAccountId.get().end();
                 }
 
-                yield Optional.of(new ParseResult<>(new CloseAccount(accountId), start, offset));
+                yield Optional.of(new ParseResult<>(new Close(accountId), start, offset));
             }
 
             case "deposit" -> {
@@ -428,22 +427,22 @@ public class Parser {
                 yield Optional.of(new ParseResult<>(new Balance(accountId), start, offset));
             }
 
-            case "list-accounts" -> {
-                // list-accounts - без аргументов
+            case "list" -> {
+                // list - без аргументов
                 Optional<ParseResult<String>> wsAfterList = parseWhitespace(source, offset);
                 if (wsAfterList.isPresent()) {
                     offset = wsAfterList.get().end();
                 }
 
-                yield Optional.of(new ParseResult<>(new ListAccounts(), start, offset));
+                yield Optional.of(new ParseResult<>(new List(), start, offset));
             }
 
             default -> Optional.empty(); // неизвестная команда
         };
     }
     
-    public static List<Command> parseCommandsFromString(String source) {
-        List<Command> commandsList = new ArrayList<>();
+    public static java.util.List<Command> parseCommandsFromString(String source) {
+        java.util.List<Command> commandsList = new ArrayList<>();
         int start = 0;
         
         while (start < source.length()) {
