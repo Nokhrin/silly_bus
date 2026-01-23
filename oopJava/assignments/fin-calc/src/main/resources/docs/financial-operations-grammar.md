@@ -1,7 +1,7 @@
 # Формальная грамматика команд консольного приложения для управления банковскими счетами
 
 ```ebnf
-command ::= open
+operation ::= open
           | close <account_id>
           | deposit <account_id> <amount>
           | withdraw <account_id> <amount>
