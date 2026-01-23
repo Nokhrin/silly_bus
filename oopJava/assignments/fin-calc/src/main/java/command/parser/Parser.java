@@ -1,5 +1,7 @@
 package command.parser;
 
+import account.operation.*;
+
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.regex.Pattern;
@@ -241,7 +243,7 @@ public class Parser {
      * | balance <account_id>
      * | list
      */
-    public static Optional<ParseResult<Command>> parseCommand(final String source, final int start) {
+    public static Optional<ParseResult<Operation>> parseCommand(final String source, final int start) {
         // проверка входных параметров    
         if (source.isEmpty() || start < 0 || start >= source.length()) {
             return Optional.empty();
@@ -441,12 +443,12 @@ public class Parser {
         };
     }
     
-    public static java.util.List<Command> parseCommandsFromString(String source) {
-        java.util.List<Command> commandsList = new ArrayList<>();
+    public static java.util.List<Operation> parseCommandsFromString(String source) {
+        java.util.List<Operation> commandsList = new ArrayList<>();
         int start = 0;
         
         while (start < source.length()) {
-            Optional<ParseResult<Command>> commandOpt = parseCommand(source, start);
+            Optional<ParseResult<Operation>> commandOpt = parseCommand(source, start);
             if (commandOpt.isPresent()) {
                 commandsList.add(commandOpt.get().value());
                 start = commandOpt.get().end();

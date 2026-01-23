@@ -1,6 +1,6 @@
 package command.parser.cli;
 
-import command.parser.Command;
+import account.operation.Operation;
 import command.parser.Parser;
 
 import java.util.List;
@@ -10,8 +10,8 @@ public class Main {
         System.out.println("управление банковскими счетами");
         //
         String input = "open deposit 123e4567-e89b-12d3-a456-426614174000 100.00 withdraw 123e4567-e89b-12d3-a456-426614174000 50.00";
-        List<Command> commands = Parser.parseCommandsFromString(input);
-        System.out.println(commands);
+        List<Operation> operations = Parser.parseCommandsFromString(input);
+        System.out.println(operations);
         // [
         // Open[], 
         // Deposit[accountId=123e4567-e89b-12d3-a456-426614174000, amount=100.00], 

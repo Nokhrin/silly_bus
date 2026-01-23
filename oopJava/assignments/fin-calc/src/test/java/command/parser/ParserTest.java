@@ -1,5 +1,6 @@
 package command.parser;
 
+import account.operation.*;
 import org.testng.annotations.Test;
 
 import java.math.BigDecimal;
@@ -119,7 +120,7 @@ public class ParserTest {
     @Test(description = "Парсинг команды open без пробелов")
     public void testParseCommand_Open() {
         String input = "open";
-        Optional<ParseResult<Command>> result = Parser.parseCommand(input, 0);
+        Optional<ParseResult<Operation>> result = Parser.parseCommand(input, 0);
 
         assertTrue(result.isPresent());
         assertTrue(result.get().value() instanceof OpenAccount);
@@ -130,7 +131,7 @@ public class ParserTest {
     @Test(description = "Парсинг команды open с пробелами")
     public void testParseCommand_OpenWithWhitespace() {
         String input = "   open   ";
-        Optional<ParseResult<Command>> result = Parser.parseCommand(input, 0);
+        Optional<ParseResult<Operation>> result = Parser.parseCommand(input, 0);
 
         assertTrue(result.isPresent());
         assertTrue(result.get().value() instanceof OpenAccount);
@@ -144,7 +145,7 @@ public class ParserTest {
     @Test(description = "Парсинг deposit с корректным синтаксисом")
     public void testParseCommand_Deposit() {
         String input = "deposit 550e8400-e29b-41d4-a716-446655440000 123.45";
-        Optional<ParseResult<Command>> result = Parser.parseCommand(input, 0);
+        Optional<ParseResult<Operation>> result = Parser.parseCommand(input, 0);
 
         assertTrue(result.isPresent());
         assertTrue(result.get().value() instanceof Deposit);
@@ -158,7 +159,7 @@ public class ParserTest {
     @Test(description = "Парсинг withdraw с корректным синтаксисом")
     public void testParseCommand_Withdraw() {
         String input = "withdraw 550e8400-e29b-41d4-a716-446655440000 123.45";
-        Optional<ParseResult<Command>> result = Parser.parseCommand(input, 0);
+        Optional<ParseResult<Operation>> result = Parser.parseCommand(input, 0);
 
         assertTrue(result.isPresent());
         assertTrue(result.get().value() instanceof Withdraw);
@@ -172,7 +173,7 @@ public class ParserTest {
     @Test(description = "Парсинг transfer с корректным синтаксисом")
     public void testParseCommand_Transfer() {
         String input = "transfer 550e8400-e29b-41d4-a716-446655440000 12345678-1234-41D4-A716-446655440000 123.45";
-        Optional<ParseResult<Command>> result = Parser.parseCommand(input, 0);
+        Optional<ParseResult<Operation>> result = Parser.parseCommand(input, 0);
         
         assertTrue(result.isPresent());
         assertTrue(result.get().value() instanceof Transfer);
@@ -185,7 +186,7 @@ public class ParserTest {
     @Test(description = "Парсинг balance с корректным синтаксисом")
     public void testParseCommand_Balance() {
         String input = "balance 550e8400-e29b-41d4-a716-446655440000";
-        Optional<ParseResult<Command>> result = Parser.parseCommand(input, 0);
+        Optional<ParseResult<Operation>> result = Parser.parseCommand(input, 0);
 
         assertTrue(result.isPresent());
         assertTrue(result.get().value() instanceof Balance);
@@ -198,7 +199,7 @@ public class ParserTest {
     @Test(description = "Парсинг list с корректным синтаксисом")
     public void testParseCommand_List() {
         String input = "list";
-        Optional<ParseResult<Command>> result = Parser.parseCommand(input, 0);
+        Optional<ParseResult<Operation>> result = Parser.parseCommand(input, 0);
 
         assertTrue(result.isPresent());
         assertTrue(result.get().value() instanceof ListAccounts);
@@ -211,7 +212,7 @@ public class ParserTest {
     @Test(description = "Парсинг close с корректным синтаксисом")
     public void testParseCommand_Close() {
         String input = "close 550e8400-e29b-41d4-a716-446655440000";
-        Optional<ParseResult<Command>> result = Parser.parseCommand(input, 0);
+        Optional<ParseResult<Operation>> result = Parser.parseCommand(input, 0);
 
         assertTrue(result.isPresent());
         assertTrue(result.get().value() instanceof CloseAccount);
@@ -224,70 +225,70 @@ public class ParserTest {
     @Test(description = "Строка с двумя командами интерпретированы как список из двух команд")
     public void testParseCommandsFromString_OpenAndOtherCommand() {
         String input = "open close 550e8400-e29b-41d4-a716-446655440000";
-        List<Command> commands = Parser.parseCommandsFromString(input);
+        List<Operation> operations = Parser.parseCommandsFromString(input);
 
-        assertEquals(commands.size(), 2);
-        assertTrue(commands.get(0) instanceof OpenAccount);
-        assertTrue(commands.get(1) instanceof CloseAccount);
+        assertEquals(operations.size(), 2);
+        assertTrue(operations.get(0) instanceof OpenAccount);
+        assertTrue(operations.get(1) instanceof CloseAccount);
     }
 
     @Test(description = "Строка с тремя командами интерпретированы как список из трех команд")
     public void testParseCommandsFromString_ThreeCommands() {
         String input = "open deposit 550e8400-e29b-41d4-a716-446655440000 100.00 withdraw 550e8400-e29b-41d4-a716-446655440000 50.00";
-        List<Command> commands = Parser.parseCommandsFromString(input);
+        List<Operation> operations = Parser.parseCommandsFromString(input);
 
-        assertEquals(commands.size(), 3);
-        assertTrue(commands.get(0) instanceof OpenAccount);
-        assertTrue(commands.get(1) instanceof Deposit);
-        assertTrue(commands.get(2) instanceof Withdraw);
+        assertEquals(operations.size(), 3);
+        assertTrue(operations.get(0) instanceof OpenAccount);
+        assertTrue(operations.get(1) instanceof Deposit);
+        assertTrue(operations.get(2) instanceof Withdraw);
     }
 
     @Test(description = "Строка с командами разных типов и пробелами")
     public void testParseCommandsFromString_MixedCommands() {
         String input = "   open   \n\t deposit 550e8400-e29b-41d4-a716-446655440000 123.45   \t\n  withdraw 550e8400-e29b-41d4-a716-446655440000 67.89   ";
-        List<Command> commands = Parser.parseCommandsFromString(input);
+        List<Operation> operations = Parser.parseCommandsFromString(input);
 
-        assertEquals(commands.size(), 3);
-        assertTrue(commands.get(0) instanceof OpenAccount);
-        assertTrue(commands.get(1) instanceof Deposit);
-        assertTrue(commands.get(2) instanceof Withdraw);
+        assertEquals(operations.size(), 3);
+        assertTrue(operations.get(0) instanceof OpenAccount);
+        assertTrue(operations.get(1) instanceof Deposit);
+        assertTrue(operations.get(2) instanceof Withdraw);
     }
 
     @Test(description = "Строка с одной командой")
     public void testParseCommandsFromString_SingleCommand() {
         String input = "deposit 550e8400-e29b-41d4-a716-446655440000 123.45";
-        List<Command> commands = Parser.parseCommandsFromString(input);
+        List<Operation> operations = Parser.parseCommandsFromString(input);
 
-        assertEquals(commands.size(), 1);
-        assertTrue(commands.get(0) instanceof Deposit);
+        assertEquals(operations.size(), 1);
+        assertTrue(operations.get(0) instanceof Deposit);
     }
 
     @Test(description = "Строка с пустыми командами и пробелами")
     public void testParseCommandsFromString_EmptyAndWhitespace() {
         String input = "   \n\t  ";
-        List<Command> commands = Parser.parseCommandsFromString(input);
+        List<Operation> operations = Parser.parseCommandsFromString(input);
 
-        assertEquals(commands.size(), 0);
+        assertEquals(operations.size(), 0);
     }
 
     @Test(description = "Строка с неправильной командой - парсинг останавливается")
     public void testParseCommandsFromString_InvalidCommandStopsParsing() {
         String input = "open invalid_command 550e8400-e29b-41d4-a716-446655440000 deposit 550e8400-e29b-41d4-a716-446655440000 100.00";
-        List<Command> commands = Parser.parseCommandsFromString(input);
+        List<Operation> operations = Parser.parseCommandsFromString(input);
 
         // Только первая команда должна быть распарсена
-        assertEquals(commands.size(), 1);
-        assertTrue(commands.get(0) instanceof OpenAccount);
+        assertEquals(operations.size(), 1);
+        assertTrue(operations.get(0) instanceof OpenAccount);
     }
 
     @Test(description = "Строка с командами, где одна невалидна - остальные парсятся")
     public void testParseCommandsFromString_MixedValidInvalidCommands() {
         String input = "open deposit 550e8400-e29b-41d4-a716-446655440000 100.00 invalid_command 550e8400-e29b-41d4-a716-446655440000";
-        List<Command> commands = Parser.parseCommandsFromString(input);
+        List<Operation> operations = Parser.parseCommandsFromString(input);
 
-        assertEquals(commands.size(), 2);
-        assertTrue(commands.get(0) instanceof OpenAccount);
-        assertTrue(commands.get(1) instanceof Deposit);
+        assertEquals(operations.size(), 2);
+        assertTrue(operations.get(0) instanceof OpenAccount);
+        assertTrue(operations.get(1) instanceof Deposit);
     }
     //endregion parseCommand последовательности команд
 }
