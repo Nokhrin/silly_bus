@@ -1,9 +1,13 @@
 package command.parser;
 
-import account.operation.*;
+import account.system.Amount;
+import command.dto.*;
 
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 import java.util.regex.Pattern;
 
 /**
@@ -205,7 +209,7 @@ public class Parser {
 
         // Попытка парсинга BigDecimal
         try {
-            BigDecimal parsedAmount = new BigDecimal(amountStr.toString());
+            Amount parsedAmount = new Amount(amountStr.toString());
             return Optional.of(new ParseResult<>(parsedAmount, start, offset));
         } catch (NumberFormatException e) {
             return Optional.empty();
@@ -243,7 +247,7 @@ public class Parser {
      * | balance <account_id>
      * | list
      */
-    public static Optional<ParseResult<Operation>> parseCommand(final String source, final int start) {
+    public static Optional<ParseResult<CommandData>> parseCommand(final String source, final int start) {
         // проверка входных параметров    
         if (source.isEmpty() || start < 0 || start >= source.length()) {
             return Optional.empty();
@@ -278,7 +282,7 @@ public class Parser {
                     offset = wsAfter.get().end();
                 }
 
-                yield Optional.of(new ParseResult<>(new OpenAccount(), start, offset));
+                yield Optional.of(new ParseResult<>(new OpenAccountData(), start, offset));
             }
             case "close" -> {
                 // close <account_id>
@@ -301,7 +305,7 @@ public class Parser {
                     offset = wsAfterAccountId.get().end();
                 }
 
-                yield Optional.of(new ParseResult<>(new CloseAccount(accountId), start, offset));
+                yield Optional.of(new ParseResult<>(new CloseAccountData(accountId), start, offset));
             }
 
             case "deposit" -> {
@@ -331,7 +335,13 @@ public class Parser {
                 BigDecimal amount = amountResult.get().value();
                 offset = amountResult.get().end();
 
-                yield Optional.of(new ParseResult<>(new Deposit(accountId, amount), start, offset));
+                // Создание Amount
+                try {
+                    Amount amountObj = new Amount(amount);
+                    yield Optional.of(new ParseResult<>(new DepositData(accountId, amountObj), start, offset));
+                } catch (IllegalArgumentException e) {
+                    yield Optional.empty();
+                }
             }
 
             case "withdraw" -> {
@@ -361,7 +371,13 @@ public class Parser {
                 BigDecimal amount = amountResult.get().value();
                 offset = amountResult.get().end();
 
-                yield Optional.of(new ParseResult<>(new Withdraw(accountId, amount), start, offset));
+                // Создание Amount
+                try {
+                    Amount amountObj = new Amount(amount);
+                    yield Optional.of(new ParseResult<>(new WithdrawData(accountId, amountObj), start, offset));
+                } catch (IllegalArgumentException e) {
+                    yield Optional.empty();
+                }
             }
 
             case "transfer" -> {
@@ -403,7 +419,13 @@ public class Parser {
                 BigDecimal amount = amountResult.get().value();
                 offset = amountResult.get().end();
 
-                yield Optional.of(new ParseResult<>(new Transfer(sourceId, targetId, amount), start, offset));
+                // Создание Amount
+                try {
+                    Amount amountObj = new Amount(amount);
+                    yield Optional.of(new ParseResult<>(new TransferData(sourceId, targetId, amountObj), start, offset));
+                } catch (IllegalArgumentException e) {
+                    yield Optional.empty();
+                }
             }
 
             case "balance" -> {
@@ -426,7 +448,7 @@ public class Parser {
                     offset = wsAfterAccountId.get().end();
                 }
 
-                yield Optional.of(new ParseResult<>(new Balance(accountId), start, offset));
+                yield Optional.of(new ParseResult<>(new BalanceData(accountId), start, offset));
             }
 
             case "list" -> {
@@ -436,19 +458,19 @@ public class Parser {
                     offset = wsAfterList.get().end();
                 }
 
-                yield Optional.of(new ParseResult<>(new ListAccounts(), start, offset));
+                yield Optional.of(new ParseResult<>(new ListAccountsData(), start, offset));
             }
 
             default -> Optional.empty(); // неизвестная команда
         };
     }
     
-    public static java.util.List<Operation> parseCommandsFromString(String source) {
-        java.util.List<Operation> commandsList = new ArrayList<>();
+    public static java.util.List<CommandData> parseCommandsFromString(String source) {
+        java.util.List<CommandData> commandsList = new ArrayList<>();
         int start = 0;
         
         while (start < source.length()) {
-            Optional<ParseResult<Operation>> commandOpt = parseCommand(source, start);
+            Optional<ParseResult<CommandData>> commandOpt = parseCommand(source, start);
             if (commandOpt.isPresent()) {
                 commandsList.add(commandOpt.get().value());
                 start = commandOpt.get().end();
