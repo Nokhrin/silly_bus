@@ -1,6 +1,8 @@
+import account.operation.Operation;
 import account.system.AccountService;
 import command.CommandExecutor;
 import command.dto.CommandData;
+import command.dto.CommandFactory;
 import command.parser.Parser;
 
 import java.util.List;
@@ -19,8 +21,10 @@ public class Main {
         System.out.println(commandDataList);
         // [OpenAccountData[], DepositData[accountId=123e4567-e89b-12d3-a456-426614174000, amount=1E+2]]
         
-        //5. создание операций
-        //6. выполнение операций
-        //7. завершение работы
+        //5. создание и выполнение операций
+        for (CommandData commandData : commandDataList) {
+            executor.executeCommand(commandData);
+        }
+        //6. завершение работы
     }
 }

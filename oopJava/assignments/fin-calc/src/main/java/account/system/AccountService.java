@@ -19,7 +19,7 @@ public class AccountService {
      * @return ID нового счета
      */
     public UUID openAccount() {
-        Account account = new Account((Amount) BigDecimal.ZERO);
+        Account account = new Account();
         accounts.put(account.getId(), account);
         return account.getId();
     }
@@ -46,7 +46,7 @@ public class AccountService {
      * @param accountId ID счета
      * @param amount сумма пополнения
      */
-    public void deposit(final UUID accountId, final BigDecimal amount) {
+    public void deposit(final UUID accountId, final Amount amount) {
         Account account = getAccount(accountId);
         if (account == null) {
             throw new IllegalArgumentException("Счет не найден");
@@ -59,12 +59,12 @@ public class AccountService {
      * @param accountId ID счета
      * @param amount сумма снятия
      */
-    public void withdraw(final UUID accountId, final BigDecimal amount) {
+    public void withdraw(final UUID accountId, final Amount amount) {
         Account account = getAccount(accountId);
         if (account == null) {
             throw new IllegalArgumentException("Счет не найден");
         }
-        if (account.getBalance().compareTo(amount) < 0) {
+        if (account.getBalance().compareTo(amount.getValue()) < 0) {
             throw new IllegalArgumentException("Недостаточно средств");
         }
         account.withdraw(amount);
@@ -77,7 +77,7 @@ public class AccountService {
      * @param amount сумма перевода
      */
     public void transfer(
-            final UUID fromId, final UUID toId, final BigDecimal amount) {
+            final UUID fromId, final UUID toId, final Amount amount) {
         withdraw(fromId, amount);
         deposit(toId, amount);
     }
