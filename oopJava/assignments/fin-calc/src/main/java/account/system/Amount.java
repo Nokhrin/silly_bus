@@ -10,64 +10,21 @@ import java.math.BigDecimal;
  *  Повышает читаемость: Amount amount говорит о смысле значения
  *  Предотвращает ошибки: Невозможно создать отрицательную сумму
  */
-public class Amount extends BigDecimal {
-
-    private static final long serialVersionUID = 1L;
-
-    /**
-     * Создает Amount с заданным значением.
-     * @param value сумма
-     */
-    public Amount(String value) {
-        super(value);
-        validate(this);
-    }
-
-    /**
-     * Создает Amount с заданным значением.
-     * @param value сумма
-     */
-    public Amount(BigDecimal value) {
-        super(value.stripTrailingZeros().toString());
-        validate(this);
-    }
+sealed public interface Amount permits PositiveAmount {
+    BigDecimal getValue();
     
-    /**
-     * Создает Amount с заданным значением.
-     * @param value сумма
-     */
-    public Amount(int value) {
-        this(BigDecimal.valueOf(value));
-    }
-
-    /**
-     * Валидация значения.
-     * @param value значение для проверки
-     */
-    private static void validate(BigDecimal value) {
+    static Amount of(String value) {
         if (value == null) {
             throw new IllegalArgumentException("Сумма не может быть null");
         }
-        if (value.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new IllegalArgumentException("Сумма должна быть строго больше нуля");
+        try {
+            BigDecimal bigDecimal = new BigDecimal(value);
+            return new PositiveAmount(bigDecimal);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Неверный формат суммы: " + value, e);
         }
     }
-
-    /**
-     * Сложение Amount с другим Amount.
-     * @param other другой Amount
-     * @return Amount
-     */
-    public Amount add(Amount other) {
-        return new Amount(super.add(other));
-    }
-
-    /**
-     * Вычитание Amount из другого Amount.
-     * @param other другой Amount
-     * @return Amount
-     */
-    public Amount subtract(Amount other) {
-        return new Amount(super.subtract(other));
-    }
+    
+    Amount add(Amount other);
+    Amount sub(Amount other);
 }

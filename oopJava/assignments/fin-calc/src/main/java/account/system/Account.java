@@ -1,6 +1,7 @@
 package account.system;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.UUID;
 
 /**
@@ -22,25 +23,24 @@ import java.util.UUID;
  */
 public class Account {
     private final UUID id = UUID.randomUUID();
-    private BigDecimal balance = BigDecimal.ZERO;
+    private BigDecimal balance = new BigDecimal(BigInteger.ZERO);
 
-    public Account(Amount amount) {
-        this.balance = amount;
+    public Account() {
     }
 
     public BigDecimal getBalance() {
         return this.balance;
     }
 
-    public void deposit(BigDecimal amount) {
-        this.balance = this.balance.add(amount);
+    public void deposit(Amount amount) {
+        this.balance = this.balance.add(amount.getValue());
     }
 
-    public void withdraw(BigDecimal amount) {
-        this.balance = this.balance.subtract(amount);
+    public void withdraw(Amount amount) {
+        this.balance = this.balance.subtract(amount.getValue());
     }
 
     public UUID getId() {
-        return id;
+        return this.id;
     }
 }

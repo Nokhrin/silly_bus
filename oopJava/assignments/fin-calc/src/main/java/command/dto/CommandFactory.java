@@ -13,9 +13,9 @@ public class CommandFactory {
             case CloseAccountData d -> new CloseAccount(d.accountId());
             case ListAccountsData d -> new ListAccounts();
             case BalanceData d -> new Balance(d.accountId());
-            case DepositData d -> new Deposit(d.accountId(), d.amount());
-            case WithdrawData d -> new Withdraw(d.accountId(), d.amount());
-            case TransferData d -> new Transfer(d.sourceAccountId(), d.targetAccountId(), d.amount());
+            case DepositData d -> new Deposit(d.accountId(), d.toAmount());
+            case WithdrawData d -> new Withdraw(d.accountId(), d.toAmount());
+            case TransferData d -> new Transfer(d.sourceAccountId(), d.targetAccountId(), d.toAmount());
         };
     }
 }

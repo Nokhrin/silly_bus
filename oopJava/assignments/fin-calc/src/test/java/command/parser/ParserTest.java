@@ -73,10 +73,10 @@ public class ParserTest {
     @Test(description = "Сумма - положительная, дробная, корректная, в строке символы только суммы, считана")
     public void testParseAmount_FloatPos() {
         String input = "123.45";
-        Optional<ParseResult<BigDecimal>> result = Parser.parseAmount(input, 0);
+        Optional<ParseResult<String>> result = Parser.parseAmount(input, 0);
 
         assertTrue(result.isPresent());
-        assertEquals(result.get().value(), new BigDecimal("123.45"));
+        assertEquals(result.get().value(), "123.45");
         assertEquals(result.get().start(), 0);
         assertEquals(result.get().end(), 6);
     }
@@ -84,10 +84,10 @@ public class ParserTest {
     @Test(description = "Сумма - положительная, целая, корректная, в строке символы только суммы, считана")
     public void testParseAmount_IntegerPos() {
         String input = "123";
-        Optional<ParseResult<BigDecimal>> result = Parser.parseAmount(input, 0);
+        Optional<ParseResult<String>> result = Parser.parseAmount(input, 0);
 
         assertTrue(result.isPresent());
-        assertEquals(result.get().value(), new BigDecimal("123"));
+        assertEquals(result.get().value(), "123");
         assertEquals(result.get().start(), 0);
         assertEquals(result.get().end(), 3);
     }
@@ -95,10 +95,10 @@ public class ParserTest {
     @Test(description = "Сумма - положительная, целая, корректная, в строке символы только суммы, считана")
     public void testParseAmount_IntegerNeg() {
         String input = "123";
-        Optional<ParseResult<BigDecimal>> result = Parser.parseAmount(input, 0);
+        Optional<ParseResult<String>> result = Parser.parseAmount(input, 0);
 
         assertTrue(result.isPresent());
-        assertEquals(result.get().value(), new BigDecimal("123"));
+        assertEquals(result.get().value(), "123");
         assertEquals(result.get().start(), 0);
         assertEquals(result.get().end(), 3);
     }

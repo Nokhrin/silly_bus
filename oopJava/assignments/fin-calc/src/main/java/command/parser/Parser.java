@@ -121,7 +121,7 @@ public class Parser {
      * | digit { digit } '.' digit { digit }
      * digit ::= "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
      */
-    public static Optional<ParseResult<BigDecimal>> parseAmount(final String source, final int start) {
+    public static Optional<ParseResult<String>> parseAmount(final String source, final int start) {
         // проверка входных параметров  
         if (source.isEmpty() || start < 0 || start >= source.length()) {
             return Optional.empty();
@@ -207,13 +207,7 @@ public class Parser {
             }
         }
 
-        // Попытка парсинга BigDecimal
-        try {
-            Amount parsedAmount = new Amount(amountStr.toString());
-            return Optional.of(new ParseResult<>(parsedAmount, start, offset));
-        } catch (NumberFormatException e) {
-            return Optional.empty();
-        }
+        return Optional.of(new ParseResult<>(amountStr.toString(), start, offset));
     }
     //endregion
 
@@ -328,20 +322,13 @@ public class Parser {
                     offset = wsAfterAccountId.get().end();
                 }
 
-                Optional<ParseResult<BigDecimal>> amountResult = parseAmount(source, offset);
-                if (amountResult.isEmpty()) {
+                Optional<ParseResult<String>> amountStr = parseAmount(source, offset);
+                if (amountStr.isEmpty()) {
                     yield Optional.empty();
                 }
-                BigDecimal amount = amountResult.get().value();
-                offset = amountResult.get().end();
+                offset = amountStr.get().end();
 
-                // Создание Amount
-                try {
-                    Amount amountObj = new Amount(amount);
-                    yield Optional.of(new ParseResult<>(new DepositData(accountId, amountObj), start, offset));
-                } catch (IllegalArgumentException e) {
-                    yield Optional.empty();
-                }
+                yield Optional.of(new ParseResult<>(new DepositData(accountId, amountStr.get().value()), start, offset));
             }
 
             case "withdraw" -> {
@@ -364,20 +351,13 @@ public class Parser {
                     offset = wsAfterAccountId.get().end();
                 }
 
-                Optional<ParseResult<BigDecimal>> amountResult = parseAmount(source, offset);
+                Optional<ParseResult<String>> amountResult = parseAmount(source, offset);
                 if (amountResult.isEmpty()) {
                     yield Optional.empty();
                 }
-                BigDecimal amount = amountResult.get().value();
                 offset = amountResult.get().end();
 
-                // Создание Amount
-                try {
-                    Amount amountObj = new Amount(amount);
-                    yield Optional.of(new ParseResult<>(new WithdrawData(accountId, amountObj), start, offset));
-                } catch (IllegalArgumentException e) {
-                    yield Optional.empty();
-                }
+                yield Optional.of(new ParseResult<>(new WithdrawData(accountId, amountResult.get().value()), start, offset));
             }
 
             case "transfer" -> {
@@ -412,20 +392,13 @@ public class Parser {
                     offset = wsAfterTargetId.get().end();
                 }
 
-                Optional<ParseResult<BigDecimal>> amountResult = parseAmount(source, offset);
+                Optional<ParseResult<String>> amountResult = parseAmount(source, offset);
                 if (amountResult.isEmpty()) {
                     yield Optional.empty();
                 }
-                BigDecimal amount = amountResult.get().value();
                 offset = amountResult.get().end();
 
-                // Создание Amount
-                try {
-                    Amount amountObj = new Amount(amount);
-                    yield Optional.of(new ParseResult<>(new TransferData(sourceId, targetId, amountObj), start, offset));
-                } catch (IllegalArgumentException e) {
-                    yield Optional.empty();
-                }
+                yield Optional.of(new ParseResult<>(new TransferData(sourceId, targetId, amountResult.get().value()), start, offset));
             }
 
             case "balance" -> {
