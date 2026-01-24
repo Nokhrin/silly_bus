@@ -16,11 +16,10 @@ public class AccountService {
 
     /**
      * Открыть новый счет.
-     * @param initialBalance начальный баланс
      * @return ID нового счета
      */
-    public UUID openAccount(final Amount initialBalance) {
-        Account account = new Account(initialBalance);
+    public UUID openAccount() {
+        Account account = new Account((Amount) BigDecimal.ZERO);
         accounts.put(account.getId(), account);
         return account.getId();
     }

@@ -1,11 +1,10 @@
 package command.dto;
 
-import java.math.BigDecimal;
-import java.util.UUID;
+import account.system.Amount;
 
-/**
+import java.util.UUID; /**
  * dto команды deposit.
  */
-public record DepositData(UUID accountId, BigDecimal amount) {
+public record DepositData(UUID accountId, Amount amount) implements CommandData {
     public static final String COMMAND_TYPE = "deposit";
 }
