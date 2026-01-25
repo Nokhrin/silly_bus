@@ -1,6 +1,7 @@
 package account.system;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 public final class PositiveAmount implements Amount {
     private final BigDecimal value; // Amount содержит BigDecimal, не наследует
@@ -10,7 +11,7 @@ public final class PositiveAmount implements Amount {
         if (value == null || value.compareTo(BigDecimal.ZERO) <= 0) {
             throw new IllegalArgumentException("Сумма должна быть строго больше нуля");
         }
-        this.value = value.stripTrailingZeros();
+        this.value = value.stripTrailingZeros().setScale(2, RoundingMode.HALF_UP);
     }
 
     @Override

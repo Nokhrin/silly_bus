@@ -11,7 +11,7 @@ import java.util.UUID; /**
 public record Deposit(UUID accountId, Amount amount) implements Operation {
     @Override
     public void execute(AccountService accountService) {
-        System.out.println("Зачисление суммы " + amount + " на счет " + accountId);
+        System.out.println("Зачисление суммы " + amount.getValue() + " на счет " + accountId);
         // accountService.deposit
     }
 }

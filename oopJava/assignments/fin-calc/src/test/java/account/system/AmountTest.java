@@ -18,7 +18,7 @@ public class AmountTest {
     @Test(description = "Валидная сумма с копейками")
     public void testPositiveAmountCreation() {
         Amount amount = Amount.of("100.50");
-        assertEquals(amount.getValue(), new BigDecimal("100.5"));
+        assertEquals(amount.getValue(), new BigDecimal("100.50"));
     }
 
     @Test(description = "Граничное - минимальная валидная сумма")
@@ -66,13 +66,13 @@ public class AmountTest {
     @Test(description = "Нули слева игнорируются")
     public void testAmountWithLeadingZeros() {
         Amount amount = Amount.of("000100.500");
-        assertEquals(amount.getValue(), new BigDecimal("100.5"));
+        assertEquals(amount.getValue(), new BigDecimal("100.50"));
     }
 
     @Test(description = "Нули справа игнорируются")
     public void testAmountWithTrailingZeros() {
         Amount amount = Amount.of("100.5000");
-        assertEquals(amount.getValue(), new BigDecimal("100.5"));
+        assertEquals(amount.getValue(), new BigDecimal("100.50"));
     }
     //endregion
  
