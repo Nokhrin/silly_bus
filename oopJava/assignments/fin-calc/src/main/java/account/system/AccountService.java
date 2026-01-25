@@ -1,89 +1,48 @@
 package account.system;
 
 import java.math.BigDecimal;
-import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 /**
  * Сервис управления счетами.
+ * Выполняет бизнес-логику.
+ * Сложение и вычитание балансов и сумм
+ * Валидация балансов и сумм
+ * Валидация логики операций
  */
 public class AccountService {
-    /**
-     * Хранит все счета с их ID.
-     */
-    private final Map<UUID, Account> accounts = new HashMap<>();
+    private final AccountRepository accountRepository;
+
+    public AccountService(AccountRepository accountRepository) {
+        this.accountRepository = accountRepository;
+    }
 
     /**
-     * Открыть новый счет.
+     * Открыть счет.
+     *
      * @return ID нового счета
      */
     public UUID openAccount() {
         Account account = new Account();
-        accounts.put(account.getId(), account);
+        accountRepository.saveAccount(account);
         return account.getId();
     }
 
     /**
      * Получить счет по ID.
-     * @param id ID счета
-     * @return счет или null, если не найден
-     */
-    public Account getAccount(final UUID id) {
-        return accounts.get(id);
-    }
-
-    /**
-     * Закрыть счет.
-     * @param id ID счета
-     */
-    public void closeAccount(final UUID id) {
-        accounts.remove(id);
-    }
-
-    /**
-     * Пополнить счет.
+     *
      * @param accountId ID счета
-     * @param amount сумма пополнения
+     * @return счет
      */
-    public void deposit(final UUID accountId, final Amount amount) {
-        Account account = getAccount(accountId);
-        if (account == null) {
-            throw new IllegalArgumentException("Счет не найден");
-        }
-        account.deposit(amount);
-    }
-
-    /**
-     * Снять деньги со счета.
-     * @param accountId ID счета
-     * @param amount сумма снятия
-     */
-    public void withdraw(final UUID accountId, final Amount amount) {
-        Account account = getAccount(accountId);
-        if (account == null) {
-            throw new IllegalArgumentException("Счет не найден");
-        }
-        if (account.getBalance().compareTo(amount.getValue()) < 0) {
-            throw new IllegalArgumentException("Недостаточно средств");
-        }
-        account.withdraw(amount);
-    }
-
-    /**
-     * Перевести деньги между счетами.
-     * @param fromId ID счета-источника
-     * @param toId ID счета-получателя
-     * @param amount сумма перевода
-     */
-    public void transfer(
-            final UUID fromId, final UUID toId, final Amount amount) {
-        withdraw(fromId, amount);
-        deposit(toId, amount);
+    public Account getAccount(final UUID accountId) {
+        return accountRepository.loadAccount(accountId);
     }
 
     /**
      * Получить баланс счета.
+     *
      * @param accountId ID счета
      * @return баланс счета
      */
@@ -97,9 +56,72 @@ public class AccountService {
 
     /**
      * Получить все счета.
+     *
      * @return копия карты счетов
      */
-    public Map<UUID, Account> getAllAccounts() {
-        return Map.copyOf(accounts);
+    public List<Account> getAllAccounts() {
+        return accountRepository.loadExistingAccounts();
     }
+
+    /**
+     * Закрыть счет.
+     *
+     * @param accountId ID счета
+     */
+    public void closeAccount(final UUID accountId) {
+        accountRepository.deleteAccount(accountId);
+    }
+
+    /**
+     * Пополнить счет.
+     *
+     * @param accountId ID счета
+     * @param amount    сумма пополнения
+     */
+    public void deposit(final UUID accountId, final Amount amount) {
+        Account account = getAccount(accountId);
+        if (account == null) {
+            throw new IllegalArgumentException("Счет не найден");
+        }
+        account.deposit(amount);
+        accountRepository.saveAccount(account);
+    }
+
+    /**
+     * Снять деньги со счета.
+     *
+     * @param accountId ID счета
+     * @param amount    сумма снятия
+     */
+    public void withdraw(final UUID accountId, final Amount amount) {
+        Account account = getAccount(accountId);
+        if (account == null) {
+            throw new IllegalArgumentException("Счет не найден");
+        }
+        if (account.getBalance().compareTo(amount.getValue()) < 0) {
+            throw new IllegalArgumentException("Недостаточно средств");
+        }
+        account.withdraw(amount);
+        accountRepository.saveAccount(account);
+    }
+
+    /**
+     * Перевести деньги между счетами.
+     *
+     * @param sourceAccountId ID счета-источника
+     * @param targetAccountId   ID счета-получателя
+     * @param amount сумма перевода
+     */
+    public void transfer(
+            final UUID sourceAccountId, final UUID targetAccountId, final Amount amount) {
+        Account sourceAccount = getAccount(sourceAccountId);
+        Account targetAccount = getAccount(targetAccountId);
+
+        withdraw(sourceAccountId, amount);
+        deposit(targetAccountId, amount);
+
+        accountRepository.saveAccount(sourceAccount);
+        accountRepository.saveAccount(targetAccount);
+    }
+
 }
