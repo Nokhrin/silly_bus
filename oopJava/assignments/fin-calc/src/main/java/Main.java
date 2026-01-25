@@ -1,7 +1,9 @@
 import account.operation.Operation;
 import account.operation.OperationCreator;
 import account.operation.OperationExecutor;
+import account.system.AccountRepository;
 import account.system.AccountService;
+import account.system.InMemoryAccountRepository;
 import command.dto.CommandData;
 import command.parser.Parser;
 
@@ -10,25 +12,28 @@ import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
-        //1. точка входа
-        //2. создание менеджера счетов
-        AccountService accountService = new AccountService();
+        // файловое хранилище счетов
+        AccountRepository accountRepository = new InMemoryAccountRepository();
         
-        //3. парсинг ввода
-        String cmdInput = "open deposit 123e4567-e89b-12d3-a456-426614174000 100.00";
+        // создание менеджера счетов
+        AccountService accountService = new AccountService(accountRepository);
+        
+        // парсинг ввода
+        String cmdInput = "open list";
+//        String cmdInput = "open deposit 123e4567-e89b-12d3-a456-426614174000 100.00";
         List<CommandData> commandDataList = Parser.parseCommandsFromString(cmdInput);
         
-        //4. создание операций
+        // создание операций
         List<Operation> operationList = new ArrayList<>();
         for (CommandData commandData : commandDataList) {
             operationList.add(OperationCreator.createOperation(commandData));
         }
         
-        //5. выполнение операций
+        // выполнение операций
         for (Operation operation : operationList) {
             OperationExecutor.executeOperation(operation, accountService);
         }
         
-        //6. завершение работы
+        // завершение работы
     }
 }
