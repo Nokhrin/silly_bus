@@ -1,19 +1,19 @@
 package account.operation;
 
-import account.system.Account;
 import account.system.AccountService;
 
-import java.util.List;
+import java.util.Optional;
 
 /**
  * Вывести список всех открытых счетов.
  */
 public record ListAccounts() implements Operation {
     @Override
-    public void execute(AccountService accountService) {
-        List<Account> listAccounts = accountService.getAllAccounts();
-        System.out.println("Существуют открытые счета: ");
-        listAccounts.forEach(account -> System.out.print(account.getId() + "\n"));
-        System.out.println();
+    public OperationResult execute(AccountService accountService) {
+        try {
+            return new Success(Optional.empty());
+        } catch (Exception e) {
+            return new Failure(e.getMessage());
+        }
     }
 }

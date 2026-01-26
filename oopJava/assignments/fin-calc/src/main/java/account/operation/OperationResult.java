@@ -6,11 +6,6 @@ import java.util.Optional;
 
 /**
  * Результат операции.
- * Результат интерпретации `команда + аргументы`
- * OperationResult содержит 
- * - информацию об операции, 
- * - метаданные: Успех/Неудача операции, флаг изменения состояния системы
- * - применить  полиморфизм - наследование и переопределение  override виртуальных методов
  */
 public sealed interface OperationResult permits Success, Failure {
     /**
@@ -23,10 +18,10 @@ public sealed interface OperationResult permits Success, Failure {
      * При успехе операции
      */
     default Optional<Account> account() {
-        if (this instanceof Success success) {
-            return success.account();
-        }
-        return Optional.empty();
+        return switch (this) {
+            case Success s -> s.account();
+            case Failure f -> Optional.empty();
+        };
     }
 }
 

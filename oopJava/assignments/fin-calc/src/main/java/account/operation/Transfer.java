@@ -3,6 +3,7 @@ package account.operation;
 import account.system.AccountService;
 import account.system.Amount;
 
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -14,8 +15,12 @@ import java.util.UUID;
  */
 public record Transfer(UUID sourceAccountId, UUID targetAccountId, Amount amount) implements Operation {
     @Override
-    public void execute(AccountService accountService) {
-        accountService.transfer(sourceAccountId, targetAccountId, amount);
-        System.out.println("Перевод суммы " + amount + " со счета " + sourceAccountId + " на счет " + targetAccountId);
+    public OperationResult execute(AccountService accountService) {
+        try {
+            return new Success(Optional.empty());
+        } catch (Exception e) {
+            return new Failure(e.getMessage());
+        }
+
     }
 }

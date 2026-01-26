@@ -7,8 +7,9 @@ import account.system.AccountService;
  */
 sealed public interface Operation permits Balance, CloseAccount, Deposit, ListAccounts, OpenAccount, Transfer, Withdraw {
     /**
-     * Выполняет команду.
+     * Выполняет операцию.
+     * @return Результат операции
      */
-    void execute(AccountService accountService);
+    OperationResult execute(AccountService accountService);
 }
 

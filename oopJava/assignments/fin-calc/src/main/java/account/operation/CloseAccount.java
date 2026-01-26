@@ -1,7 +1,9 @@
 package account.operation;
 
+import account.system.Account;
 import account.system.AccountService;
 
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -11,8 +13,11 @@ import java.util.UUID;
  */
 public record CloseAccount(UUID accountId) implements Operation {
     @Override
-    public void execute(AccountService accountService) {
-        accountService.closeAccount(accountId);
-        System.out.println("Закрытие счета id=" + accountId);
+    public OperationResult execute(AccountService accountService) {
+        try {
+            return new Success(Optional.empty());
+        } catch (Exception e) {
+            return new Failure(e.getMessage());
+        }
     }
 }
