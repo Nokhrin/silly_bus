@@ -16,7 +16,8 @@ public record Withdraw(UUID accountId, Amount amount) implements Operation {
     @Override
     public OperationResult execute(AccountService accountService) {
         try {
-            return new Success(Optional.empty());
+            accountService.withdraw(accountId, amount);
+            return new Success(Optional.of(accountService.getAccount(accountId)));
         } catch (Exception e) {
             return new Failure(e.getMessage());
         }
