@@ -1,7 +1,10 @@
 package account.operation;
 
+import account.system.Account;
 import account.system.AccountService;
 
+import java.math.BigDecimal;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -11,8 +14,11 @@ import java.util.UUID;
  */
 public record Balance(UUID accountId) implements Operation {
     @Override
-    public void execute(AccountService accountService) {
-        accountService.getBalance(accountId);
-        System.out.println("Баланс счета " + accountId);
+    public OperationResult execute(AccountService accountService) {
+        try {
+            return new Success(Optional.empty());
+        } catch (Exception e) {
+            return new Failure(e.getMessage());
+        }
     }
 }
