@@ -19,8 +19,7 @@ public class Main {
         AccountService accountService = new AccountService(accountRepository);
         
         // парсинг ввода
-        String cmdInput = "open list";
-//        String cmdInput = "open deposit 123e4567-e89b-12d3-a456-426614174000 100.00";
+        String cmdInput = "open deposit 123e4567-e89b-12d3-a456-426614174000 100.00";
         List<CommandData> commandDataList = Parser.parseCommandsFromString(cmdInput);
         
         // создание операций
