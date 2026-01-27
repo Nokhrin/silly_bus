@@ -15,9 +15,9 @@ public record CloseAccount(UUID accountId) implements Operation {
     @Override
     public OperationResult execute(AccountService accountService) {
         try {
-            return new Success(Optional.empty());
+            return new Success(Optional.empty(), this.getClass().getSimpleName());
         } catch (Exception e) {
-            return new Failure(e.getMessage());
+            return new Failure(e.getMessage(), this.getClass().getSimpleName());
         }
     }
 }

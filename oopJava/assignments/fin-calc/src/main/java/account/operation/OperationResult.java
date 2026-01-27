@@ -2,12 +2,29 @@ package account.operation;
 
 import account.system.Account;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Результат операции.
  */
 public sealed interface OperationResult permits Success, Failure {
+    /**
+     * Имя операции.
+     */
+    String operationName();
+
+    /**
+     * id операции.
+     */
+    UUID operationId();
+
+    /**
+     * Дата-время операции.
+     */
+    LocalDateTime operationDatetime();
+
     /**
      * Определить успех/неудача выполнения.
      */
@@ -28,8 +45,11 @@ public sealed interface OperationResult permits Success, Failure {
 /**
  * Успех.
  */
-record Success(Optional<Account> account) implements OperationResult {
-
+record Success(Optional<Account> account, String operationName, UUID operationId, LocalDateTime operationDatetime) implements OperationResult {
+    public Success(Optional<Account> account, String operationName) {
+        this(account, operationName, UUID.randomUUID(), LocalDateTime.now());
+    }
+        
     @Override
     public boolean isSuccess() {
         return true;
@@ -39,7 +59,11 @@ record Success(Optional<Account> account) implements OperationResult {
 /**
  * Неудача.
  */
-record Failure(String message) implements OperationResult {
+record Failure(String message, String operationName, UUID operationId, LocalDateTime operationDatetime) implements OperationResult {
+    public Failure(String message, String operationName) {
+        this(message, operationName, UUID.randomUUID(), LocalDateTime.now());
+    }
+    
     @Override
     public boolean isSuccess() {
         return false;
