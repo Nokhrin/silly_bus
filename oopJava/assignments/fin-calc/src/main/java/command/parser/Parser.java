@@ -11,7 +11,7 @@ import java.util.UUID;
 import java.util.regex.Pattern;
 
 /**
- * Парсер команд финансовой системы.
+ * Парсер строки, поступающей на вход программы.
  * Спецификация синтаксиса команд находится в файле:
  * src/main/resources/docs/financial-operations-grammar.md
  */

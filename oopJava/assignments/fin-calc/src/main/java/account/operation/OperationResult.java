@@ -26,6 +26,11 @@ public sealed interface OperationResult permits Success, Failure {
     LocalDateTime operationDatetime();
 
     /**
+     * Пояснение результата операции.
+     */
+    String message();
+
+    /**
      * Определить успех/неудача выполнения.
      */
     boolean isSuccess();
@@ -49,7 +54,12 @@ record Success(Optional<Account> account, String operationName, UUID operationId
     public Success(Optional<Account> account, String operationName) {
         this(account, operationName, UUID.randomUUID(), LocalDateTime.now());
     }
-        
+
+    @Override
+    public String message() {
+        return "Успешное выполнение";
+    }
+
     @Override
     public boolean isSuccess() {
         return true;
@@ -67,5 +77,10 @@ record Failure(String message, String operationName, UUID operationId, LocalDate
     @Override
     public boolean isSuccess() {
         return false;
+    }
+
+    @Override
+    public String message() {
+        return message;
     }
 }
