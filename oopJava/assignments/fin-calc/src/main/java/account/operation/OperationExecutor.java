@@ -9,6 +9,7 @@ public class OperationExecutor {
     public static void executeOperation(Operation operation, AccountService accountService) {
         OperationResult operationResult = operation.execute(accountService);
         
+        System.out.println();
         switch (operationResult) {
             // логирование
             case Success s -> {
@@ -17,7 +18,7 @@ public class OperationExecutor {
                 });
             }
             case Failure f -> {
-                System.err.println("Успех операции " + operation.toString() + "\n" + f.message());
+                System.err.println("Ошибка операции " + operation.toString() + "\n" + f.message());
             }
         }
     }

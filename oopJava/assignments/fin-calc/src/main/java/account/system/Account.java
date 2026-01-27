@@ -8,10 +8,24 @@ import java.util.UUID;
  * Счет.
  */
 public class Account {
-    private final UUID id = UUID.randomUUID();
+    private final UUID id;
     private BigDecimal balance = new BigDecimal(BigInteger.ZERO);
 
+    /**
+     * Конструктор по умолчанию.
+     * Случайный id при открытии счета
+     */
     public Account() {
+        this.id = UUID.randomUUID();
+    }
+
+    /**
+     * Конструктор по требованию.
+     * Известный id при открытии счета
+     * Для тестов
+     */
+    public Account(UUID id) {
+        this.id = id;
     }
 
     public BigDecimal getBalance() {

@@ -1,6 +1,5 @@
 package account.operation;
 
-import account.system.Account;
 import account.system.AccountService;
 
 import java.util.Optional;
@@ -14,10 +13,9 @@ public record OpenAccount() implements Operation {
     public OperationResult execute(AccountService accountService) {
         try {
             UUID accountId = accountService.openAccount();
-            Account account = accountService.getAccount(accountId);
-            return new Success(Optional.of(account));
+            return new Success(Optional.of(accountService.getAccount(accountId)), this.getClass().getSimpleName());
         } catch (Exception e) {
-            return new Failure(e.getMessage());
+            return new Failure(e.getMessage(), this.getClass().getSimpleName());
         }
     }
 

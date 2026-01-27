@@ -17,9 +17,9 @@ public record Withdraw(UUID accountId, Amount amount) implements Operation {
     public OperationResult execute(AccountService accountService) {
         try {
             accountService.withdraw(accountId, amount);
-            return new Success(Optional.of(accountService.getAccount(accountId)));
+            return new Success(Optional.of(accountService.getAccount(accountId)), this.getClass().getSimpleName());
         } catch (Exception e) {
-            return new Failure(e.getMessage());
+            return new Failure(e.getMessage(), this.getClass().getSimpleName());
         }
     }
 }
