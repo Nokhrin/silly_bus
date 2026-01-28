@@ -13,7 +13,11 @@ public record OpenAccount() implements Operation {
     public OperationResult execute(AccountService accountService) {
         try {
             UUID accountId = accountService.openAccount();
-            return new Success(Optional.of(accountService.getAccount(accountId)), this.getClass().getSimpleName());
+            return new Success(
+                    accountId.toString(),
+                    Optional.of(accountService.getAccount(accountId)),
+                    this.getClass().getSimpleName()
+            );
         } catch (Exception e) {
             return new Failure(e.getMessage(), this.getClass().getSimpleName());
         }

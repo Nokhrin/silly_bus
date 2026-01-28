@@ -2,6 +2,7 @@ package account.system.cli;
 
 import account.operation.Operation;
 import account.operation.OperationCreator;
+import account.operation.OperationExecutor;
 import account.operation.OperationResult;
 import account.system.AccountService;
 import command.dto.CommandData;
@@ -28,41 +29,33 @@ public class CommandLineProcessor {
      */
     public void start() {
         System.out.println("Управление банковскими счетами. Введите команду (или 'exit' для выхода):");
+        
         while (true) {
             System.out.print("> ");
+            
             String input = scanner.nextLine().trim();
             if (input.equalsIgnoreCase("exit")) {
                 System.out.println("Завершение работы");
                 break;
             }
+            
             if (input.isEmpty()) {
                 continue;
             }
 
-            // создание команд
+            // парсинг команд
             List<CommandData> commandDataList = Parser.parseCommandsFromString(input);
             if (commandDataList.isEmpty()) {
                 System.out.println("err некорректный ввод");
                 continue;
             }
 
-            // создание операций
-            List<Operation> operationList = new ArrayList<>();
             for (CommandData commandData : commandDataList) {
-                operationList.add(OperationCreator.createOperation(commandData));
+                // создание операции
+                Operation operation = OperationCreator.createOperation(commandData);
+                // выполнение операции
+                OperationExecutor.executeOperation(operation, accountService, System.out, System.err);
             }
-
-            // выполнение операций
-            for (Operation operation : operationList) {
-                OperationResult operationResult = operation.execute(accountService);
-                if (operationResult.isSuccess()){
-                    System.out.println("ok");
-                } else {
-                    System.err.println("err " + operationResult.message());
-                }
-            }
-
-            // завершение работы
         }
     }
 }
