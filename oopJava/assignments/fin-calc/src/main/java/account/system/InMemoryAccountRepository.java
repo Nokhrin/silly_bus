@@ -10,25 +10,25 @@ public final class InMemoryAccountRepository implements AccountRepository {
 
     @Override
     public void saveAccount(Account account) {
-        System.out.println("Запись в память счета " + account.getId());
+        System.out.println("\nОТЛАДКА\nЗапись в память счета " + account.getId() + "\n");
         accountMap.put(account.getId(), account);
     }
 
     @Override
     public Account loadAccount(UUID accountId) {
-        System.out.println("Чтение из памяти счета " + accountId);
+        System.out.println("\nОТЛАДКА\nЧтение из памяти счета " + accountId + "\n");
         return accountMap.get(accountId);
     }
 
     @Override
     public void deleteAccount(UUID accountId) {
-        System.out.println("Удаление из памяти счета " + accountId);
+        System.out.println("\nОТЛАДКА\nУдаление из памяти счета " + accountId + "\n");
         accountMap.remove(accountId);
     }
 
     @Override
     public List<Account> loadExistingAccounts() {
-        System.out.println("Чтение из памяти существующих счетов");
+        System.out.println("\nОТЛАДКА\nЧтение из памяти существующих счетов\n");
         return new ArrayList<>(accountMap.values());
     }
 

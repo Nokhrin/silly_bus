@@ -50,21 +50,40 @@ public sealed interface OperationResult permits Success, Failure {
 /**
  * Успех.
  */
-record Success(Optional<Account> account, String operationName, UUID operationId, LocalDateTime operationDatetime) implements OperationResult {
-    public Success(Optional<Account> account, String operationName) {
-        this(account, operationName, UUID.randomUUID(), LocalDateTime.now());
+record Success(
+        String message,
+        Optional<Account> account, String operationName, UUID operationId, LocalDateTime operationDatetime) implements OperationResult {
+
+    /**
+     * Управляемое сообщение.
+     * @param message
+     * @param account
+     * @param operationName
+     */
+    public Success(String message, Optional<Account> account, String operationName) {
+        this(message, account, operationName, UUID.randomUUID(), LocalDateTime.now());
     }
 
-    @Override
-    public String message() {
-        return "Успешное выполнение";
+    /**
+     * Сообщение по умолчанию.
+     * @param account
+     * @param operationName
+     */
+    public Success(Optional<Account> account, String operationName) {
+        this("Успешное выполнение", account, operationName, UUID.randomUUID(), LocalDateTime.now());
     }
 
     @Override
     public boolean isSuccess() {
         return true;
     }
+
+    @Override
+    public String message() {
+        return message;
+    }
 }
+
 
 /**
  * Неудача.
