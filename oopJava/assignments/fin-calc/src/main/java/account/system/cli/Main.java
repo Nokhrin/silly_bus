@@ -1,16 +1,9 @@
 package account.system.cli;
 
-import account.operation.Operation;
-import account.operation.OperationCreator;
-import account.operation.OperationExecutor;
 import account.system.AccountRepository;
 import account.system.AccountService;
 import account.system.InMemoryAccountRepository;
-import command.dto.CommandData;
-import command.parser.Parser;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Scanner;
 
 public class Main {
@@ -18,26 +11,78 @@ public class Main {
     public static void main(String[] args) {
         AccountRepository accountRepository = new InMemoryAccountRepository();
         AccountService accountService = new AccountService(accountRepository);
-        
-//        String input = "open list";
-//        // парсинг команд
-//        List<CommandData> commandDataList = Parser.parseCommandsFromString(input);
-//
-//        // создание операций
-//        List<Operation> operationList = new ArrayList<>();
-//        for (CommandData commandData : commandDataList) {
-//            operationList.add(OperationCreator.createOperation(commandData));
-//        }
-//
-//        // выполнение операций
-//        for (Operation operation : operationList) {
-//            OperationExecutor.executeOperation(operation, accountService, System.out, System.err);
-//        }
+
         Scanner scanner = new Scanner(System.in);
         CommandLineProcessor commandLineProcessor = new CommandLineProcessor(scanner, accountService);
         commandLineProcessor.start();
         
+        // Ручная проверка
+        // Интерактивный режим
         
+        // открыть счет 1 - успех
+        // open
+        // ok 1c471d4f-f241-4fbb-92f7-2e40c277012a
         
+        // баланс счета 1 - успех
+        // balance 1c471d4f-f241-4fbb-92f7-2e40c277012a
+        // ok 0
+
+        // открыть счет 2 - успех
+        // open
+        // ok 344c81a5-9256-45a4-af81-37fa147d47f7
+        
+        // баланс счета 2 - успех
+        // balance 344c81a5-9256-45a4-af81-37fa147d47f7
+        // ok 0
+
+        // список счетов - успех
+        // list
+        // ok 344c81a5-9256-45a4-af81-37fa147d47f7 b511e9c8-842f-4397-8097-ebbe1ff30b07
+        
+        // зачисление на счет 1 - успех
+        // deposit 344c81a5-9256-45a4-af81-37fa147d47f7 100
+        // ok
+
+        // снятие со счета 1 - успех
+        // withdraw 344c81a5-9256-45a4-af81-37fa147d47f7 50
+        // ok
+
+        // перевод со счета 1 на счет 2
+        // transfer 344c81a5-9256-45a4-af81-37fa147d47f7 b511e9c8-842f-4397-8097-ebbe1ff30b07 30.0
+        // ok
+        
+        // баланс счета 1 - успех
+        // balance 344c81a5-9256-45a4-af81-37fa147d47f7
+        // ok 20.00
+
+        // баланс счета 2 - успех
+        // balance b511e9c8-842f-4397-8097-ebbe1ff30b07
+        // ok 30.00
+
+        // закрытие счета 1 - успех
+        // close 344c81a5-9256-45a4-af81-37fa147d47f7
+        // ok
+
+        // список счетов - отсутствует закрытый счет - успех
+        // list
+        // ok b511e9c8-842f-4397-8097-ebbe1ff30b07
+        
+        // TODO
+        // закрытие несуществующего счета - неудача
+        // close 344c81a5-9256-45a4-af81-37fa147d47f7
+        // 
+
+        // снятие с несуществующего счета - неудача
+        // 
+
+        // зачисление на несуществующий счет - неудача
+        // 
+
+        // баланс несуществующего счета - неудача
+        // 
+
+        // снятие с существующего счета, amount > balance - неудача
+        // 
+
     }
 }

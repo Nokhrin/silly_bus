@@ -17,6 +17,7 @@ public record Transfer(UUID sourceAccountId, UUID targetAccountId, Amount amount
     @Override
     public OperationResult execute(AccountService accountService) {
         try {
+            accountService.transfer(sourceAccountId, targetAccountId, amount);
             return new Success(Optional.empty(), this.getClass().getSimpleName());
         } catch (Exception e) {
             return new Failure(e.getMessage(), this.getClass().getSimpleName());

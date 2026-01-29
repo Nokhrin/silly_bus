@@ -117,8 +117,8 @@ public class AccountService {
         Account sourceAccount = getAccount(sourceAccountId);
         Account targetAccount = getAccount(targetAccountId);
 
-        withdraw(sourceAccountId, amount);
-        deposit(targetAccountId, amount);
+        sourceAccount.withdraw(amount);
+        targetAccount.deposit(amount);
 
         accountRepository.saveAccount(sourceAccount);
         accountRepository.saveAccount(targetAccount);
