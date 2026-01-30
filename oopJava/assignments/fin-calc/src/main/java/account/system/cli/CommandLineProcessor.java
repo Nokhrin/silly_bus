@@ -3,12 +3,9 @@ package account.system.cli;
 import account.operation.Operation;
 import account.operation.OperationCreator;
 import account.operation.OperationExecutor;
-import account.operation.OperationResult;
-import account.system.AccountService;
 import command.dto.CommandData;
 import command.parser.Parser;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
@@ -17,11 +14,9 @@ import java.util.Scanner;
  */
 public class CommandLineProcessor {
     private final Scanner scanner;
-    private final AccountService accountService;
 
-    public CommandLineProcessor(Scanner scanner, AccountService accountService) {
+    public CommandLineProcessor(Scanner scanner) {
         this.scanner = scanner;
-        this.accountService = accountService;
     }
 
     /**
@@ -46,7 +41,13 @@ public class CommandLineProcessor {
             // парсинг команд
             List<CommandData> commandDataList = Parser.parseCommandsFromString(input);
             if (commandDataList.isEmpty()) {
-                System.out.println("err некорректный ввод");
+                // перехват синтаксических ошибок
+                // Неверный формат команды (deposit, close, transfer).
+                //Неправильная последовательность токенов.
+                //Некорректный UUID.
+                //Некорректная сумма (amount).
+                //Пропущенные аргументы.
+                System.out.println("err invalid input");
                 continue;
             }
 
@@ -54,7 +55,7 @@ public class CommandLineProcessor {
                 // создание операции
                 Operation operation = OperationCreator.createOperation(commandData);
                 // выполнение операции
-                OperationExecutor.executeOperation(operation, accountService, System.out, System.err);
+                OperationExecutor.executeOperation(operation, System.out, System.err);
             }
         }
     }

@@ -1,6 +1,5 @@
 package account.operation;
 
-import account.system.AccountService;
 import account.system.Amount;
 
 import java.util.Optional;
@@ -15,13 +14,7 @@ import java.util.UUID;
  */
 public record Transfer(UUID sourceAccountId, UUID targetAccountId, Amount amount) implements Operation {
     @Override
-    public OperationResult execute(AccountService accountService) {
-        try {
-            accountService.transfer(sourceAccountId, targetAccountId, amount);
-            return new Success(Optional.empty(), this.getClass().getSimpleName());
-        } catch (Exception e) {
-            return new Failure(e.getMessage(), this.getClass().getSimpleName());
-        }
-
+    public OperationResult execute() {
+        return null;
     }
 }

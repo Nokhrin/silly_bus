@@ -1,7 +1,5 @@
 package account.operation;
 
-import account.system.AccountService;
-
 /**
  * Операция.
  */
@@ -10,6 +8,6 @@ sealed public interface Operation permits Balance, CloseAccount, Deposit, ListAc
      * Выполняет операцию.
      * @return Результат операции
      */
-    OperationResult execute(AccountService accountService);
+    OperationResult execute();
 }
 

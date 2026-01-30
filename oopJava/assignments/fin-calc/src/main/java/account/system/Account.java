@@ -1,22 +1,23 @@
 package account.system;
 
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.UUID;
 
 /**
  * Счет.
  */
-public class Account {
-    private final UUID id;
-    private BigDecimal balance = new BigDecimal(BigInteger.ZERO);
+public record Account(
+        UUID id,
+        BigDecimal balance
+) {
+    
 
     /**
      * Конструктор по умолчанию.
      * Случайный id при открытии счета
      */
     public Account() {
-        this.id = UUID.randomUUID();
+        this(UUID.randomUUID(), BigDecimal.ZERO);
     }
 
     /**
@@ -25,22 +26,26 @@ public class Account {
      * Для тестов
      */
     public Account(UUID id) {
-        this.id = id;
+        this(id, BigDecimal.ZERO);
+    }
+
+    public Account deposit(Amount amount) {
+        return new Account(id, balance.add(amount.getValue()));
+    }
+
+    public Account withdraw(Amount amount) {
+        if (balance.compareTo(amount.getValue()) < 0) {
+            return this;
+        };
+        return new Account(id, balance.subtract(amount.getValue()));
+    }
+
+    public UUID getId() {
+        return this.id;
     }
 
     public BigDecimal getBalance() {
         return this.balance;
     }
 
-    public void deposit(Amount amount) {
-        this.balance = this.balance.add(amount.getValue());
-    }
-
-    public void withdraw(Amount amount) {
-        this.balance = this.balance.subtract(amount.getValue());
-    }
-
-    public UUID getId() {
-        return this.id;
-    }
 }

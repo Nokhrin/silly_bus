@@ -1,6 +1,7 @@
 package account.system;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -8,7 +9,7 @@ import java.util.UUID;
  */
 public sealed interface AccountRepository permits InMemoryAccountRepository {
     void saveAccount(Account account);
-    Account loadAccount(UUID accountId);
+    Optional<Account> loadAccount(UUID accountId);
     void deleteAccount(UUID accountId);
     List<Account> loadExistingAccounts();
 }
