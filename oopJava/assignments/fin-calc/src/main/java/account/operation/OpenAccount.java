@@ -1,26 +1,17 @@
 package account.operation;
 
-import account.system.AccountService;
+import account.system.Account;
+import account.system.AccountRepository;
 
-import java.util.Optional;
 import java.util.UUID;
 
 /**
  * Открыть счет.
  */
 public record OpenAccount() implements Operation {
-    @Override
-    public OperationResult execute(AccountService accountService) {
-        try {
-            UUID accountId = accountService.openAccount();
-            return new Success(
-                    accountId.toString(),
-                    Optional.of(accountService.getAccount(accountId)),
-                    this.getClass().getSimpleName()
-            );
-        } catch (Exception e) {
-            return new Failure(e.getMessage(), this.getClass().getSimpleName());
-        }
-    }
 
+    @Override
+    public OperationResult execute() {
+        return null;
+    }
 }

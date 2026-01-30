@@ -1,19 +1,13 @@
 package account.system.cli;
 
-import account.system.AccountRepository;
-import account.system.AccountService;
-import account.system.InMemoryAccountRepository;
-
 import java.util.Scanner;
 
 public class Main {
 
     public static void main(String[] args) {
-        AccountRepository accountRepository = new InMemoryAccountRepository();
-        AccountService accountService = new AccountService(accountRepository);
 
         Scanner scanner = new Scanner(System.in);
-        CommandLineProcessor commandLineProcessor = new CommandLineProcessor(scanner, accountService);
+        CommandLineProcessor commandLineProcessor = new CommandLineProcessor(scanner);
         commandLineProcessor.start();
         
         // Ручная проверка
@@ -35,7 +29,7 @@ public class Main {
         // balance 344c81a5-9256-45a4-af81-37fa147d47f7
         // ok 0
 
-        // список счетов - успех
+        // список счетов - существуют 2 счета - успех
         // list
         // ok 344c81a5-9256-45a4-af81-37fa147d47f7 b511e9c8-842f-4397-8097-ebbe1ff30b07
         
@@ -84,5 +78,12 @@ public class Main {
         // снятие с существующего счета, amount > balance - неудача
         // 
 
+        // закрыть счет - нарушение формата ввода - неудача
+        // close
+        // err некорректный ввод
+
+        // закрыть счет - нарушение формата ввода - неудача
+        // close 1
+        // err некорректный ввод
     }
 }
