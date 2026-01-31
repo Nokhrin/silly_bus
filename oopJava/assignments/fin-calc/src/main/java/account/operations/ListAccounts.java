@@ -1,12 +1,6 @@
-package account.operation;
+package account.operations;
 
-import account.system.Account;
-import account.system.AccountRepository;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.stream.Collectors;
+import account.operations.result.OperationResult;
 
 /**
  * Вывести список всех открытых счетов.

@@ -7,6 +7,7 @@ public class Main {
     public static void main(String[] args) {
 
         Scanner scanner = new Scanner(System.in);
+        
         CommandLineProcessor commandLineProcessor = new CommandLineProcessor(scanner);
         commandLineProcessor.start();
         

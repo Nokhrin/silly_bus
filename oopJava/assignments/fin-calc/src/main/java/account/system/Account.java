@@ -1,5 +1,7 @@
 package account.system;
 
+import account.operations.amount.Amount;
+
 import java.math.BigDecimal;
 import java.util.UUID;
 

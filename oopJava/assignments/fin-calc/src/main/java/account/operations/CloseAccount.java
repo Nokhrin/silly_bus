@@ -1,6 +1,7 @@
-package account.operation;
+package account.operations;
 
-import java.util.Optional;
+import account.operations.result.OperationResult;
+
 import java.util.UUID;
 
 /**
