@@ -12,6 +12,7 @@ public sealed interface OperationResult permits SuccessResult, FailureResult {
     LocalDateTime operationTimestamp();
     String message();
     boolean isSuccess();
+    boolean isStateModified();
 
     /**
      * Получает значение результата при успехе.

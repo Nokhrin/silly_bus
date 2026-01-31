@@ -5,4 +5,8 @@ import java.util.UUID; /**
  */
 public record CloseAccountData(UUID accountId) implements CommandData {
     public static final String COMMAND_TYPE = "close";
+
+    public UUID getAccountId() {
+        return accountId;
+    }
 }

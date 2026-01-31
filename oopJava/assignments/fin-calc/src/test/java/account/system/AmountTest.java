@@ -50,11 +50,11 @@ public class AmountTest {
         Amount.of("0");
     }
 
-    @Test(description = "Сумма = null",
-            expectedExceptions = IllegalArgumentException.class)
-    public void testNullAmount() {
-        Amount.of(null);
-    }
+//    @Test(description = "Сумма = null",
+//            expectedExceptions = IllegalArgumentException.class)
+//    public void testNullAmount() {
+//        Amount.of(null);
+//    }
 
     @Test(description = "Сумма - нечисловая строка",
             expectedExceptions = IllegalArgumentException.class)

@@ -7,7 +7,8 @@ public record FailureResult(
         String operationName,
         UUID operationId,
         LocalDateTime operationTimestamp,
-        String message
+        String message,
+        boolean isStateModified
 ) implements OperationResult {
     @Override
     public boolean isSuccess() {

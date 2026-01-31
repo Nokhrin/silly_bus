@@ -1,12 +1,17 @@
 package account.system;
 
-import account.operations.amount.Amount;
+import account.operations.amount.PositiveAmount;
 
 import java.math.BigDecimal;
 import java.util.UUID;
 
 /**
  * Счет.
+ * inc: поля только для чтения, скрытым геттером
+ * srp: только данные счета
+ * liskov: Account можно использовать для объектов, ожидающих тип Account
+ * ocp: функционал добавлен с помощью методов
+ * imm: не изменяется после создания, выполнение операции над счетом порождает новый экземпляр счета
  */
 public record Account(
         UUID id,
@@ -31,23 +36,25 @@ public record Account(
         this(id, BigDecimal.ZERO);
     }
 
-    public Account deposit(Amount amount) {
+    /**
+     * Зачисление.
+     * @param amount
+     * @return
+     */
+    public Account deposit(PositiveAmount amount) {
         return new Account(id, balance.add(amount.getValue()));
     }
 
-    public Account withdraw(Amount amount) {
+    /**
+     * Списание.
+     * @param amount
+     * @return
+     */
+    public Account withdraw(PositiveAmount amount) {
         if (balance.compareTo(amount.getValue()) < 0) {
             return this;
         };
         return new Account(id, balance.subtract(amount.getValue()));
-    }
-
-    public UUID getId() {
-        return this.id;
-    }
-
-    public BigDecimal getBalance() {
-        return this.balance;
     }
 
 }
