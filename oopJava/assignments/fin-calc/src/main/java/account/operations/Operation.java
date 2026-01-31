@@ -1,4 +1,6 @@
-package account.operation;
+package account.operations;
+
+import account.operations.result.OperationResult;
 
 /**
  * Операция.

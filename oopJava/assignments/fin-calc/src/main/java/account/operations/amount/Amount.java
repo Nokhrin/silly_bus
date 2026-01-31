@@ -1,4 +1,4 @@
-package account.system;
+package account.operations.amount;
 
 import java.math.BigDecimal;
 

@@ -1,8 +1,9 @@
 package account.system.cli;
 
-import account.operation.Operation;
-import account.operation.OperationCreator;
-import account.operation.OperationExecutor;
+import account.operations.Operation;
+import account.operations.OperationCreator;
+import account.operations.OperationExecutor;
+import account.operations.result.OperationResult;
 import command.dto.CommandData;
 import command.parser.Parser;
 
@@ -14,9 +15,11 @@ import java.util.Scanner;
  */
 public class CommandLineProcessor {
     private final Scanner scanner;
+    private final OperationExecutor executor;
 
     public CommandLineProcessor(Scanner scanner) {
         this.scanner = scanner;
+        this.executor = new OperationExecutor();
     }
 
     /**
@@ -41,7 +44,7 @@ public class CommandLineProcessor {
             // парсинг команд
             List<CommandData> commandDataList = Parser.parseCommandsFromString(input);
             if (commandDataList.isEmpty()) {
-                // перехват синтаксических ошибок
+                // todo - перехват синтаксических ошибок 
                 // Неверный формат команды (deposit, close, transfer).
                 //Неправильная последовательность токенов.
                 //Некорректный UUID.
@@ -55,7 +58,8 @@ public class CommandLineProcessor {
                 // создание операции
                 Operation operation = OperationCreator.createOperation(commandData);
                 // выполнение операции
-                OperationExecutor.executeOperation(operation, System.out, System.err);
+                OperationResult result = executor.execute(operation);
+                System.out.println(result.message());
             }
         }
     }

@@ -1,5 +1,7 @@
 package account.system;
 
+import account.operations.amount.Amount;
+import account.operations.amount.PositiveAmount;
 import org.testng.annotations.Test;
 
 import java.math.BigDecimal;

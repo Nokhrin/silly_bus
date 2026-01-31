@@ -1,6 +1,6 @@
 package command.dto;
 
-import account.system.Amount;
+import account.operations.amount.Amount;
 
 import java.util.UUID; /**
  * dto команды transfer.

@@ -1,8 +1,8 @@
-package account.operation;
+package account.operations;
 
-import account.system.Amount;
+import account.operations.amount.Amount;
+import account.operations.result.OperationResult;
 
-import java.util.Optional;
 import java.util.UUID;
 
 /**
