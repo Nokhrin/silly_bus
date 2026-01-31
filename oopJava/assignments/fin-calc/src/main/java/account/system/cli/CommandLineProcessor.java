@@ -18,11 +18,13 @@ public class CommandLineProcessor {
     private final Scanner scanner;
     private final OperationExecutor operationExecutor;
     private final OperationCreator operationCreator;
+    private final ConsoleOutputFormatter consoleOutputFormatter;
 
     public CommandLineProcessor(Scanner scanner, AccountRepository accountRepository) {
         this.scanner = scanner;
         this.operationExecutor = new OperationExecutor();
         this.operationCreator = new OperationCreator(accountRepository);
+        this.consoleOutputFormatter = new ConsoleOutputFormatter();
     }
 
     /**
@@ -37,6 +39,7 @@ public class CommandLineProcessor {
             String input = scanner.nextLine().trim();
             if (input.equalsIgnoreCase("exit")) {
                 System.out.println("Завершение работы");
+                System.out.flush();
                 break;
             }
             
@@ -47,13 +50,9 @@ public class CommandLineProcessor {
             // парсинг команд
             List<CommandData> commandDataList = Parser.parseCommandsFromString(input);
             if (commandDataList.isEmpty()) {
-                // todo - перехват синтаксических ошибок 
-                // Неверный формат команды (deposit, close, transfer).
-                //Неправильная последовательность токенов.
-                //Некорректный UUID.
-                //Некорректная сумма (amount).
-                //Пропущенные аргументы.
+                // todo - применить consoleOutputFormatter
                 System.out.println("err invalid input");
+                System.out.flush();
                 continue;
             }
 
@@ -62,7 +61,11 @@ public class CommandLineProcessor {
                 Operation operation = this.operationCreator.createOperation(commandData);
                 // выполнение операции
                 OperationResult operationResult = this.operationExecutor.execute(operation);
-                System.out.println(operationResult.message());
+                // форматирование, вывод
+                String formattedOutput = this.consoleOutputFormatter.format(operationResult);
+                
+                System.out.println(formattedOutput);
+                System.out.flush();
             }
         }
     }

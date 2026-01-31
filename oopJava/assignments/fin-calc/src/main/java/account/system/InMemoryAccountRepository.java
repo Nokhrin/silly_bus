@@ -10,14 +10,14 @@ public final class InMemoryAccountRepository implements AccountRepository {
 
     @Override
     public void saveAccount(Account account) {
-        System.out.println("\nОТЛАДКА => Записать в хранилище счет: " + account.getId());
-        accountMap.put(account.getId(), account);
+        System.out.println("\nОТЛАДКА => Записать в хранилище счет: " + account.id());
+        accountMap.put(account.id(), account);
     }
 
     @Override
-    public Optional<Account> loadAccount(UUID accountId) {
+    public Account loadAccount(UUID accountId) {
         System.out.println("\nОТЛАДКА => Прочитать из хранилища счет: " + accountId);
-        return Optional.ofNullable(accountMap.get(accountId));
+        return accountMap.get(accountId);
     }
 
     @Override

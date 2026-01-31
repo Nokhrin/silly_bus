@@ -9,7 +9,7 @@ import java.util.UUID;
  */
 public sealed interface AccountRepository permits InMemoryAccountRepository {
     void saveAccount(Account account);
-    Optional<Account> loadAccount(UUID accountId);
+    Account loadAccount(UUID accountId);
     void deleteAccount(UUID accountId);
     List<Account> loadExistingAccounts();
 }

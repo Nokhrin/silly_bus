@@ -1,5 +1,6 @@
 package account.operations;
 
+import account.operations.result.FailureResult;
 import account.operations.result.OperationResult;
 import account.operations.result.SuccessResult;
 import account.system.Account;
@@ -30,11 +31,6 @@ import java.util.UUID;
  *  
  */
 public record OpenAccount(OpenAccountData d, AccountRepository accountRepository) implements Operation {
-    
-//    // репозиторий передан по умолчанию
-//    public OpenAccount(OpenAccountData d) {
-//        // AccountRepository accountRepository из глобальной области видимости
-//    }
 
     @Override
     public OperationResult execute() {
@@ -44,23 +40,24 @@ public record OpenAccount(OpenAccountData d, AccountRepository accountRepository
             // создать account
             Account account = new Account();
             // записать в хранилище
+            accountRepository.saveAccount(account);
 
-            // вернуть id счета исполнителю
-
+            // вернуть id счета
             return new SuccessResult<>(
-                    "Открытие счета",
+                    account.id(),
+                    this.getClass().getSimpleName(),
                     operationId,
                     operationTimestamp,
-                    "Успешно открыт счет " + account.getId(),
-                    account.getId()
+                    "Успешно открыт счет " + account.id(),
+                    true
             );
         } catch (Exception e) {
-            return new SuccessResult<>(
-                    "Открытие счета",
+            return new FailureResult(
+                    this.getClass().getSimpleName(),
                     operationId,
                     operationTimestamp,
                     "Ошибка при открытии счета",
-                    null
+                    false
             );
 
         }

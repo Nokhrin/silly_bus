@@ -4,11 +4,12 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 public record SuccessResult<T>(
+        T value,
         String operationName,
         UUID operationId,
         LocalDateTime operationTimestamp,
         String message,
-        T value
+        boolean isStateModified
 ) implements OperationResult {
 
     @Override

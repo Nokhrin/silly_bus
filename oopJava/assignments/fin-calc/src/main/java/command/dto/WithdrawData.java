@@ -8,8 +8,4 @@ import java.util.UUID; /**
 public record WithdrawData(UUID accountId, String amount) implements CommandData {
     public static final String COMMAND_TYPE = "withdraw";
 
-    public Amount toAmount() {
-        return Amount.of(amount);
-    }
-
 }
