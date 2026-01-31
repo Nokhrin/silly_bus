@@ -4,6 +4,7 @@ import account.operations.Operation;
 import account.operations.OperationCreator;
 import account.operations.OperationExecutor;
 import account.operations.result.OperationResult;
+import account.system.AccountRepository;
 import command.dto.CommandData;
 import command.parser.Parser;
 
@@ -15,11 +16,13 @@ import java.util.Scanner;
  */
 public class CommandLineProcessor {
     private final Scanner scanner;
-    private final OperationExecutor executor;
+    private final OperationExecutor operationExecutor;
+    private final OperationCreator operationCreator;
 
-    public CommandLineProcessor(Scanner scanner) {
+    public CommandLineProcessor(Scanner scanner, AccountRepository accountRepository) {
         this.scanner = scanner;
-        this.executor = new OperationExecutor();
+        this.operationExecutor = new OperationExecutor();
+        this.operationCreator = new OperationCreator(accountRepository);
     }
 
     /**
@@ -56,10 +59,10 @@ public class CommandLineProcessor {
 
             for (CommandData commandData : commandDataList) {
                 // создание операции
-                Operation operation = OperationCreator.createOperation(commandData);
+                Operation operation = this.operationCreator.createOperation(commandData);
                 // выполнение операции
-                OperationResult result = executor.execute(operation);
-                System.out.println(result.message());
+                OperationResult operationResult = this.operationExecutor.execute(operation);
+                System.out.println(operationResult.message());
             }
         }
     }
