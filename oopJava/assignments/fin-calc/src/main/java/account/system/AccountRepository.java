@@ -5,7 +5,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 /**
- * Хранение данных.
+ * Хранение данных - интерфейс.
  */
 public sealed interface AccountRepository permits InMemoryAccountRepository {
     void saveAccount(Account account);

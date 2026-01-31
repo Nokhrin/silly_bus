@@ -1,14 +1,17 @@
 package account.system.cli;
 
+import account.system.AccountRepository;
+import account.system.InMemoryAccountRepository;
+
 import java.util.Scanner;
 
 public class Main {
 
     public static void main(String[] args) {
-
+        AccountRepository accountRepository = new InMemoryAccountRepository();
         Scanner scanner = new Scanner(System.in);
         
-        CommandLineProcessor commandLineProcessor = new CommandLineProcessor(scanner);
+        CommandLineProcessor commandLineProcessor = new CommandLineProcessor(scanner, accountRepository);
         commandLineProcessor.start();
         
         // Ручная проверка
@@ -62,7 +65,6 @@ public class Main {
         // list
         // ok b511e9c8-842f-4397-8097-ebbe1ff30b07
         
-        // TODO
         // закрытие несуществующего счета - неудача
         // close 344c81a5-9256-45a4-af81-37fa147d47f7
         // 
@@ -86,5 +88,9 @@ public class Main {
         // закрыть счет - нарушение формата ввода - неудача
         // close 1
         // err некорректный ввод
+
+        // завершить работу программы - успех
+        // exit
+        // Завершение работы
     }
 }
