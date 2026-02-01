@@ -24,6 +24,8 @@ public final class ConsoleOutputFormatter implements OutputFormatter {
         // сообщение о состоянии системы
         if (failureResult.isStateModified()) {
             stringBuilder.append(" [состояние системы было изменено до ошибки]");
+        } else {
+            stringBuilder.append(" [состояние системы не было изменено до ошибки]");
         }
 
         return stringBuilder.toString();

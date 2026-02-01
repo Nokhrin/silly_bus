@@ -1,7 +1,6 @@
 package account.operations;
 
-import account.operations.amount.Amount;
-import account.operations.amount.PositiveAmount;
+import account.operations.amount.TransactionAmount;
 import account.operations.result.FailureResult;
 import account.operations.result.OperationResult;
 import account.operations.result.SuccessResult;
@@ -25,16 +24,49 @@ public record Transfer(TransferData transferData, AccountRepository accountRepos
         try {
             RepositoryResult<Account> repositoryResultSourceAccount = accountRepository.loadAccount(transferData.getSourceAccountId());
             Account sourceAccount = repositoryResultSourceAccount.value();
-            Account sourceAccountAfterWithdraw = sourceAccount.withdraw(new PositiveAmount(transferData.amount()));
-            repositoryResultSourceAccount = accountRepository.saveAccount(sourceAccountAfterWithdraw);
+            
+            if (sourceAccount == null) {
+                return new FailureResult(
+                        this.getClass().getSimpleName(),
+                        operationId,
+                        operationTimestamp,
+                        "Счет источник не найден",
+                        false
+                );
+            }
             
             RepositoryResult<Account> repositoryResultTargetAccount = accountRepository.loadAccount(transferData.getTargetAccountId());
             Account targetAccount = repositoryResultTargetAccount.value();
-            Account targetAccountAfterDeposit = targetAccount.deposit(new PositiveAmount(transferData.amount()));
+            if (targetAccount == null) {
+                return new FailureResult(
+                        this.getClass().getSimpleName(),
+                        operationId,
+                        operationTimestamp,
+                        "Счет назначения не найден",
+                        false
+                );
+            }
+
+            Account sourceAccountAfterWithdraw = sourceAccount.withdraw(new TransactionAmount(transferData.amount()));
+            if (sourceAccount.balance().equals(sourceAccountAfterWithdraw.balance())) {
+                return new FailureResult(
+                        this.getClass().getSimpleName(),
+                        operationId,
+                        operationTimestamp,
+                        "Недостаточно средств для перевода",
+                        false
+                );
+            }
+
+            // зачисление
+            Account targetAccountAfterDeposit = targetAccount.deposit(new TransactionAmount(transferData.amount()));
+
+
             repositoryResultTargetAccount = accountRepository.saveAccount(targetAccountAfterDeposit);
+            repositoryResultSourceAccount = accountRepository.saveAccount(sourceAccountAfterWithdraw);
 
             boolean isStateModified = false;
-            if (repositoryResultSourceAccount.isStaisStateModified() || repositoryResultTargetAccount.isStaisStateModified()) {
+            if (repositoryResultSourceAccount.isStateModified() || repositoryResultTargetAccount.isStateModified()) {
                 isStateModified = true;
             }
             
@@ -51,7 +83,7 @@ public record Transfer(TransferData transferData, AccountRepository accountRepos
                     this.getClass().getSimpleName(),
                     operationId,
                     operationTimestamp,
-                    "Ошибка при перевод со счета на счет",
+                    "Ошибка при перевод со счета на счет: " + e.getMessage(),
                     false
             );
 

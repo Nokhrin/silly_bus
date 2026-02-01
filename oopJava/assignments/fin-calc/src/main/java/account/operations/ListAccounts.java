@@ -37,14 +37,14 @@ public record ListAccounts(ListAccountsData listAccountsData, AccountRepository 
                     operationId,
                     operationTimestamp,
                     "В системе существуют счета: " + accountListStr,
-                    repositoryResultAccountList.isStaisStateModified()
+                    repositoryResultAccountList.isStateModified()
             );
         } catch (Exception e) {
             return new FailureResult(
                     this.getClass().getSimpleName(),
                     operationId,
                     operationTimestamp,
-                    "Ошибка чтения счетов",
+                    "Ошибка чтения счетов: " + e.getMessage(),
                     false
             );
 

@@ -1,15 +1,24 @@
 package account.system;
 
-public record RepositoryResult<T>(
-        T value,
-        boolean isStaisStateModified
-) {
+public sealed interface RepositoryResult<T> permits RepositoryResult.Failure, RepositoryResult.Success {
+    T value();
 
-    public static <T> RepositoryResult<T> success(T value, boolean modified) {
-        return new RepositoryResult<>(value, modified);
+    boolean isStateModified();
+
+    String description();
+
+    boolean isSuccess();
+
+    record Success<T>(T value, boolean isStateModified, String description) implements RepositoryResult<T> {
+        @Override
+        public boolean isSuccess() {
+            return true;
+        }
     }
-
-    public static <T> RepositoryResult<T> failure(T value, boolean modified) {
-        return new RepositoryResult<>(value, modified);
+    record Failure<T>(T value, boolean isStateModified, String description) implements RepositoryResult<T> {
+        @Override
+        public boolean isSuccess() {
+            return false;
+        }
     }
 }

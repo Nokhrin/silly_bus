@@ -26,8 +26,20 @@ public record Balance(BalanceData balanceData, AccountRepository accountReposito
 
         try {
             // прочитать account
-            RepositoryResult<Account> repositoryResult = accountRepository.loadAccount(balanceData.getAccountId());
+            RepositoryResult<Account> repositoryResult = accountRepository.loadAccount(balanceData.accountId());
             Account account = repositoryResult.value();
+
+            if (account == null) {
+                return new FailureResult(
+                        this.getClass().getSimpleName(),
+                        operationId,
+                        operationTimestamp,
+                        "Счет не найден",
+                        false
+                );
+            }
+
+
             BigDecimal balance = account.balance();
 
             // вернуть id счета
@@ -37,14 +49,14 @@ public record Balance(BalanceData balanceData, AccountRepository accountReposito
                     operationId,
                     operationTimestamp,
                     "Баланс счета " + account.id() + ": " + account.balance(),
-                    repositoryResult.isStaisStateModified()
+                    repositoryResult.isStateModified()
             );
         } catch (Exception e) {
             return new FailureResult(
                     this.getClass().getSimpleName(),
                     operationId,
                     operationTimestamp,
-                    "Ошибка при чтении баланса счета",
+                    "Ошибка при чтении баланса счета: " + e.getMessage(),
                     false
             );
 
