@@ -10,9 +10,7 @@ import java.util.UUID;
 public record DepositData(UUID accountId, String amount) implements CommandData {
     public static final String COMMAND_TYPE = "deposit";
 
-    public UUID getAccountId() {
-        return accountId;
-    }
+
     public String getAmount() {
         return amount;
     }

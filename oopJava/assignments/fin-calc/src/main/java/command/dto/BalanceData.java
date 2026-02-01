@@ -8,7 +8,5 @@ import java.util.UUID;
 public record BalanceData(UUID accountId) implements CommandData {
     public static final String COMMAND_TYPE = "balance";
     
-    public UUID getAccountId() {
-        return accountId;
-    }
+
 }

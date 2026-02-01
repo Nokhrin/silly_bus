@@ -1,7 +1,6 @@
 package account.operations;
 
-import account.operations.amount.Amount;
-import account.operations.amount.PositiveAmount;
+import account.operations.amount.TransactionAmount;
 import account.operations.result.FailureResult;
 import account.operations.result.OperationResult;
 import account.operations.result.SuccessResult;
@@ -25,7 +24,30 @@ public record Withdraw(WithdrawData withdrawData, AccountRepository accountRepos
         try {
             RepositoryResult<Account> repositoryResult = accountRepository.loadAccount(withdrawData.accountId());
             Account account = repositoryResult.value();
-            Account accountAfterWithdraw = account.withdraw(new PositiveAmount(withdrawData.amount()));
+
+            if (account == null) {
+                return new FailureResult(
+                        this.getClass().getSimpleName(),
+                        operationId,
+                        operationTimestamp,
+                        "Счет не найден",
+                        false
+                );
+            }
+
+            Account accountAfterWithdraw = account.withdraw(new TransactionAmount(withdrawData.amount()));
+
+            if (account.balance().equals(accountAfterWithdraw.balance())) {
+                return new FailureResult(
+                        this.getClass().getSimpleName(),
+                        operationId,
+                        operationTimestamp,
+                        "Недостаточно средств для снятия",
+                        false
+                );
+            }
+            
+            
             repositoryResult = accountRepository.saveAccount(accountAfterWithdraw);
 
             return new SuccessResult<>(
@@ -34,14 +56,14 @@ public record Withdraw(WithdrawData withdrawData, AccountRepository accountRepos
                     operationId,
                     operationTimestamp,
                     "Успешно снято " + withdrawData.amount() + " со счета " + account.id(),
-                    repositoryResult.isStaisStateModified()
+                    repositoryResult.isStateModified()
             );
         } catch (Exception e) {
             return new FailureResult(
                     this.getClass().getSimpleName(),
                     operationId,
                     operationTimestamp,
-                    "Ошибка при снятии",
+                    "Ошибка при снятии: " + e.getMessage(),
                     false
             );
 

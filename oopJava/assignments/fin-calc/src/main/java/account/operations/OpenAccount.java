@@ -50,14 +50,14 @@ public record OpenAccount(OpenAccountData d, AccountRepository accountRepository
                     operationId,
                     operationTimestamp,
                     "Успешно открыт счет " + account.id(),
-                    repositoryResult.isStaisStateModified()
+                    repositoryResult.isStateModified()
             );
         } catch (Exception e) {
             return new FailureResult(
                     this.getClass().getSimpleName(),
                     operationId,
                     operationTimestamp,
-                    "Ошибка при открытии счета",
+                    "Ошибка при открытии счета: " + e.getMessage(),
                     false
             );
 

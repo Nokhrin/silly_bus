@@ -176,7 +176,7 @@ public class Parser {
             return Optional.empty(); // Нет цифр, ни до, ни после точки
         }
 
-        // Собираем строку для парсинга BigDecimal
+        // Сумма
         StringBuilder amountStr = new StringBuilder();
         if (isNegative) {
             amountStr.append('-');

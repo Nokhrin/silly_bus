@@ -6,13 +6,12 @@
     <artifactId>fin-calc</artifactId>
     <packaging>jar</packaging>
 
-    <name>Finance Calculator Project</name>
-    <description>Java OOP project for financial operations and expression parsing.</description>
+    <name>Account Operations System</name>
+    <description>Java OOP project implementing financial operations with strict type safety, immutability principles, and functional programming concepts. Features account management with deposit/withdraw operations, fund transfers, balance validation, and comprehensive error handling while maintaining clean architecture separation. Implements sealed interfaces for type safety, record classes for immutable data structures, and functional composition patterns for business logic.</description>
 
     <properties>
         <java.version>17</java.version>
-        <maven.compiler.source>${java.version}</maven.compiler.source>
-        <maven.compiler.target>${java.version}</maven.compiler.target>
+        <maven-compiler-plugin.version>3.14.0</maven-compiler-plugin.version>
         <groovy.version>4.0.26</groovy.version>
         <logback-classic.version>1.5.18</logback-classic.version>
         <slf4j-api.version>2.0.17</slf4j-api.version>
@@ -103,9 +102,10 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven-compiler-plugin.version}</version>
                 <configuration>
-                    <source>17</source>
-                    <target>17</target>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
                     <compilerArgs>
                         <arg>--enable-preview</arg>
                     </compilerArgs>

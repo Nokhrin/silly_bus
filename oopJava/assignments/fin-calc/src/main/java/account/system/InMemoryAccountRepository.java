@@ -1,5 +1,7 @@
 package account.system;
 
+import account.operations.ListAccounts;
+
 import java.util.*;
 
 /**
@@ -10,30 +12,35 @@ public final class InMemoryAccountRepository implements AccountRepository {
 
     @Override
     public RepositoryResult<Account> saveAccount(Account account) {
-        System.out.println("\nОТЛАДКА => Записать в хранилище счет: " + account.id());
+        String description = "Записать в хранилище счет: " + account.id();
         accountMap.put(account.id(), account);
-        return RepositoryResult.success(account, true);
+        return new RepositoryResult.Success<>(account, true, description);
     }
 
     @Override
     public RepositoryResult<Void> deleteAccount(UUID accountId) {
-        boolean accountExisted = accountMap.containsKey(accountId);
-        System.out.println("\nОТЛАДКА => Удалить из хранилища счет: " + accountId);
+        String description = "Удалить из хранилища счет: " + accountId;
         accountMap.remove(accountId);
-        return RepositoryResult.success(null, accountExisted);
+        return new RepositoryResult.Success<>(null, true, description);
     }
 
     @Override
     public RepositoryResult<Account> loadAccount(UUID accountId) {
+        String description = "Прочитать из хранилища счет: " + accountId;
         Account account = accountMap.get(accountId);
-        System.out.println("\nОТЛАДКА => Прочитать из хранилища счет: " + accountId);
-        return RepositoryResult.success(account, false);
+        
+        if (account == null) {
+            return new RepositoryResult.Failure<>(null, false, description);
+        }
+
+        return new RepositoryResult.Success<>(account, false, description);
     }
 
     @Override
     public RepositoryResult<List<Account>> loadExistingAccounts() {
-        System.out.println("\nОТЛАДКА => Прочитать счета, существующие в хранилище");
-        return RepositoryResult.success(new ArrayList<>(accountMap.values()), false);
+        String description = "Прочитать счета, существующие в хранилище";
+        List<Account> accountList = accountMap.values().stream().toList();
+        return new RepositoryResult.Success<>(accountList, false, description);
     }
 
 }
