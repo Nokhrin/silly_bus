@@ -6,6 +6,7 @@ import account.operations.result.OperationResult;
 import account.operations.result.SuccessResult;
 import account.system.Account;
 import account.system.AccountRepository;
+import account.system.RepositoryResult;
 import command.dto.BalanceData;
 
 import java.math.BigDecimal;
@@ -25,7 +26,8 @@ public record Balance(BalanceData balanceData, AccountRepository accountReposito
 
         try {
             // прочитать account
-            Account account = accountRepository.loadAccount(balanceData.getAccountId());
+            RepositoryResult<Account> repositoryResult = accountRepository.loadAccount(balanceData.getAccountId());
+            Account account = repositoryResult.value();
             BigDecimal balance = account.balance();
 
             // вернуть id счета
@@ -35,7 +37,7 @@ public record Balance(BalanceData balanceData, AccountRepository accountReposito
                     operationId,
                     operationTimestamp,
                     "Баланс счета " + account.id() + ": " + account.balance(),
-                    false
+                    repositoryResult.isStaisStateModified()
             );
         } catch (Exception e) {
             return new FailureResult(

@@ -7,6 +7,7 @@ import account.operations.result.OperationResult;
 import account.operations.result.SuccessResult;
 import account.system.Account;
 import account.system.AccountRepository;
+import account.system.RepositoryResult;
 import command.dto.DepositData;
 
 import java.math.BigDecimal;
@@ -22,9 +23,10 @@ public record Deposit(DepositData depositData, AccountRepository accountReposito
         LocalDateTime operationTimestamp = LocalDateTime.now();
 
         try {
-            Account account = accountRepository.loadAccount(depositData.getAccountId());
+            RepositoryResult<Account> repositoryResultAccount = accountRepository.loadAccount(depositData.getAccountId());
+            Account account = repositoryResultAccount.value();
             Account accountAfterDeposit = account.deposit(new PositiveAmount(depositData.amount()));
-            accountRepository.saveAccount(accountAfterDeposit);
+            repositoryResultAccount = accountRepository.saveAccount(accountAfterDeposit);
 
             return new SuccessResult<>(
                     "",
@@ -32,7 +34,7 @@ public record Deposit(DepositData depositData, AccountRepository accountReposito
                     operationId,
                     operationTimestamp,
                     "Успешно зачислено " + depositData.amount() + " на счет " + account.id(),
-                    true
+                    repositoryResultAccount.isStaisStateModified()
             );
         } catch (Exception e) {
             return new FailureResult(

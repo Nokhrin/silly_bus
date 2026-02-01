@@ -36,4 +36,6 @@ public sealed interface OperationResult permits SuccessResult, FailureResult {
 }
 
 
+
+
 }

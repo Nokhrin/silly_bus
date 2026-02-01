@@ -7,6 +7,7 @@ import account.operations.result.OperationResult;
 import account.operations.result.SuccessResult;
 import account.system.Account;
 import account.system.AccountRepository;
+import account.system.RepositoryResult;
 import command.dto.WithdrawData;
 
 import java.time.LocalDateTime;
@@ -22,9 +23,10 @@ public record Withdraw(WithdrawData withdrawData, AccountRepository accountRepos
         LocalDateTime operationTimestamp = LocalDateTime.now();
 
         try {
-            Account account = accountRepository.loadAccount(withdrawData.accountId());
+            RepositoryResult<Account> repositoryResult = accountRepository.loadAccount(withdrawData.accountId());
+            Account account = repositoryResult.value();
             Account accountAfterWithdraw = account.withdraw(new PositiveAmount(withdrawData.amount()));
-            accountRepository.saveAccount(accountAfterWithdraw);
+            repositoryResult = accountRepository.saveAccount(accountAfterWithdraw);
 
             return new SuccessResult<>(
                     "",
@@ -32,7 +34,7 @@ public record Withdraw(WithdrawData withdrawData, AccountRepository accountRepos
                     operationId,
                     operationTimestamp,
                     "Успешно снято " + withdrawData.amount() + " со счета " + account.id(),
-                    true
+                    repositoryResult.isStaisStateModified()
             );
         } catch (Exception e) {
             return new FailureResult(
