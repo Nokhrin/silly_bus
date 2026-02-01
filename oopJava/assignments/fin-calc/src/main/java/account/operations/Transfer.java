@@ -7,6 +7,7 @@ import account.operations.result.OperationResult;
 import account.operations.result.SuccessResult;
 import account.system.Account;
 import account.system.AccountRepository;
+import account.system.RepositoryResult;
 import command.dto.TransferData;
 
 import java.time.LocalDateTime;
@@ -22,21 +23,28 @@ public record Transfer(TransferData transferData, AccountRepository accountRepos
         LocalDateTime operationTimestamp = LocalDateTime.now();
 
         try {
-            Account sourceAccount = accountRepository.loadAccount(transferData.getSourceAccountId());
+            RepositoryResult<Account> repositoryResultSourceAccount = accountRepository.loadAccount(transferData.getSourceAccountId());
+            Account sourceAccount = repositoryResultSourceAccount.value();
             Account sourceAccountAfterWithdraw = sourceAccount.withdraw(new PositiveAmount(transferData.amount()));
-            accountRepository.saveAccount(sourceAccountAfterWithdraw);
+            repositoryResultSourceAccount = accountRepository.saveAccount(sourceAccountAfterWithdraw);
             
-            Account targetAccount = accountRepository.loadAccount(transferData.getTargetAccountId());
+            RepositoryResult<Account> repositoryResultTargetAccount = accountRepository.loadAccount(transferData.getTargetAccountId());
+            Account targetAccount = repositoryResultTargetAccount.value();
             Account targetAccountAfterDeposit = targetAccount.deposit(new PositiveAmount(transferData.amount()));
-            accountRepository.saveAccount(targetAccountAfterDeposit);
+            repositoryResultTargetAccount = accountRepository.saveAccount(targetAccountAfterDeposit);
 
+            boolean isStateModified = false;
+            if (repositoryResultSourceAccount.isStaisStateModified() || repositoryResultTargetAccount.isStaisStateModified()) {
+                isStateModified = true;
+            }
+            
             return new SuccessResult<>(
                     "",
                     this.getClass().getSimpleName(),
                     operationId,
                     operationTimestamp,
                     "Успешно выполнен перевод со счета на счет",
-                    true
+                    isStateModified
             );
         } catch (Exception e) {
             return new FailureResult(

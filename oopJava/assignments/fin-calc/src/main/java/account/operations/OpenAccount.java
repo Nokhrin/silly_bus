@@ -5,6 +5,7 @@ import account.operations.result.OperationResult;
 import account.operations.result.SuccessResult;
 import account.system.Account;
 import account.system.AccountRepository;
+import account.system.RepositoryResult;
 import command.dto.OpenAccountData;
 
 import java.time.LocalDateTime;
@@ -40,7 +41,7 @@ public record OpenAccount(OpenAccountData d, AccountRepository accountRepository
             // создать account
             Account account = new Account();
             // записать в хранилище
-            accountRepository.saveAccount(account);
+            RepositoryResult<Account> repositoryResult = accountRepository.saveAccount(account);
 
             // вернуть id счета
             return new SuccessResult<>(
@@ -49,7 +50,7 @@ public record OpenAccount(OpenAccountData d, AccountRepository accountRepository
                     operationId,
                     operationTimestamp,
                     "Успешно открыт счет " + account.id(),
-                    true
+                    repositoryResult.isStaisStateModified()
             );
         } catch (Exception e) {
             return new FailureResult(

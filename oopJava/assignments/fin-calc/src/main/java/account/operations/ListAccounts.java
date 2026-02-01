@@ -5,6 +5,7 @@ import account.operations.result.OperationResult;
 import account.operations.result.SuccessResult;
 import account.system.Account;
 import account.system.AccountRepository;
+import account.system.RepositoryResult;
 import command.dto.ListAccountsData;
 
 import java.time.LocalDateTime;
@@ -23,21 +24,20 @@ public record ListAccounts(ListAccountsData listAccountsData, AccountRepository 
         UUID operationId = UUID.randomUUID();
         LocalDateTime operationTimestamp = LocalDateTime.now();
         try {
-            // прочитать хранилище
-            List<Account> accountList = accountRepository.loadExistingAccounts();
+            RepositoryResult<List<Account>> repositoryResultAccountList = accountRepository.loadExistingAccounts();
+            List<Account> accountList = repositoryResultAccountList.value();
             String accountListStr = accountList.stream()
                     .map(Account::id)
                     .map(UUID::toString)
                     .collect(Collectors.joining(" "));
 
-            // вернуть id счета
             return new SuccessResult<>(
                     accountListStr,
                     this.getClass().getSimpleName(),
                     operationId,
                     operationTimestamp,
                     "В системе существуют счета: " + accountListStr,
-                    false
+                    repositoryResultAccountList.isStaisStateModified()
             );
         } catch (Exception e) {
             return new FailureResult(

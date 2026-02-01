@@ -5,6 +5,7 @@ import account.operations.result.OperationResult;
 import account.operations.result.SuccessResult;
 import account.system.Account;
 import account.system.AccountRepository;
+import account.system.RepositoryResult;
 import command.dto.CloseAccountData;
 
 import java.time.LocalDateTime;
@@ -19,7 +20,7 @@ public record CloseAccount(CloseAccountData closeAccountData, AccountRepository 
         UUID operationId = UUID.randomUUID();
         LocalDateTime operationTimestamp = LocalDateTime.now();
         try {
-            accountRepository.deleteAccount(closeAccountData.getAccountId());
+            RepositoryResult<Void> repositoryResult = accountRepository.deleteAccount(closeAccountData.getAccountId());
 
             return new SuccessResult<>(
                     "",
@@ -27,7 +28,7 @@ public record CloseAccount(CloseAccountData closeAccountData, AccountRepository 
                     operationId,
                     operationTimestamp,
                     "Успешно закрыт счет " + closeAccountData.getAccountId(),
-                    true
+                    repositoryResult.isStaisStateModified()
             );
         } catch (Exception e) {
             return new FailureResult(
