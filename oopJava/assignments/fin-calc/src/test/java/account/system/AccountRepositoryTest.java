@@ -1,92 +1,81 @@
 package account.system;
 
 import org.testng.annotations.Test;
+
 import static org.testng.Assert.*;
 
 public class AccountRepositoryTest {
 
     /**
      * Тест: Сохранение аккаунта должно изменять состояние системы
-     * Применяет instanceof pattern matching для проверки типа результата
      */
     @Test(description = "Сохранение аккаунта изменяет состояние системы")
     public void testSaveAccountChangesState() {
-        // Given
+        // Given  
         var repository = new InMemoryAccountRepository();
         var account = new Account();
 
-        // When
+        // When  
         var result = repository.saveAccount(account);
 
-        // Then
-        if (result instanceof RepositoryResult<Account> repoResult) {
-            assertTrue(repoResult.isStateModified(), "Состояние должно быть изменено при сохранении");
-        } else {
-            fail("Результат должен быть экземпляром RepositoryResult<Account>");
-        }
+        // Then  
+        assertTrue(result instanceof RepositoryResult<?>, "Результат должен быть экземпляром RepositoryResult");
+        assertTrue(((RepositoryResult<Account>) result).isStateModified(),
+                "Состояние должно быть изменено при сохранении");
     }
 
     /**
      * Тест: Удаление существующего аккаунта должно изменять состояние системы
-     * Применяет instanceof pattern matching для проверки типа результата
      */
     @Test(description = "Удаление существующего аккаунта изменяет состояние системы")
     public void testDeleteExistingAccountChangesState() {
-        // Given
+        // Given  
         var repository = new InMemoryAccountRepository();
         var account = new Account();
         repository.saveAccount(account);
 
-        // When
+        // When  
         var result = repository.deleteAccount(account.id());
 
-        // Then
-        if (result instanceof RepositoryResult<Void> repoResult) {
-            assertTrue(repoResult.isStateModified(), "Состояние должно быть изменено при удалении");
-        } else {
-            fail("Результат должен быть экземпляром RepositoryResult<Void>");
-        }
+        // Then  
+        assertTrue(result instanceof RepositoryResult<?>, "Результат должен быть экземпляром RepositoryResult");
+        assertTrue(((RepositoryResult<Void>) result).isStateModified(),
+                "Состояние должно быть изменено при удалении");
     }
 
     /**
      * Тест: Загрузка аккаунта не должна изменять состояние системы
-     * Применяет instanceof pattern matching для проверки типа результата
      */
     @Test(description = "Загрузка аккаунта не изменяет состояние системы")
     public void testLoadAccountDoesNotChangeState() {
-        // Given
+        // Given  
         var repository = new InMemoryAccountRepository();
         var account = new Account();
         repository.saveAccount(account);
 
-        // When
+        // When  
         var result = repository.loadAccount(account.id());
 
-        // Then
-        if (result instanceof RepositoryResult<Account> repoResult) {
-            assertFalse(repoResult.isStateModified(), "Состояние не должно быть изменено при загрузке");
-        } else {
-            fail("Результат должен быть экземпляром RepositoryResult<Account>");
-        }
+        // Then  
+        assertTrue(result instanceof RepositoryResult<?>, "Результат должен быть экземпляром RepositoryResult");
+        assertFalse(((RepositoryResult<Account>) result).isStateModified(),
+                "Состояние не должно быть изменено при загрузке");
     }
 
     /**
      * Тест: Загрузка несуществующего аккаунта не должна изменять состояние системы
-     * Применяет instanceof pattern matching для проверки типа результата
      */
     @Test(description = "Загрузка несуществующего аккаунта не изменяет состояние системы")
     public void testLoadNonExistentAccountDoesNotChangeState() {
-        // Given
+        // Given  
         var repository = new InMemoryAccountRepository();
 
-        // When
+        // When  
         var result = repository.loadAccount(java.util.UUID.randomUUID());
 
-        // Then
-        if (result instanceof RepositoryResult<Account> repoResult) {
-            assertTrue(true);
-        } else {
-            fail("Результат должен быть экземпляром RepositoryResult<Account>");
-        }
+        // Then  
+        assertTrue(result instanceof RepositoryResult<?>, "Результат должен быть экземпляром RepositoryResult");
+        // Проверка состояния не требуется для несуществующего аккаунта
+        assertTrue(true);
     }
 }
