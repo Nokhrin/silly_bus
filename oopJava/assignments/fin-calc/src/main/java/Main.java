@@ -14,9 +14,8 @@ public class Main {
         AccountRepository accountRepository = new InMemoryAccountRepository();
         
         InputSource inputSource = getInputSource(args);
-        Scanner scanner = inputSource.getScanner();
 
-        CommandLineProcessor commandLineProcessor = new CommandLineProcessor(scanner, accountRepository);
+        CommandLineProcessor commandLineProcessor = new CommandLineProcessor(inputSource, accountRepository);
         commandLineProcessor.start();
 
     }

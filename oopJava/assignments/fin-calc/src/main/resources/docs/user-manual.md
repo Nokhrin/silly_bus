@@ -1,34 +1,5 @@
 ## Сборка
 
-клонировать
-
-перейти в директорию проекта
-
-```shell
-cd ~/projects/silly_bus/oopJava/assignments/fin-calc
-```
-
-собрать jar
-```shell
-mvn clean package -Pproduction
-```
-
-проверить формирование jar
-```shell
-ls target/fin*
-```
-> target/fin-calc-1.0.0.jar
-
-создать файл `target/commands.txt` с командами
-
-пример ввода
-```shell
-open list
-
-open  \topen
-list
-exit
-```
 
 настроить JDK 21
 
@@ -42,6 +13,35 @@ export PATH=$JAVA_HOME/bin:$PATH
 # Проверьте версию
 java -version
 javac -version
+```
+
+клонировать репозиторий
+
+перейти в директорию проекта
+
+```shell
+cd ~/projects/silly_bus/oopJava/assignments/fin-calc
+```
+
+собрать jar
+```shell
+mvn clean package -Pproduction
+```
+
+создать файл `target/commands.txt` с командами
+
+пример ввода
+```text
+open list
+
+open  \topen
+list
+exit
+```
+
+создание файла с командами
+```shell
+printf 'open list\n\nopen \topen\nlist' > target/commands.txt
 ```
 
 

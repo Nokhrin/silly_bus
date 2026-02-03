@@ -12,4 +12,9 @@ public sealed interface InputSource permits InteractiveInputSource, FileInputSou
      * @return
      */
     Scanner getScanner();
+
+    /**
+     * Вывод приглашения к вводу.
+     */
+    void printPrompt();
 }
