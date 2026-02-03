@@ -23,4 +23,9 @@ public final class FileInputSource implements InputSource {
         }
 
     }
+
+    @Override
+    public void printPrompt() {
+        
+    }
 }

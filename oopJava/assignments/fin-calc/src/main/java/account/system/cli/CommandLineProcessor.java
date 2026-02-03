@@ -15,13 +15,13 @@ import java.util.Scanner;
  * CLI-взаимодействие с пользователем.
  */
 public class CommandLineProcessor {
-    private final Scanner scanner;
+    private final InputSource inputSource;
     private final OperationExecutor operationExecutor;
     private final OperationCreator operationCreator;
     private final ConsoleOutputFormatter consoleOutputFormatter;
 
-    public CommandLineProcessor(Scanner scanner, AccountRepository accountRepository) {
-        this.scanner = scanner;
+    public CommandLineProcessor(InputSource inputSource, AccountRepository accountRepository) {
+        this.inputSource = inputSource;
         this.operationExecutor = new OperationExecutor();
         this.operationCreator = new OperationCreator(accountRepository);
         this.consoleOutputFormatter = new ConsoleOutputFormatter();
@@ -33,8 +33,10 @@ public class CommandLineProcessor {
     public void start() {
         System.out.println("Управление банковскими счетами. Введите команду (или 'exit' для выхода):");
         
+        Scanner scanner = inputSource.getScanner();
+        
         while (true) {
-            System.out.print("> ");
+            inputSource.printPrompt();
             
             String input = scanner.nextLine().trim();
             if (input.equalsIgnoreCase("exit")) {
@@ -51,7 +53,7 @@ public class CommandLineProcessor {
             List<CommandData> commandDataList = Parser.parseCommandsFromString(input);
             if (commandDataList.isEmpty()) {
                 // todo - применить consoleOutputFormatter
-                System.out.println("err invalid input");
+                System.out.println("err некорректный ввод");
                 System.out.flush();
                 continue;
             }

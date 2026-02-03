@@ -92,17 +92,110 @@ public class ParserTest {
         assertEquals(result.get().end(), 3);
     }
 
-    @Test(description = "Сумма - положительная, целая, корректная, в строке символы только суммы, считана")
+    @Test(description = "Сумма - отрицательная, целая, корректная, в строке символы только суммы, считана")
     public void testParseAmount_IntegerNeg() {
-        String input = "123";
+        String input = "-123";
         Optional<ParseResult<String>> result = Parser.parseAmount(input, 0);
 
         assertTrue(result.isPresent());
-        assertEquals(result.get().value(), "123");
+        assertEquals(result.get().value(), "-123");
+        assertEquals(result.get().start(), 0);
+        assertEquals(result.get().end(), 4);
+    }
+
+    @Test(description = "parseAmount - отрицательное дробное")
+    public void testParseAmount_NegativeFloat() {
+        String input = "-123.45";
+        Optional<ParseResult<String>> result = Parser.parseAmount(input, 0);
+        assertTrue(result.isPresent());
+        assertEquals(result.get().value(), "-123.45");
+    }
+
+    @Test(description = "parseAmount - валидное значение: минус точка две цифры")
+    public void testParseAmount_NegativeCents() {
+        String input = "-.45";
+        Optional<ParseResult<String>> result = Parser.parseAmount(input, 0);
+        assertEquals(result.get().value(), "-.45");
+        assertEquals(result.get().start(), 0);
+        assertEquals(result.get().end(), 4);
+    }
+
+    @Test(description = "parseAmount - большое число с множеством знаков после запятой")
+    public void testParseAmount_HighPrecision() {
+        String input = "123.123456789012345678901234567890";
+        Optional<ParseResult<String>> result = Parser.parseAmount(input, 0);
+        assertTrue(result.isPresent());
+        assertEquals(result.get().value(), "123.123456789012345678901234567890");
+        assertEquals(result.get().start(), 0);
+        assertEquals(result.get().end(), 34);
+    }
+
+    @Test(description = "parseAmount - очень длинное число")
+    public void testParseAmount_VeryLongNumber() {
+        String input = "1234567890123456789012345678901234567890.123456789012345678901234567890";
+        Optional<ParseResult<String>> result = Parser.parseAmount(input, 0);
+        assertTrue(result.isPresent());
+        assertEquals(result.get().start(), 0);
+        assertEquals(result.get().end(), 71);
+    }
+    
+    @Test(description = "parseAmount - невалидное значение: буквы")
+    public void testParseAmount_InvalidLetters() {
+        String input = "abc";
+        Optional<ParseResult<String>> result = Parser.parseAmount(input, 0);
+        assertTrue(result.isEmpty());
+    }
+
+    @Test(description = "parseAmount - невалидное значение: только минус")
+    public void testParseAmount_JustMinus() {
+        String input = "-";
+        Optional<ParseResult<String>> result = Parser.parseAmount(input, 0);
+        assertTrue(result.isEmpty());
+    }
+
+    @Test(description = "parseAmount - невалидное значение: две точки")
+    public void testParseAmount_DoubleDot() {
+        String input = "123..45";
+        Optional<ParseResult<String>> result = Parser.parseAmount(input, 0);
+        assertTrue(result.isEmpty());
+    }
+
+    @Test(description = "parseAmount - невалидное значение: точка без цифр после")
+    public void testParseAmount_DotWithoutDigits() {
+        String input = "123.";
+        Optional<ParseResult<String>> result = Parser.parseAmount(input, 0);
+        assertTrue(result.isEmpty()); // Точка без цифр после — невалидно
+    }
+    
+    @Test(description = "parseAmount - невалидное значение: точка без цифр до и после")
+    public void testParseAmount_DotOnly() {
+        String input = ".";
+        Optional<ParseResult<String>> result = Parser.parseAmount(input, 0);
+        assertTrue(result.isEmpty());
+    }
+
+    @Test(description = "parseAmount - минимальная сумма: 0.0")
+    public void testParseAmount_Zero() {
+        String input = "0.0";
+        Optional<ParseResult<String>> result = Parser.parseAmount(input, 0);
+        assertTrue(result.isPresent());
+        assertEquals(result.get().value(), "0.0");
         assertEquals(result.get().start(), 0);
         assertEquals(result.get().end(), 3);
     }
 
+    @Test(description = "parseAmount - минимальная сумма: 0")
+    public void testParseAmount_ZeroInteger() {
+        String input = "0";
+        Optional<ParseResult<String>> result = Parser.parseAmount(input, 0);
+        assertTrue(result.isPresent());
+        assertEquals(result.get().value(), "0");
+        assertEquals(result.get().start(), 0);
+        assertEquals(result.get().end(), 1);
+    }
+
+    
+    
     //endregion parseAmount
     
     

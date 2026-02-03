@@ -116,7 +116,6 @@ public class Parser {
      * Парсит сумму
      * <p>
      * amount ::= [ '-' ] ( digit { digit } | digit { digit } '.' digit { digit } | '.' digit { digit } )
-     * | digit { digit } '.' digit { digit }
      * digit ::= "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
      */
     public static Optional<ParseResult<String>> parseAmount(final String source, final int start) {
@@ -135,11 +134,6 @@ public class Parser {
         }
 
         // Шаг 2: Проверка на наличие цифр перед точкой или после неё
-        // Возможные форматы:
-        // 1. "123" → целое число
-        // 2. "123.45" → дробь с целой частью
-        // 3. ".45" → дробь без целой части
-        // 4. "-123", "-123.45", "-.45"
 
         boolean hasDigitsBeforeDot = false;
         boolean hasDigitsAfterDot = false;
@@ -161,6 +155,27 @@ public class Parser {
         if (offset < source.length() && source.charAt(offset) == '.') {
             hasDot = true;
             offset++;
+            
+            // после точки - цифра и нет последовательности точек
+            // amount ::= [ '-' ] 
+            // ( digit { digit } | digit { digit } '.' digit { digit } | '.' digit { digit } ) | 
+            // digit { digit } '.' digit { digit }
+            int dotOffset = offset;
+            while (dotOffset< source.length() && Character.isDigit(source.charAt(dotOffset))) {
+                digitsAfterDot++;
+                dotOffset++;
+            }
+            
+            // после точки нет цифр -> невалидный формат
+            if (digitsAfterDot == 0) {
+                return Optional.empty();
+            }
+            
+            // допускается строго одна точка
+            if (dotOffset < source.length() && source.charAt(dotOffset) == '.') {
+                return Optional.empty();
+            }
+            
             // Сбор цифр после точки
             while (offset < source.length() && Character.isDigit(source.charAt(offset))) {
                 digitsAfterDot++;
@@ -171,9 +186,9 @@ public class Parser {
             }
         }
 
-        // Проверка: должно быть либо цифры до точки, либо после, либо и то, и другое
+        // Строго одна точка, до и после которой допускается цифра
         if (!hasDigitsBeforeDot && !hasDigitsAfterDot) {
-            return Optional.empty(); // Нет цифр, ни до, ни после точки
+            return Optional.empty();
         }
 
         // Сумма
