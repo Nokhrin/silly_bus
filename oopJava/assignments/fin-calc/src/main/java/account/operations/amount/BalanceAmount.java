@@ -48,11 +48,11 @@ public final class BalanceAmount implements Amount {
 
     @Override
     public Amount add(Amount other) {
-        return TransactionAmount.of(this.value.add(other.getValue()));
+        return BalanceAmount.of(this.value.add(other.getValue()));
     }
 
     @Override
     public Amount sub(Amount other) {
-        return TransactionAmount.of(this.value.subtract(other.getValue()));
+        return BalanceAmount.of(this.value.subtract(other.getValue()));
     }
 }
