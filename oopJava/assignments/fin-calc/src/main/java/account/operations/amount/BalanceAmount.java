@@ -35,6 +35,8 @@ public final class BalanceAmount implements Amount {
 
     /**
      * Создает BigDecimal для операций сложения и вычитания.
+     * Применяется для косвенного тестирования private конструктора 
+     *  - проверяется обработка конструктором значения типа BigDecimal
      * @return
      */
     public static BalanceAmount of(BigDecimal value) {
