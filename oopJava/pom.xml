@@ -1,0 +1,14 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0">
+
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.example</groupId>
+    <version>1.0.0</version>
+    <artifactId>oop</artifactId>
+    <packaging>jar</packaging>
+
+    <modules>
+        <module>assignments/calc-parser</module>
+        <module>assignments/fin-calc</module>
+    </modules>
+    
+</project>
