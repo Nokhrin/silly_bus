@@ -4,14 +4,14 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>concepts</artifactId>
-    <version>1.0-SNAPSHOT</version>
-    <packaging>jar</packaging>
-
     <parent>
         <groupId>org.example</groupId>
-        <artifactId>oopJava</artifactId>
+        <artifactId>line-appender</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
 
+    <artifactId>impl1</artifactId>
+
+    <name>реализация api</name>
+    
 </project>
