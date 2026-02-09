@@ -9,43 +9,6 @@
     <name>Account Operations System</name>
     <description>Java OOP project implementing financial operations with strict type safety, immutability principles, and functional programming concepts. Features account management with deposit/withdraw operations, fund transfers, balance validation, and comprehensive error handling while maintaining clean architecture separation. Implements sealed interfaces for type safety, record classes for immutable data structures, and functional composition patterns for business logic.</description>
 
-    <properties>
-        <java.version>21</java.version>
-        <maven-compiler-plugin.version>3.14.0</maven-compiler-plugin.version>
-        <maven-jar-plugin.version>3.4.2</maven-jar-plugin.version>
-        <logback-classic.version>1.5.18</logback-classic.version>
-        <slf4j-api.version>2.0.17</slf4j-api.version>
-        <testng.version>7.9.0</testng.version>
-        <checkstyle-plugin.version>3.4.0</checkstyle-plugin.version>
-        <guava.version>33.4.8-jre</guava.version>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
-
-    <dependencyManagement>
-        <dependencies>
-            <!-- TestNG -->
-            <dependency>
-                <groupId>org.testng</groupId>
-                <artifactId>testng</artifactId>
-                <version>${testng.version}</version>
-                <scope>test</scope>
-            </dependency>
-
-            <!-- Логирование -->
-            <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-api</artifactId>
-                <version>${slf4j-api.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>ch.qos.logback</groupId>
-                <artifactId>logback-classic</artifactId>
-                <version>${logback-classic.version}</version>
-            </dependency>
-        </dependencies>
-
-    </dependencyManagement>
-
     <dependencies>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -63,23 +26,6 @@
     </dependencies>
 
     <build>
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-checkstyle-plugin</artifactId>
-                    <version>${checkstyle-plugin.version}</version>
-                    <dependencies>
-                        <dependency>
-                            <groupId>com.google.guava</groupId>
-                            <artifactId>guava</artifactId>
-                            <version>${guava.version}</version>
-                        </dependency>
-                    </dependencies>
-                </plugin>
-            </plugins>
-        </pluginManagement>
-
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
