@@ -5,10 +5,15 @@
     <parent>
         <groupId>org.example</groupId>
         <artifactId>oopJava</artifactId>
-        <version>1.0.0</version>
+        <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>concepts</artifactId>
+    <artifactId>assignments</artifactId>
     <packaging>pom</packaging>
 
+    <modules>
+        <module>calc-parser</module>
+        <module>fin-calc</module>
+        <module>line-appender</module>
+    </modules>
 </project>

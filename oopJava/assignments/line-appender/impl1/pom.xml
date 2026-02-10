@@ -11,7 +11,16 @@
     </parent>
 
     <artifactId>impl1</artifactId>
+    <packaging>jar</packaging>
 
-    <name>реализация api</name>
-    
+    <name>реализация api #1</name>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.example</groupId>
+            <artifactId>api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+    </dependencies>
+
 </project>
