@@ -11,8 +11,9 @@
     </parent>
 
     <artifactId>api</artifactId>
+    <packaging>jar</packaging>
 
     <name>API модуль</name>
-    <description>Интерфейсы для построчного копировальщика</description>
+    <description>Интерфейсы построчного копировальщика</description>
     
 </project>
