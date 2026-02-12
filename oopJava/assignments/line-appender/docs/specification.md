@@ -29,7 +29,7 @@
   
 в целевом файле каждая строка имеет определенный формат  
   
-[target_line_num] source_file_name:src_line_num src_line_text nl  
+`[target_line_num] source_file_name:src_line_num src_line_text nl`  
   
 target_line_num - номер строки в целевом файле  
 source_file_name - имя исходного файла  
