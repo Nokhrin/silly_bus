@@ -1,4 +1,4 @@
-package main.java.org.example.polymorphism;
+package main.java.org.example.polymorphism.payments;
 
 /**
  * для каждой задачи - свой метод
@@ -21,21 +21,5 @@ class Payment implements PaymentNoPoly {
     public boolean processCashPayment() {
         System.out.println("оплата наличными");
         return false;
-    }
-}
-
-
-class Main {
-    public static void main(String[] args) {
-        Payment payment1 = new Payment();
-
-        String userInput = "безнал, пожалуйста";
-
-        if (userInput.equalsIgnoreCase("безнал, пожалуйста")) {
-            payment1.processCardPayment();
-
-        } else {
-            payment1.processCashPayment();
-        }
     }
 }

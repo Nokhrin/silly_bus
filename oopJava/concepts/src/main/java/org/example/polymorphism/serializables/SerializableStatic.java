@@ -1,4 +1,4 @@
-package main.java.org.example.polymorphism;
+package main.java.org.example.polymorphism.serializables;
 
 
 /**
