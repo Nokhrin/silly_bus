@@ -3,7 +3,7 @@ package main.java.org.example.polymorphism.shapes;
 import java.util.List;
 import java.util.Objects;
 
-public class AreasManagerNoOcp {
+public class AreasManagerNoPoly {
     public static double sumAreas(List<Objects> shapes) {
         double sum = 0;
 
