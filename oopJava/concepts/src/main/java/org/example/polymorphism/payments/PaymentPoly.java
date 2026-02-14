@@ -1,7 +1,7 @@
 /**
  * разные реализации метода с одной сигнатурой
  */
-package polymorphism;
+package main.java.org.example.polymorphism.payments;
 
 // тип PaymentPoly объявляет операцию, доступную для использования 
 interface PaymentPoly {
