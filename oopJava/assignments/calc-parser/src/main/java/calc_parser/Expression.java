@@ -1,7 +1,7 @@
 package calc_parser;
 
 /**
- * Выражение
+ * Выражение.
  */
 public sealed interface Expression permits Atom, BinaryExpression, NumValue, UnaryExpression {
     double evaluate();  // абстрактный метод => наследники обязаны реализовать evaluate
