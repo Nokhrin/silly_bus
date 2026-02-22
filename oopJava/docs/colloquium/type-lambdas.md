@@ -1,7 +1,5 @@
 # Лямбда-выражения в Java  
   
-> введены в Java 8  
-  
 ## Положение в архитектуре  
 Интерфейс  
 v  
@@ -12,12 +10,16 @@ v
 переменная типа функционального интерфейса  
   
 ## Прагматика  
+  
+  
+  
 не создавать класс для разовых вычислений, действий => меньше строк кода в классах  
 создание лямбды - выполнение - результат  
   
 до лямбды решалось анонимными классами  
-введены как замена анонимных классов  
+введены в Java 8  как замена анонимных классов  
 [анонимный класс vs лямбда выражение](../../concepts/src/main/java/org/example/lambdas/AnonymAndLambda.java)  
+  
   
 лямбды применять точечно - для переопределения и вызова одного метода  
 анонимные классы применять, когда требуется расширить класс: переопределить >1 метода, добавить поля  
@@ -31,7 +33,7 @@ v
   
 ## Синтаксис  
   
-Лямбда-выражения в Java - метод, не имеющий имени, блок кода, принимающий аргументы и возвращающий значение   
+Лямбда-выражения в Java - метод, не имеющий имени, блок кода, принимающий аргументы и возвращающий значение  
   
 Элементы:  
 - формальные параметры, >=1  
@@ -49,7 +51,87 @@ statement != expression
   
 однако  
 и statement, и expression могут быть вызовом метода  
-так как вызов метода - может приводить к действию, может приводить к возвращению значения   
+так как вызов метода - может приводить к действию, может приводить к возвращению значения  
+  
+## Сигнатура функции  
+  
+Функция принимает на вход аргументы (>=0) и возвращает результат  
+Сигнатура - запись требований к типам аргументов и результата  
+Сигнатура всегда содержит тип результата  
+Сигнатура может содержать имя функции (сигнатура анонимной функции не содержит имени по определению)  
+Сигнатура может содержать формальные параметры - типы+имена аргументов (если формальных параметров нет, указываются пустые скобки)  
+  
+Сигнатура лямбда-выражения  
+Лямбда - реализация функционального интерфейса  
+=> содержит строго один метод  
+> // метод имеет сигнатуру  
+  
+=> для вызова метода не надо знать имя метода  
+> // можно исключить имя функции из сигнатуры  
+  
+=> для передачи аргументов достаточно передать значения ожидаемых типов в порядке, в котором ожидает функция  
+> // сигнатура предписывает порядок, может описывать имена параметров, но порядка достаточно для передачи аргументов  
+  
+Formal Parameter - формальный параметр - тип+имя параметра => явно указанный программистом ожидаемый тип значения входного аргумента  
+Inferred Formal Parameter - выведенный формальный параметр - формальный параметр, тип которого определяет компилятор  
+  
+```ebnf  
+LambdaExpression ::= LambdaParameters -> LambdaBody  
+LambdaParameters ::= Identifier ( [FormalParameterList] ) ( InferredFormalParameterList )  
+  
+FormalParameterList ::= ReceiverParameter  
+FormalParameters , LastFormalParameter  
+LastFormalParameter  
+FormalParameters ::= FormalParameter {, FormalParameter}  
+ReceiverParameter {, FormalParameter}  
+FormalParameter ::= {VariableModifier} UnannType VariableDeclaratorId  
+VariableModifier ::= (one of)  
+Annotation final  
+ReceiverParameter ::= {Annotation} UnannType [Identifier .] this  
+LastFormalParameter ::= {VariableModifier} UnannType {Annotation} ... VariableDeclaratorId  
+FormalParameter  
+  
+  
+  
+InferredFormalParameterList ::= Identifier {, Identifier}  
+  
+Identifier ::= IdentifierChars but not a Keyword or BooleanLiteral or NullLiteral  
+  
+IdentifierChars ::= JavaLetter {JavaLetterOrDigit}  
+JavaLetter ::= any Unicode character that is a "Java letter"  
+JavaLetterOrDigit ::= any Unicode character that is a "Java letter-or-digit"  
+  
+```  
+  
+### Пример: [функция факториала](../../concepts/src/main/java/org/example/lambdas/LambdasBasics.java#L87)  
+  
+```java  
+    public static long getFactorial(int num) {  
+        if (num == 0 || num == 1) {  
+            return 1;  
+        }  
+  
+        return num * getFactorial(num - 1);  
+    }  
+```  
+  
+имя функции  
+`getFactorial`  
+  
+аргументы функции  
+`int num`  
+  
+тип возвращаемого значения  
+`long`  
+  
+тело функции  
+```  
+if (num == 0 || num == 1) {  
+    return 1;  
+}  
+  
+return num * getFactorial(num - 1);  
+```  
   
   
 ## Лямбда как значение переменной  
@@ -57,20 +139,8 @@ statement != expression
 [функциональный интерфейс - пример](../../concepts/src/main/java/org/example/lambdas/IIntegerAction.java)  
 значение переменной - лямбда-выражение - обязано содержать параметры и возвращаемое значение типов, указанных в интерфейсе  
   
-  
-  
 [Лямбда - базовые операции - пример](../../concepts/src/main/java/org/example/lambdas/LambdasBasics.java)  
   
-  
-  
-  
-  
-### свойства лямбда-выражений в java  
-- лямбда-функция принимает параметры и возвращает значение  
-  - (parameter1, parameter2, ..., parameterN)   → expression  
-- лямбда-функция не имеет имени - анонимна  
-- лямбда-функция может быть передана как параметр другой функции  
-- лямбда-функция может быть значением переменной  
   
   
 ### функциональные интерфейсы / ФИ  
@@ -81,7 +151,7 @@ statement != expression
 лямбда-выражение может быть передано как реализация абстрактного метода  
   
   
-### стандартные интерфейсы Function, Consumer, Supplier BiFunction, BiConsumer  
+### функциональные интерфейсы модуля java.util.function  
 - java.util.function содержит функциональные интерфейсы  
 - стандартные - наиболее часто используемые  
 - в качестве типов данных могут применяться обозначения `T`, `R`, например, `Function<T, R>`  
