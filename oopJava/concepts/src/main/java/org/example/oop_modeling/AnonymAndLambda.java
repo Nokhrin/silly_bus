@@ -1,4 +1,4 @@
-package org.example.lambdas;
+package org.example.oop_modeling;
 
 public class AnonymAndLambda {
     public static void main(String[] args) {

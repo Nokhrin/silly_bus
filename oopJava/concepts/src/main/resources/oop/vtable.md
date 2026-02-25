@@ -11,4 +11,4 @@ vtable | method table - структура данных в метаданных 
 JVM читает фактический тип объекта и вызывает метод, который указан в vtable для этого типа   
 => экономия времени на последовательном поиске реализации в иерархии классов: O(1) вместо O(n)  
   
-[переопределение - пример](../../concepts/src/main/java/org/example/inheritance/ShapesVtable.java)  
+[переопределение - пример](../../java/org/example/inheritance/ShapesVtable.java)  

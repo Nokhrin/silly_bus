@@ -1,48 +1,16 @@
-package org.example.lambdas;
+package org.example.oop_modeling;
 
 /**
  * Лямбда-функции - базовые операции
  */
-public class LambdasBasics {
+public class MethodModel {
     /**
      * работы с лямбдами как с переменными
      */
     public static void main(String[] args) {
         System.out.println("=== начало ===");
-        
-        // а) определить/объявить переменную типа лямбды
         IIntegerAction lambdaN; // объявление переменной
-        System.out.println("\nА");
-//        System.out.println("тип переменной lambdaN: " + lambdaN.getClass().getSimpleName());
-        //java: variable lambdaN might not have been initialized => переменная объявлена, не инициализирована
-        
-        // б) запись в переменную значения типа лямбды
         lambdaN = n -> n*n;
-        System.out.println("\nБ");
-        System.out.println("тип в runtime - ссылка на объект лямбды: " + lambdaN.getClass().getSimpleName());
-        //тип переменной lambdaN: LambdasBasics$$Lambda/0x000076c6f4002bf8
-        
-        // в) чтение значения типа лямбды из переменной - с целью выполнить метод
-        System.out.println("\nВ");
-//        lambdaN.perform(5); // вызов метода, реализованного лямбдой
-        System.out.println("результат вычисления: " + lambdaN.perform(5)); // вычисление
-        //результат вычисления: 25
-
-        // г) передача значения типа лямбды из переменной в метод через стек 
-        //     * -> передача указателя на функцию методу
-        System.out.println("\nГ");
-        getLambda(lambdaN, 8); // опосредованная передача значения лямбде
-        System.out.println("тип в runtime - ссылка на интерфейс: " + getLambda(lambdaN, 8).getClass().getSimpleName());
-        //ссылка на интерфейс: LambdasBasics$$Lambda/0x00007ad0bc002bf8
-
-        // д) получение переменных / значений в результате вызова метода
-        //     * -> метод возвращает указатель на функцию
-        System.out.println("\nД");
-        IIntegerAction calcSquare = getLambda(lambdaN, 8); 
-        System.out.println("тип в runtime - ссылка на интерфейс: " + calcSquare.getClass().getSimpleName());
-        //ссылка на интерфейс: LambdasBasics$$Lambda/0x00007ad0bc002bf8
-        System.out.println("результат вычисления: " + calcSquare.perform(5)); // вычисление
-        //результат вычисления: 25
 
         // полиморфизм ссылок
         // up cast из типа лямбды к типу object - явное приведение типа с расширением  от Lambda к Object
@@ -78,7 +46,7 @@ public class LambdasBasics {
         System.out.println("\nЗ");
         // статический метод
         // variable = Myclass::static_method
-        IIntegerAction lambdaVar = LambdasBasics::getFactorial;
+        IIntegerAction lambdaVar = num -> getFactorial(num);
         System.out.println("Myclass::static_method -> " + lambdaVar.getClass().getSimpleName());
         //лямбда - ссылка на существующий метод: LambdasBasics$$Lambda/0x00007dac44004800
         System.out.println("результат вычисления: " + lambdaVar.perform(5)); // вычисление
@@ -88,8 +56,8 @@ public class LambdasBasics {
         System.out.println("\nИ");
         // метод экземпляра конкретного объекта
         // variable = object::instance_method 
-        LambdasBasics lambdasBasics = new LambdasBasics();
-        IIntegerAction lambdaVarObjInstance = lambdasBasics::getCube;
+        MethodModel lambdasBasics = new MethodModel();
+        IIntegerAction lambdaVarObjInstance = num -> lambdasBasics.getCube(num);
         System.out.println("object::instance_method -> " + lambdaVarObjInstance.getClass().getSimpleName());
         System.out.println("результат вычисления: " + lambdaVarObjInstance.perform(4));
         //object::instance_method -> LambdasBasics$$Lambda/0x00007f41f8004a18
@@ -98,7 +66,7 @@ public class LambdasBasics {
         System.out.println("\nК");
         // метод экземпляра текущего объекта
         // variable = this::instance_method 
-        LambdasBasics instance = new LambdasBasics();
+        MethodModel instance = new MethodModel();
         System.out.println("this::instance_method -> " + instance.getClass().getSimpleName());
         System.out.println("результат вычисления: " + instance.testCube(5));
         //this::instance_method -> LambdasBasics
@@ -132,7 +100,7 @@ public class LambdasBasics {
      * ссылается на метод текущего экземпляра
      */
     public int testCube(int n) {
-        IIntegerAction lambdaVarThis = this::getCube;
+        IIntegerAction lambdaVarThis = num -> getCube(num);
         return  lambdaVarThis.perform(n);
     }
 

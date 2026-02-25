@@ -212,7 +212,7 @@ public class MainBroken {
 
 ---
 
-[Почему подсказки типов / аннотации типов в Python - отстой](../typing/why-type-hinting-sucks.md)
+[Почему подсказки типов / аннотации типов в Python - отстой](../../../../../docs/typing/why-type-hinting-sucks.md)
 
 ---
 
