@@ -18,7 +18,7 @@ v
   
 до лямбды решалось анонимными классами  
 введены в Java 8  как замена анонимных классов  
-[анонимный класс vs лямбда выражение](../../concepts/src/main/java/org/example/lambdas/AnonymAndLambda.java)  
+[анонимный класс vs лямбда выражение](../../concepts/src/main/java/org/example/oop_modeling/AnonymAndLambda.java)  
   
   
 лямбды применять точечно - для переопределения и вызова одного метода  
@@ -40,7 +40,7 @@ v
 - применение | стрелка | `->`  
 - тело ::= выражение | '{' [return] {выражение;} '}'  
   
-[анонимный класс vs лямбда выражение](../../concepts/src/main/java/org/example/lambdas/AnonymAndLambda.java)  
+[анонимный класс vs лямбда выражение](../../concepts/src/main/java/org/example/oop_modeling/AnonymAndLambda.java)  
   
 statement != expression  
 `statement` - **инструкция**, выполняет действие, не возвращает значение  
@@ -103,7 +103,7 @@ JavaLetterOrDigit ::= any Unicode character that is a "Java letter-or-digit"
   
 ```  
   
-### Пример: [функция факториала](../../concepts/src/main/java/org/example/lambdas/LambdasBasics.java#L87)  
+### Пример: [функция факториала](../../concepts/src/main/java/org/example/oop_modeling/LambdasBasics.java#L87)  
   
 ```java  
     public static long getFactorial(int num) {  
@@ -136,10 +136,10 @@ return num * getFactorial(num - 1);
   
 ## Лямбда как значение переменной  
 тип переменной - функциональный интерфейс  
-[функциональный интерфейс - пример](../../concepts/src/main/java/org/example/lambdas/IIntegerAction.java)  
+[функциональный интерфейс - пример](../../concepts/src/main/java/org/example/oop_modeling/IIntegerAction.java)  
 значение переменной - лямбда-выражение - обязано содержать параметры и возвращаемое значение типов, указанных в интерфейсе  
   
-[Лямбда - базовые операции - пример](../../concepts/src/main/java/org/example/lambdas/LambdasBasics.java)  
+[Лямбда - базовые операции - пример](../../concepts/src/main/java/org/example/oop_modeling/LambdasBasics.java)  
   
   
 ### инициализация лямбда переменной значением на существующий метод  
@@ -152,11 +152,11 @@ return num * getFactorial(num - 1);
 `object::instanceMethod` - метод экземпляра, контекст конкретного экземпляра  
 `this::instanceMethod` - метод экземпляра, контекст текущего экземпляра  
   
-[Лямбда <- существующий метод](../../concepts/src/main/java/org/example/lambdas/LambdasBasics.java#L77)  
+[Лямбда <- существующий метод](../../concepts/src/main/java/org/example/oop_modeling/LambdasBasics.java#L77)  
   
 `Class::instanceMethod` - метод экземпляра, контекст конкретного экземпляра, первый параметр: класс-получатель  
 
-[Лямбда <- пример `String::length`](../../concepts/src/main/java/org/example/lambdas/LambdasBasics.java#L107)  
+[Лямбда <- пример `String::length`](../../concepts/src/main/java/org/example/oop_modeling/LambdasBasics.java#L107)  
   
     
   

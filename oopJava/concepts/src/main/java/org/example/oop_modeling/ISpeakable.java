@@ -1,4 +1,4 @@
-package org.example.lambdas;
+package org.example.oop_modeling;
 
 /**
 
