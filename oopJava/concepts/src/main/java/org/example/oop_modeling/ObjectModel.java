@@ -2,50 +2,63 @@ package org.example.oop_modeling;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.lang.Runnable;
 
 /**
  * Моделирование объекта Animal в стиле JavaScript
  * структура = поля + методы
  * моделируется как Мар<String,Object>
+ *     
+ *     объект хранит функцию как правило
+ *     v
+ *     чтение по ключу возвращает правило (функцию)
+ *     v
+ *     применение параметра создает конкретный вызов функции
+ *     v
+ *     вызов выполняет функцию
+ *     
+ *     словарь Мар<String,Object> содержит ключ "makeSound" -> значение типа Object
+ *     get("makeSound") -> значение типа Object => требуется приведение к Runnable
+ *     значение типа Runnable - реализация функционального интерфейса с методом run()
+ *     
  */
 public class ObjectModel {
+    /**
+     * Эмуляция оператора new
+     * возвращает Мар<String,Object>
+     */
+    static Map<String, Object> newAnimal() {
+        Map<String, Object> animal = new HashMap<>();
+        animal.put("name", "Class Animal");
+        // явное приведение - гарантировать компилятору, что тип вычисленного значения будет Runnable
+        animal.put("makeSound", (Runnable) () -> System.out.println("Some sound"));
+        return animal;
+    }
 
     /**
-     * Моделирование объекта Animal в стиле JavaScript
-     * функциональный интерфейс
-    // Объект Мар<String,Object> должен содержать значение makeSound, 
-    // Тип значения Runnable
+     * ПОлучает функцию из мапы, приводит к Runnable, выполняет
+     * @param object
+     * @param method
+     * @return
      */
-    interface ISoundmaking {
-        void make(String sound);
+    static void callingAnimal(Map<String, Object> object, String method) {
+        Object action = object.get(method);
+        ((Runnable) action).run();
     }
-    
+
     public static void main(String[] args) {
         System.out.println("=== начало ===");
-        // class Animal
-        Map<String, Object> Animal = new HashMap<>();
-        ISoundmaking makeSound;
 
-        makeSound = sound -> System.out.println("Animal: " + sound);
-        Animal.put("makeSound", makeSound);
-
-//    void makeSound() { System.out.println("Some sound"); }
-        ((ISoundmaking)Animal.get("makeSound")).make("Some sound");
-
-        // class Dog
-        // переопределение
-        Map<String, Object> Dog = new HashMap<>();
-        makeSound = sound -> System.out.println("Dog: " + sound);
-        Dog.put("makeSound", makeSound);
-
-//    void makeSound() { System.out.println("Bark"); }
-        ((ISoundmaking)Dog.get("makeSound")).make("Bark");
+        // Эмуляция оператора new
+        var obj = newAnimal();
+ 
+        // Вызвать у объекта метод makeSound()
+        callingAnimal(obj, "makeSound");
 
         System.out.println("=== завершение ===");
     }
 }
 
 //=== начало ===
-//Animal: Some sound
-//Dog: Bark
+//Some sound
 //=== завершение ===
