@@ -34,6 +34,7 @@ public class ObjectModel {
     }
 
     /**
+     * Добавить метод newDog()
      * result = {HashMap@822}  size = 1
      *  "makeSound" -> {ObjectModel$lambda@828}
      *   key = "makeSound"
@@ -45,12 +46,16 @@ public class ObjectModel {
         
         // модель полиморфизма
         // - имя метода фиксировано: "makeSound"
-        // - метод принимает значение типа Runnable
-        // - сигнатура `(Runnable) () -> System.out.println("Bark")`
+        // - метод есть значение типа Runnable, получаемое по ключу "makeSound"
+        // => эмуляция полиморфизма - вызов по фиксированному ключу метода, которые заранее неизвестен
+        // => динамическая диспетчеризация - знаю как вызвать, что будет вызвано конкретно - не знаю
         //
         // модель vtable: 
         //  "makeSound" - id метода
         //  (Runnable) () -> System.out.println("Bark") - фактическая реализация метода, ссылку на которую содержит id метода
+        // где
+        //  () -> System.out.println("Bark") - реализация Runnable, объект Lambda
+        //  (Runnable) - явное приведение, гарантия вернуть Runnable
         dog.put("makeSound", (Runnable) () -> System.out.println("Bark"));
         return dog;
     }
@@ -64,7 +69,9 @@ public class ObjectModel {
     static void callingAnimal(Map<String, Object> object) {
         // объяснить почему метод callingAnimal работает
         //
-        // проявление полиморфизма в compile-time
+        // проявление полиморфизма 
+        // - в compile-time объявляется тип Object
+        // - в runtime - приведение Object к Runnable, вызов run()
         // - пара String->Object является корректным значением
         // - обработка экземпляра Object недоступна в compile - выполняется далее в runtime 
         //
@@ -80,10 +87,28 @@ public class ObjectModel {
         //  => лямбда-выражение - реализует интерфейс с единственным методом (функциональный интерфейс)
         //  
         //  нет явного переопределения метода Runnable.run()
+        //  гипотеза: выполняется неявное переопределение
+        //      компилятор генерирует связь между run() и телом лямбда-выражения
+        //
         //  каким образом вызов Runnable.run() приводит к вычислению лямбда-выражения?
         // 
+        // определен целевой тип Runnable
+        // (Runnable) () -> System.out.println("Bark")
+        // v
+        // тело лямбды компилятор преобразует в метод класса ObjectModel
+        //  class ObjectModel {
+        //      private static void lambda1() { System.out.println("Bark"); }
+        //  }
+        // v
+        // вызов run() связывается с lambda1()
+        // v
+        // выполнение run() выполняет lambda1()
+        // v
+        // наблюдаемое поведение - вычислено лямбда-выражение
         // 
         // модель ошибки
+        //
+        // =========
         //
         //  ошибка возможна при нарушении структуры - нет ключа с таким именем
         //  => get вернет null
@@ -117,6 +142,7 @@ public class ObjectModel {
         //
         //
         Object action = object.get("makeSound");
+        System.out.println("DEBUG: " + action);
         ((Runnable) action).run();
     }
 
@@ -129,6 +155,7 @@ public class ObjectModel {
         // Вызвать у объекта метод makeSound()
         callingAnimal(obj);
 
+        // Не меняя реализацию callingAnimal передать объект dog, ожидаем ответ Bark
         obj = newDog();
         callingAnimal(obj);
         
