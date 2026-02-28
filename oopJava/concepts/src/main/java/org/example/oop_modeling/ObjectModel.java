@@ -142,7 +142,6 @@ public class ObjectModel {
         //
         //
         Object action = object.get("makeSound");
-        System.out.println("DEBUG: " + action);
         ((Runnable) action).run();
     }
 
