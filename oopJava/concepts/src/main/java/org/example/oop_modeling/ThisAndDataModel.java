@@ -2,13 +2,11 @@ package org.example.oop_modeling;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.lang.Runnable;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 /**
  * Моделирование this и данных
- * > wip
  * <p>
  * Задача смоделировать работу ООП в стиле Javascript в аспектах:
  * • Чтение данных объекта
@@ -57,7 +55,7 @@ public class ThisAndDataModel {
         //    }
         // требуется принять значение
         // => параметризация лямбда-выражения => Runnable не подходит, использую Consumer
-        calculator.put("setValue", (Consumer<Integer>) v -> calculator.put("value", v));
+        calculator.put("setValue", (Consumer<Object>) v -> calculator.put("value", v));
 
         // Метод, использующий значение поля в математических операциях
         //    public int calculateSquare() {
@@ -65,10 +63,10 @@ public class ThisAndDataModel {
         //    }
         // требуется передать значение
         // => параметризация лямбда-выражения => Runnable не подходит, Consumer не подходит, использую Supplier
-        calculator.put("calculateSquare", (Supplier<Integer>) () -> {
+        calculator.put("calculateSquare", (Supplier<Object>) () -> {
             Integer value = (Integer) calculator.get("value");
             if (value == null) {
-                throw new IllegalArgumentException("Калькулятору не передано число");
+                throw new IllegalArgumentException("Калькулятору не передано значение");
             }
             return value * value;
         });
@@ -102,12 +100,12 @@ public class ThisAndDataModel {
         System.out.println(calculatingOperation(calc, "calculateSquare"));
 
         // * • Установить не допустимое значение (string или другой тип) и попытаться вычислить квадрат  
-//        calculatingOperation(calc, "setValue", "восемь");
-        // по спеке - тип значения value - int, в конструкторе привожу к Integer, передача строки приводит к исключению
-        //ClassCastException: class java.lang.String cannot be cast to class java.lang.Integer
-        
+        calculatingOperation(calc, "setValue", "восемь");
         System.out.println(calculatingOperation(calc, "getValue"));
-        System.out.println(calculatingOperation(calc, "calculateSquare"));
+        // ожидаемая ошибка приведения типа в строке 69: Integer value = (Integer) calculator.get("value");
+        // сигнатура (Integer) ожидает Integer, передан String
+//        System.out.println(calculatingOperation(calc, "calculateSquare"));
+        // ClassCastException: class java.lang.String cannot be cast to class java.lang.Integer
 
         // * всё взаимодействие с объектом должно проходить через его методы  
 
@@ -119,6 +117,5 @@ public class ThisAndDataModel {
 //null
 //8
 //64
-//8
-//64
+//восемь
 //=== завершение ===

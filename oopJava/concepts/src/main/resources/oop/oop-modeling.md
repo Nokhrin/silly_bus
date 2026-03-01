@@ -1,46 +1,46 @@
 # Моделирование ООП  
-  
+
 # Шаг 1 - Лямбда-функции - базовые операции  
-  
+
 работы с лямбдами как с переменными  
-  
+
 а) определить/объявить переменную типа лямбды  
-  
+
 б) запись в переменную значения типа лямбды  
-  
+
 в) чтение значения типа лямбды из переменной - с целью выполнить метод  
-  
-г) передача значения типа лямбды из переменной в метод через стек   
+
+г) передача значения типа лямбды из переменной в метод через стек  
 -> передача указателя на функцию методу  
-  
+
 д) получение переменных / значений в результате вызова метода  
 -> метод возвращает указатель на функцию  
 
 [Лямбда-функции - базовые операции - код](../../java/org/example/oop_modeling/LambdasBasics.java)  
-  
----
-  
+
+---  
+
 # Шаг 2 - Моделирование метода  
-  
+
 Реализовать метод, который:  
-  
+
 принимает на вход значение типа Object, которое может содержать указатель на лямбда-функцию  
-  
+
 выполняет явное приведение типа к сигнатуре  
-  
-Выполнением метода получить результаты:   
-  
+
+Выполнением метода получить результаты:  
+
 а) downcast выполнен, метод возвращает значение  
 б) downcast провален, метод генерирует исключение  
 
-[Моделирование метода - код](../../java/org/example/oop_modeling/MethodModel.java)
+[Моделирование метода - код](../../java/org/example/oop_modeling/MethodModel.java)  
 
----
-  
-# Шаг 3 - Моделирование Объекта   
-  
+---  
+
+# Шаг 3 - Моделирование Объекта  
+
 Моделирование объекта Animal в стиле JavaScript - Мар<String,Object>  
-  
+
 Их содержание это  
 1. Данные  
 2. Ссылки на методы  
@@ -50,37 +50,37 @@
    в обоих случаях вызываются методы  
    один возвращает Мар<String,Object>  
    другой получает Мар<String,Object>  
-  
+
 Задача 1  
-1) Эмуляция оператора new   
+1) Эмуляция оператора new  
 - создать метод который вернет новый объект класса Animal, тип объекта Мар<String,Object>  
-  
-2) Вызвать у объекта метод makeSound()   
+
+2) Вызвать у объекта метод makeSound()  
 ожидаем ответ Some sound  
 Объект Мар<String,Object> должен содержать значение makeSound, Тип значения Runnable  
-  
+
 3) Добавить метод newDog() - конструктор объекта класса Dog, который также возвращает Мар<String,Object>  
 Создать объект dog  
-Не меняя реализацию callingAnimal передать объект dog, ожидаем ответ Bark
+Не меняя реализацию callingAnimal передать объект dog, ожидаем ответ Bark  
 
-4) объяснить почему метод callingAnimal работает
+4) объяснить почему метод callingAnimal работает  
 привести пример когда работать не будет  
 
-[Моделирование объекта - код](../../java/org/example/oop_modeling/ObjectModel.java)
+[Моделирование объекта - код](../../java/org/example/oop_modeling/ObjectModel.java)  
 
----
+---  
 
-  
+
 # Шаг 4 - Моделирование this и данных  
-> wip
-  
+> wip  
+
 Задача смоделировать работу ООП в стиле Javascript в аспектах:  
 • Чтение данных объекта  
 • Изменение данных объекта  
 • Использование данных объекта с учетом типа  
-  
+
 Надо:  
-• Создать конструктор возвращающий данный объект тип javascript Мар <String,Object>, 
+• Создать конструктор возвращающий данный объект тип javascript Мар <String,Object>,  
 с инициализированным значением и таблицей Vtable  
 • вычислить квадрат (вызов метода)  
 ◦ реализация должна прочитывать value  
@@ -88,76 +88,78 @@
 • Установить не допустимое значение (string или другой тип) и попытаться вычислить квадрат  
 всё взаимодействие с объектом должно проходить через его методы  
 
-```java
-public class Calculator {
-    private int value; // Поле класса
+```java  
+public class Calculator {  
+    private int value; // Поле класса  
 
-    // Метод, изменяющий значение поля
-    public void setValue(int value) {
-        this.value = value;
-    }
+    // Метод, изменяющий значение поля  
+    public void setValue(int value) {  
+        this.value = value;  
+    }  
 
-    // Метод, использующий значение поля в математических операциях
-    public int calculateSquare() {
-        return value * value;
-    }
+    // Метод, использующий значение поля в математических операциях  
+    public int calculateSquare() {  
+        return value * value;  
+    }  
 
-    // Геттер для текущего значения (опционально)
-    public int getValue() {
-        return value;
-    }
-}
-```
+    // Геттер для текущего значения (опционально)  
+    public int getValue() {  
+        return value;  
+    }  
+}  
+```  
 
-[моделирование this и данных - код](../../java/org/example/oop_modeling/ThisAndDataModel.java)
+[Моделирование this и данных - код](../../java/org/example/oop_modeling/ThisAndDataModel.java)  
 
----
+---  
 
 # Шаг 5 - Моделирование Сигнатур методов  
-реализовать объекты в стиле Javascript
-повторить пример использования
-Тут разные методы и у них соответственно разные сигнатуры
+реализовать объекты в стиле Javascript  
+повторить пример использования  
+Тут разные методы и у них соответственно разные сигнатуры  
 
-```java
-public class MathOperations {
-    private int result;
+```java  
+public class MathOperations {  
+    private int result;  
 
-    // Метод без аргументов
-    public int getResult() {
-        return result;
-    }
+    // Метод без аргументов  
+    public int getResult() {  
+        return result;  
+    }  
 
-    // Метод с одним аргументом
-    public void setValue(int value) {
-        this.result = value;
-    }
+    // Метод с одним аргументом  
+    public void setValue(int value) {  
+        this.result = value;  
+    }  
 
-    // Метод с двумя аргументами
-    public void add(int a, int b) {
-        this.result = a + b;
-    }
+    // Метод с двумя аргументами  
+    public void add(int a, int b) {  
+        this.result = a + b;  
+    }  
 
-    // Также можно добавить метод, использующий текущее значение
-    public void multiplyBy(int multiplier) {
-        this.result *= multiplier;
-    }
-}
-```
+    // Также можно добавить метод, использующий текущее значение  
+    public void multiplyBy(int multiplier) {  
+        this.result *= multiplier;  
+    }  
+}  
+```  
 
-Пример использования
-```java
-public class Main {
-    public static void main(String[] args) {
-        MathOperations ops = new MathOperations();
+Пример использования  
+```java  
+public class Main {  
+    public static void main(String[] args) {  
+        MathOperations ops = new MathOperations();  
 
-        ops.add(5, 3);      // 2 аргумента → результат: 8
-        System.out.println(ops.getResult()); // 0 аргументов → вывод: 8
+        ops.add(5, 3);      // 2 аргумента → результат: 8  
+        System.out.println(ops.getResult()); // 0 аргументов → вывод: 8  
 
-        ops.setValue(10);     // 1 аргумент → результат: 10
-        System.out.println(ops.getResult()); // 0 аргументов → вывод: 10
+        ops.setValue(10);     // 1 аргумент → результат: 10  
+        System.out.println(ops.getResult()); // 0 аргументов → вывод: 10  
 
-        ops.multiplyBy(2);    // 1 аргумент → результат: 20
-        System.out.println(ops.getResult()); // 0 аргументов → вывод: 20
-    }
-}
-```
+        ops.multiplyBy(2);    // 1 аргумент → результат: 20  
+        System.out.println(ops.getResult()); // 0 аргументов → вывод: 20  
+    }  
+}  
+```  
+
+[Моделирование Сигнатур методов - код](../../java/org/example/oop_modeling/MethodSignatures.java)  
