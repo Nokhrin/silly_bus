@@ -21,7 +21,7 @@ public class MethodSignatures {
         Map<String, Object> operations = new HashMap<>();
 
         // private int result;
-        operations.put("result", null);
+        operations.put("result", 0);
         
         // Метод без аргументов
         //    public int getResult() {

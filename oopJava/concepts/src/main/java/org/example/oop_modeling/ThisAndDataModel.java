@@ -46,8 +46,8 @@ public class ThisAndDataModel {
         Map<String, Object> calculator = new HashMap<>(); // представляет vtable
 
         // Поле класса
-        // private int value; 
-        calculator.put("value", null);
+        // private int value; // Поле класса
+        calculator.put("value", 0);
 
         // Метод, изменяющий значение поля
         //    public void setValue(int value) {
