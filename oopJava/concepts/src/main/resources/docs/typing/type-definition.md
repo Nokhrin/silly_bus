@@ -14,7 +14,7 @@
   
 ## Прагматическое определение | Воплощение идеи | Для чего это?  
   
-Типизация не является частью [парадигмы ООП](oop-idea.md)  
+Типизация не является частью [парадигмы ООП](../colloquium/oop-idea.md)  
 Типизация - свойство языка программирование  
   
   
@@ -50,8 +50,8 @@
 если класс не open, то программист уверен, что класс не переопределен, ошибку в наследниках можно элиминировать  
   
 возможная проблема - использование класса в тестах, когда в тесте создается не экземпляр конкретного класса, а экземпляр наследника со структурой и поведением, отвечающим задаче теста  
-[мок реализуем - Java - not final class](../../concepts/src/main/java/org/example/inheritance/MockOpen.java)  
-[мок невозможен - Java - final class](../../concepts/src/main/java/org/example/inheritance/MockFinal.java)  
+[мок реализуем - Java - not final class](../../../java/org/example/inheritance/MockOpen.java)  
+[мок невозможен - Java - final class](../../../java/org/example/inheritance/MockFinal.java)  
   
 открытый тип - "открыт" означает - открыт для расширения (как в принципе OCP)   
 то есть :  
@@ -65,21 +65,21 @@ open метод может быть переопределен
 для наследования надо явно "открыть" класс, сделать not final - `open class Smth {}`  
   
 open interface может быть расширен без ограничений  
-[наследование классов в Kotlin по умолчанию (имитация на Java)](../../concepts/src/main/java/org/example/inheritance/NotificationKotlin.java)  
+[наследование классов в Kotlin по умолчанию (имитация на Java)](../../../java/org/example/inheritance/NotificationKotlin.java)  
   
 идея контроля наследования в Java:  
 sealed interface может быть расширен явно указанными подтипами, переданными в permits `sealed interface INotifications permits EmailNotifications`  
 то есть  
 sealed interface - открыты, но ограничены: конкретными наследниками, областью видимости - доступны на уровне модуля  
-[наследование типа в Java](../../concepts/src/main/java/org/example/inheritance/INotification.java)  
-[наследование без ограничения Java - class](../../concepts/src/main/java/org/example/inheritance/EmailJavaOpen.java)  
-[ограничение наследование Java - final class](../../concepts/src/main/java/org/example/inheritance/EmailJavaFinal.java)  
-[ограничение наследование Java - sealed class](../../concepts/src/main/java/org/example/inheritance/EmailJavaSealed.java)  
+[наследование типа в Java](../../../java/org/example/inheritance/INotification.java)  
+[наследование без ограничения Java - class](../../../java/org/example/inheritance/EmailJavaOpen.java)  
+[ограничение наследование Java - final class](../../../java/org/example/inheritance/EmailJavaFinal.java)  
+[ограничение наследование Java - sealed class](../../../java/org/example/inheritance/EmailJavaSealed.java)  
   
 в Java `class Something`, `interface IActionable` - по умолчанию открыты  
 возможная проблема: наследование без контроля, в случае изменения базового класса может перестать работать код наследников, множество которых не определено, надо искать, отлаживать  
 открыт  
-[наследование классов в Java по умолчанию](../../concepts/src/main/java/org/example/inheritance/NotificationJava.java)  
+[наследование классов в Java по умолчанию](../../../java/org/example/inheritance/NotificationJava.java)  
   
   
 ## Связь между закрытыми типами (sealed) и pattern matching  
@@ -91,5 +91,5 @@ pattern matching сопоставляет объект с типом и извл
 sealed предоставляет компилятору исчерпывающий перечень подтипов в permits  
 pattern matching (в выражении switch) обеспечивает проверку подтипов из перечня в compile time => не требуется default, невозможны "неучтенные" типы  
   
-[switch без sealed](../../concepts/src/main/java/org/example/inheritance/INotificationSwitchWithoutSealed.java)  
-[switch с sealed](../../concepts/src/main/java/org/example/inheritance/INotificationSwitchWithSealed.java)  
+[switch без sealed](../../../java/org/example/inheritance/INotificationSwitchWithoutSealed.java)  
+[switch с sealed](../../../java/org/example/inheritance/INotificationSwitchWithSealed.java)  
