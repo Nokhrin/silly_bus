@@ -1,5 +1,40 @@
 цель: осознанное проектирование систем, способность принять решение о целесообразности решения  
 
+
+---  
+
+
+атом знания: инструмент=(способность объяснить + умение применить)
+
+
+---  
+
+# Knowledge Tree
+> корень - инженерия по
+> ветви - род инструмента
+> листья - конкретный инструмент
+
+Управление жизненным циклом кода (Code Lifecycle)
+    Контроль версий (Version Control):  Git
+    Сборка и зависимости (Build/Dependency):  Maven
+Инфраструктура и Выполнение (Infrastructure & Runtime)
+    Изоляция среды (Containerization):  Docker
+    Оркестрация кластеров (Orchestration/Dispatching):  Kubernetes
+Данные и Хранение (Data Management)
+    Интерфейс доступа (Access Interface):  JDBC
+    Паттерн операций (Operation Pattern):  CRUD
+    Системы управления (DBMS): PostgreSQL/MySQL
+Архитектура и Взаимодействие (Architecture & Interaction)
+    Архитектурный стиль (Style):  Микросервисы
+    Протоколы обмена (Messaging Protocol):  Kafka
+    Сетевые протоколы (Network Protocol):  HTTP/gRPC
+Управление процессами (Process Management)
+    Методологии (Methodologies):  Agile/Waterfall (как концепты)
+    Трекинг задач (Issue Tracking):  (Jira - пример)
+
+---
+
+
 # Knowledge Resources  
 
 ресурсы используются параллельно  
@@ -87,8 +122,3 @@ v
 | применение            | pet-project с использованием нового инструмента: бд, фреймворка, ci, контейнеров                           |          |  
 | логика                |                                                                                                            |          |  
 
----  
-
-# Knowledge Tree  
-
-TOGROW  
