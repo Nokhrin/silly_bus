@@ -15,6 +15,7 @@
         <module>calc-parser</module>
         <module>fin-calc</module>
         <module>line-appender</module>
-        <module>pipeline-processing-engine</module>
+        <module>lambda-parser</module>
     </modules>
+
 </project>
