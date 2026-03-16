@@ -3,51 +3,80 @@
 Сформировать понимание о устройстве лямбда (объект - функция).
 Привить базовые навыки применения лямбд.
 Показать особенности синтаксиса
+
 Кратко о устройстве
 Лямбда понятие совмещающее свойство объектов (сущностей) и функции (инструкций +
 аргументов + результатов)
 Со стороны функции
 result = lambda (arg1, arg2)
+
 Lambda - выглядит как функция, вызов функции с аргументами и результатом.
 В реализации Java вызов лямбда как функции выглядит как вызов метода объекта
 result = obj. арply (arg1, arg2)
 По факту реализация лямбд является объектом который реализует хотя бы один метод
 не зависимо от языка программирования
 В зависимости от языка лямбда это или „функциональный" объект со строго одной
-функций.
-Либо объект хотябы с одной функцией.
+функций. Либо объект хотябы с одной функцией.
+
 Если объекты это группа из данных 0+ (fields) и функций 0+ (methods), то
 лямбда - это объект который:из данных 0+ (fields) и функций 1+ (methods)
-Первая достигаямая цель разделить понятие функции и объекта который ведет себя как
-функция
-Практика 1
+
+# Практика 1
+
+Первая достигаямая цель 
+разделить понятие функции и объекта который ведет себя как функция
+
 Парсинг и парсеры представлены как функции с определенной сигнатурой:
-Optional< ParseResult< A> > parse- name (String source, int begin_offset)
-interface ParseResult < A> {
-A value ();
-int end_offset ();
+
+```java
+Optional<ParseResult<A>> parse(String source, int begin_offset);
+
+interface ParseResult<A> {
+    A value();
+
+    int end_offset();
 }
+```
+
 Теперь должен быть
-interface Parser < А > {
-Optional< ParseResult< A> > parse (String source, int begin_offset)
+```java
+interface Parser<А> {
+    Optional<ParseResult<A>> parse(String source, int begin_offset);
 }
+```
+
 Данный интерфейс по факту можно условно назвать лямбдой (1 метод), его называют
 функциональным, но это только в Java
-Реализовать синтаксис вида:
-integer {[whitespace] binary_operator [whitespace] integer}
+
+
+## Реализовать синтаксис 
+вида:
+`integer {[whitespace] binary_operator [whitespace] integer}`
+
 Это должен быть комбинированный объект Parser, который содержит другие объекты
 Parser.
+
 В результате этого синтаксиса должен быть объект вида (условный синтаксис)
-interface {
-Integer head ();
-List< Suffix> tail ();
+
+```java
+interface combined {
+
+    Integer head();
+
+    List<Suffix> tail();
 }
+
 interface Suffix {
-BinaryOperator operator ();
-Integer value ();
+    BinaryOperator operator();
+
+    Integer value();
 }
-Запрограммировать базовые части
+```
+
+## Запрограммировать базовые части
+
 1. Класс реализующий Parser< Integer>
+
 2. класс для Parser < Whitespace>
 3. класс для Parser < BinaryOperator>
    BinaryOperator это enum {add, sub, div, mul} - мат операции
