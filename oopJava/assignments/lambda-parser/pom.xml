@@ -9,6 +9,6 @@
     </parent>
 
     <artifactId>lambda-parser</artifactId>
-    <packaging>pom</packaging>
+    <packaging>jar</packaging>
 
 </project>
