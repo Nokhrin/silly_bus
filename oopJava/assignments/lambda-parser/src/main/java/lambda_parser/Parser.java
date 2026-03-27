@@ -5,6 +5,12 @@ import java.util.Optional;
 import java.util.function.Function;
 
 interface Parser<A> {
+    /**
+     * 
+     * @param source
+     * @param begin_offset - признак потребления строки
+     * @return
+     */
     Optional<ParseResult<A>> parse(String source, int begin_offset);
 
     default <B> Parser<B> map(Function<A, B> function) {

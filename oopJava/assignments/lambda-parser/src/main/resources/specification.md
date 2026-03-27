@@ -1,4 +1,26 @@
-# Реализовать парсер
+# Функциональный парсер-комбинатор
+
+## Требования
+
+```ebnf
+integer {[whitespace] binary_operator [whitespace] integer}
+```
+
+## Атомарные парсеры
+1. [Парсер integer](../java/lambda_parser/IntParser.java)
+2. [Парсер whitespace](../java/lambda_parser/WhitespaceParser.java)
+3. [Парсер binary_operator](../java/lambda_parser/BinaryOperatorParser.java)
+
+## Комбинаторы
+
+
+---
+
+### Стартовая постановка
+
+<details><summary>развернуть</summary>
+
+
 
 Парсинг и парсеры представлены как функции с определенной сигнатурой:
 
@@ -52,7 +74,7 @@ interface Suffix {
 
 ## Запрограммировать базовые части
 
-1. [Класс реализующий Parser< Integer>](../java/lambda_parser/IntParser.java)
+1. Класс реализующий Parser< Integer>
 
 2. класс для Parser < Whitespace>
 
@@ -211,3 +233,7 @@ interface Suffix {
     BinaryOperator operator ();
     Integer value ();
     }
+
+
+
+</details>

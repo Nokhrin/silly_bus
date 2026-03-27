@@ -1,36 +1,35 @@
 package lambda_parser;
 
-import java.util.function.Consumer;
+import java.util.List;
+import java.util.Optional;
 
 public class Main {
     public static void main(String[] args) {
-        String name = "lambda";
 
-        Consumer<String> lambda = (n) -> System.out.println(n + ", " + name); 
-        
-        lambda.accept(("hello"));
-        
-        // name = "world";
-        // изменение значения захваченной переменной вызовет ошибку
-        // java: local variables referenced from a lambda expression must be final or effectively final
-        
-        
-        
-        
-        // TODO
-        // Сборка парсеров в единый объект
-        //   Теперь собрать парсер
-        //   integer { binary_operator integer}
-        //   Допустим есть уже парсеры:
-        //   Parser < Integer> intР = ...
-        //   Parser < Whitespace> wsP =...
-        //   Parser < BinaryOperator> binР =...
-        //   Начать с простых конструкций:
-        //   integer binary_operator
-        //   Результат такого простого парсера record R1(Integer n, Binaryoperator о)
-        //   Должно быть примерно так
-        //   intP.plus( binP ).map( tuple - > new R1( tuple.a(), tuple.b() ) )
-        //   После по пробовать собрать такую конструкцию
-        //   integer { binary_operator integer}
+        Parser<Integer> parser = new IntParser();
+
+        List<String> inputs = List.of("123", "-123", "", "asd", "0", "-0", "9999999999999999999999", "-9999999999999999999999");
+
+        for (String input : inputs) {
+
+            Optional<ParseResult<Integer>> integerParseResult = parser.parse(input, 0);
+            integerParseResult.ifPresentOrElse(
+                    parseResult -> {
+                        System.out.println("Распознано число: " + parseResult.value());
+                    },
+                    () -> System.out.println("Не удалось распознать число в вводе")
+            );
+
+        }
     }
 }
+
+//Распознано число: 123
+//Распознано число: -123
+//Не удалось распознать число в вводе
+//Не удалось распознать число в вводе
+//Распознано число: 0
+//Распознано число: 0
+// TODO - переполнение
+//Распознано число: -1304428545
+//Распознано число: 1304428545

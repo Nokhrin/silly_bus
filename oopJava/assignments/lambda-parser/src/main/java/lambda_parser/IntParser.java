@@ -2,6 +2,9 @@ package lambda_parser;
 
 import java.util.Optional;
 
+/**
+ * integer = последовательность цифр, возможно со знаком. Останавливается на первом не-цифровом символе
+ */
 public class IntParser implements Parser {
     @Override
     public Optional<ParseResult<Integer>> parse(String source, int begin_offset) {
@@ -22,12 +25,12 @@ public class IntParser implements Parser {
             }
         }
 
-        Integer value = 0;
+        int result = 0;
         int start = offset;
 
         while (offset < source.length() && Character.isDigit(source.charAt(offset))) {
-            //приведение
-            value = value * 10 + (source.charAt(offset) - '0');
+            // приведение
+            result = result * 10 + (source.charAt(offset) - '0');
             offset++;
         }
 
@@ -38,11 +41,9 @@ public class IntParser implements Parser {
 
         // применение отрицания
         if (negative) {
-            int result = (int) -value;
-        } else {
-            int result = (int) value;
+            result = -1*result;
         }
         
-        return Optional.of(new ParseResultImpl<>(value, offset));
+        return Optional.of(new ParseResultImpl<>(result, offset));
     }
 }
