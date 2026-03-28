@@ -24,8 +24,9 @@ public class IntParser implements Parser {
                 return Optional.empty();
             }
         }
+        
+        long result = 0;
 
-        int result = 0;
         int start = offset;
 
         while (offset < source.length() && Character.isDigit(source.charAt(offset))) {
@@ -34,6 +35,15 @@ public class IntParser implements Parser {
             offset++;
         }
 
+        // проверка переполнения
+        if ((!negative && result > Integer.MAX_VALUE)) {
+            return Optional.empty();
+        }
+        if ((negative && -result < Integer.MIN_VALUE)) {
+            return Optional.empty();
+        }
+        
+
         // нет цифр
         if ((offset == start) && !negative) {
             return Optional.empty();
@@ -41,9 +51,9 @@ public class IntParser implements Parser {
 
         // применение отрицания
         if (negative) {
-            result = -1*result;
+            result = -1 * result;
         }
-        
-        return Optional.of(new ParseResultImpl<>(result, offset));
+
+        return Optional.of(new ParseResultImpl<>((int) result, offset));
     }
 }

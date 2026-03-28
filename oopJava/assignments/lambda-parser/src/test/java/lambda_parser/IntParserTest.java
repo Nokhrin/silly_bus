@@ -50,4 +50,16 @@ public class IntParserTest {
         assertTrue(result.isEmpty());
     }
 
+    @Test(description = "Переполнение Integer >0")
+    void testIntegerMaxValue() {
+        var result = integerParser.parse("99999999999999999", 0);
+        assertTrue(result.isEmpty());
+    }
+
+    @Test(description = "Переполнение Integer <0")
+    void testIntegerMinValue() {
+        var result = integerParser.parse("-99999999999999999", 0);
+        assertTrue(result.isEmpty());
+    }
+
 }

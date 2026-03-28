@@ -12,7 +12,8 @@ integer {[whitespace] binary_operator [whitespace] integer}
 3. [Парсер binary_operator](../java/lambda_parser/BinaryOperatorParser.java)
 
 ## Комбинаторы
-
+1. [Структура Combined]()
+1. [Структура Suffix]()
 
 ---
 
