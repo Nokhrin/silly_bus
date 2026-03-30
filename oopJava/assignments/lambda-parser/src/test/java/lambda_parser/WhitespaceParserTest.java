@@ -7,11 +7,19 @@ import static org.testng.Assert.*;
 public class WhitespaceParserTest {
     private final Parser<String> wsParser = new WhitespaceParser();
 
+    @Test(description = "Два пробела")
+    void testTwoSpaces() {
+        var result = wsParser.parse("  ", 0);
+        assertTrue(result.isPresent());
+        assertEquals("  ", result.get().value());
+        assertEquals(2, result.get().end_offset());
+    }
+
     @Test(description = "Один пробел")
     void testOneSpace() {
         var result = wsParser.parse(" ", 0);
         assertTrue(result.isPresent());
-        assertEquals("", result.get().value());
+        assertEquals(" ", result.get().value());
         assertEquals(1, result.get().end_offset());
     }
 
@@ -27,7 +35,7 @@ public class WhitespaceParserTest {
     void testMixedSpaces() {
         var result = wsParser.parse("\r\n\t ", 0);
         assertTrue(result.isPresent());
-        assertEquals("", result.get().value());
+        assertEquals("\r\n\t ", result.get().value());
         assertEquals(4, result.get().end_offset());
     }
 

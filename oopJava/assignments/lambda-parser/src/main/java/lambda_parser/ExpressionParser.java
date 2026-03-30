@@ -32,39 +32,31 @@ public class ExpressionParser implements Parser<Combined> {
         
         // integer
         Optional<ParseResult<Integer>> headInt = this.intParser.parse(source, offset);
-        headInt.ifPresentOrElse(
-                res -> System.out.println("прочитан HEAD: " + res.value()),
-                () ->  System.out.println("Не удалось прочитать HEAD")
-        );
-        
         if (headInt.isEmpty()) {return Optional.empty();}
         offset = headInt.get().end_offset();
-
 
         List<Suffix> suffixList = new ArrayList<>();
         while (true) {
             // {[whitespace] binary_operator [whitespace] integer}
+            int wsRollback = offset;
+            
             Optional<ParseResult<String>> ws1 = this.wsParser.parse(source, offset);
             offset = ws1.get().end_offset();
             
             Optional<ParseResult<BinaryOperatorParser.Operation>> op = this.operationParser.parse(source, offset);
             if (op.isEmpty()) {
-                System.out.println("Не удалось прочитать ОПЕРАТОР => парсинг завершен");
+                offset = wsRollback;
                 break;
             }
-            System.out.println("прочитан ОПЕРАТОР: " + op.get().value());
             offset = op.get().end_offset();
 
             Optional<ParseResult<String>> ws2 = this.wsParser.parse(source, offset);
             offset = ws2.get().end_offset();
 
             Optional<ParseResult<Integer>> tailInt = this.intParser.parse(source, offset);
-            tailInt.ifPresentOrElse(
-                    res -> System.out.println("прочитано число в TAIL: " + res.value()),
-                    () ->  System.out.println("Не удалось прочитать число в TAIL")
-            );
-
-            if (tailInt.isEmpty()) {return Optional.empty();}
+            if (tailInt.isEmpty()) {
+                return Optional.empty(); // оператор есть, числа нет => ошибка
+            }
             offset = tailInt.get().end_offset();
             
             SuffixImpl suffix = new SuffixImpl(op.get().value(), tailInt.get().value());
@@ -87,14 +79,16 @@ public class ExpressionParser implements Parser<Combined> {
 выполнение происходит последовательно, суффикс состоит из 2, 3 или 4 элементов
 [whitespace] binary_operator [whitespace] integer
 влияет линейно, так как читается каждый символ суффикса (M символов в суффиксе)
-время на чтение N суффиксов = N*M
+время на чтение N суффиксов = N*M - по факту это общее число символов строки, сложность линейная для  всех парсеров
 
 Как изменить ExpressionParser, чтобы поддерживать левую рекурсию (например, для вложенных выражений в скобках) без зацикливания?
 1 + ((2 + 3) + 4)
-добавить проверку символов скобок
+добавить проверку символов скобок, реализовать парсер атомарных выражений, например, AtomParser;  вызывать AtomParser в ExpressionParser
 
 Зачем возвращать структуру Combined с List<Suffix>, а не сразу вычислять результат выражения — не упростит ли это код?
 задача парсер - создание последовательности токенов, интерпретация токенов выполняется далее
 
 Если суффикс требует обязательное число после оператора, как распознать унарный минус в "1 + -2" — не противоречит ли это грамматике?
+грамматика не описывает унарные операторы, но описывает integer, который может быть числом с предшествующим минусом
+для поддержки Integer следует поддерживать парсинг строк, представляющих значения в [Integer.MIN_VALUE; Integer.MIN_VALUE] => [-2147483648; 2147483647]
  */

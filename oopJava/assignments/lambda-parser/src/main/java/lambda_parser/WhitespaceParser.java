@@ -21,7 +21,7 @@ public class WhitespaceParser implements Parser {
             offset++;
         }
 
-        return Optional.of(new ParseResultImpl<>("", offset));
+        return Optional.of(new ParseResultImpl<>(source.substring(begin_offset, offset), offset));
     }
 
 

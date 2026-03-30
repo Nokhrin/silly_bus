@@ -1,49 +1,17 @@
 package lambda_parser;
 
-import java.util.List;
+import java.util.Optional;
 
 public class Main {
     public static void main(String[] args) {
         Parser<Combined> parser = new ExpressionParser();
-
-        List<String> inputsExpressions = List.of(
-                "123 + 456", "123-456", "123* 456", "123 /456", "0+0 ", "999999999-999999999",
-                "1 + ((2 + 3) + 4)");
-
-        for (String input : inputsExpressions) {
-            parser.parse(input, 0);
-            
-        }
+        Optional<ParseResult<Combined>> result = parser.parse("123 + 456", 0);
+        
+        result.ifPresentOrElse(
+                res -> System.out.println(
+                        "\nHEAD: " + res.value().head() 
+                + "\nTAIL: " + res.value().tail().toString()),
+                () -> System.out.println("Парсинг не удался")
+        );
     }
-
 }
-
-/*
-прочитан HEAD: 123
-прочитан ОПЕРАТОР: ADD
-прочитано число в TAIL: 456
-Не удалось прочитать ОПЕРАТОР => парсинг завершен
-прочитан HEAD: 123
-прочитан ОПЕРАТОР: SUB
-прочитано число в TAIL: 456
-Не удалось прочитать ОПЕРАТОР => парсинг завершен
-прочитан HEAD: 123
-прочитан ОПЕРАТОР: MUL
-прочитано число в TAIL: 456
-Не удалось прочитать ОПЕРАТОР => парсинг завершен
-прочитан HEAD: 123
-прочитан ОПЕРАТОР: DIV
-прочитано число в TAIL: 456
-Не удалось прочитать ОПЕРАТОР => парсинг завершен
-прочитан HEAD: 0
-прочитан ОПЕРАТОР: ADD
-прочитано число в TAIL: 0
-Не удалось прочитать ОПЕРАТОР => парсинг завершен
-прочитан HEAD: 999999999
-прочитан ОПЕРАТОР: SUB
-прочитано число в TAIL: 999999999
-Не удалось прочитать ОПЕРАТОР => парсинг завершен
-прочитан HEAD: 1
-прочитан ОПЕРАТОР: ADD
-Не удалось прочитать число в TAIL
- */
