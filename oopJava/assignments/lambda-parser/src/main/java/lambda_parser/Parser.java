@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
-interface Parser<A> {
+public interface Parser<A> {
     /**
      * 
      * @param source
