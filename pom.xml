@@ -18,8 +18,9 @@
         <logback-classic.version>1.5.18</logback-classic.version>
         <slf4j-api.version>2.0.17</slf4j-api.version>
         <testng.version>7.9.0</testng.version>
+        <junit.version>5.11.0</junit.version>
         <checkstyle-plugin.version>3.4.0</checkstyle-plugin.version>
-        <guava.version>33.4.8-jre</guava.version>
+        <guava.version>33.5.0-jre</guava.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
@@ -31,6 +32,12 @@
                 <groupId>org.testng</groupId>
                 <artifactId>testng</artifactId>
                 <version>${testng.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter</artifactId>
+                <version>${junit.version}</version>
                 <scope>test</scope>
             </dependency>
 

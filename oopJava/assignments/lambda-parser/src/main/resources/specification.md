@@ -12,10 +12,8 @@ integer {[whitespace] binary_operator [whitespace] integer}
 3. [Парсер binary_operator](../java/lambda_parser/BinaryOperatorParser.java)
 
 ## Комбинаторы
-1. [Структура Combined](../java/lambda_parser/CombinedImpl.java)
-2. [Структура Suffix](../java/lambda_parser/SuffixImpl.java)
-3. [Парсер выражения](../java/lambda_parser/ExpressionParser.java)
-4. [Повторитель парсера](../java/lambda_parser/ListParser.java)
+1. [Структура Combined]()
+1. [Структура Suffix]()
 
 ---
 
@@ -23,44 +21,28 @@ integer {[whitespace] binary_operator [whitespace] integer}
 
 <details><summary>развернуть</summary>
 
-
-
-Парсинг и парсеры представлены как функции с определенной сигнатурой:
-
-```java
-Optional<ParseResult<A>> parse(String source, int begin_offset);
-
-interface ParseResult<A> {
-    A value();
-
-    int end_offset();
-}
-```
-
----
-
-Теперь должен быть
+парсер
 ```java
 interface Parser<А> {
     Optional<ParseResult<A>> parse(String source, int begin_offset);
 }
 ```
 
-Данный интерфейс по факту можно условно назвать лямбдой (1 метод), его называют
-функциональным, но это только в Java
-
-
+результат парсинга
+```java
+interface ParseResult<A> {
+    A value();
+    int end_offset();
+}
+```
 
 ---
 
-
 ## Синтаксис
-вида:
+
 `integer {[whitespace] binary_operator [whitespace] integer}`
 
-Это должен быть комбинированный объект Parser, который содержит другие объекты
-Parser.
-
+Это должен быть комбинированный объект Parser, который содержит другие объекты Parser.
 В результате этого синтаксиса должен быть объект вида (условный синтаксис)
 
 ```java
@@ -77,25 +59,18 @@ interface Suffix {
 
 ## Запрограммировать базовые части
 
-1. Класс реализующий Parser< Integer>
-
-2. класс для Parser < Whitespace>
-
-3. класс для Parser < BinaryOperator>
-   BinaryOperator это enum {add, sub, div, mul} - мат операции
-
-4. Класс реализующ ий Parser< List< A> > ,
-   который:
-- в конструкторе принимает Parser< А>
-
-- применяет принятый парсер для парсинга повторов во входных данных ( source,
-  offset)
-- Возвращает в случае совпадения результат.
-- Можно указать Минимальное /максимальное кол- во повторов (min, max)
-- Работает по „жадному" алгоритму.
-  Данный Parser < List < A > > является частю синтаксиса E BNF
-  В случае min = 0 & max = 1, это соответствует квадратным скобками в eBNF
-  В случае min = 0 & max > 0 - фигурным скобкам еBNF
+1. Класс реализующий Parser<Integer>
+2. класс для Parser<Whitespace>
+3. класс для Parser<BinaryOperator> - enum {add, sub, div, mul} - мат операции
+4. Класс реализующий Parser<List<A>> , который:
+   - в конструкторе принимает Parser<А>
+   - применяет принятый парсер для парсинга повторов во входных данных (source, offset)
+   - Возвращает в случае совпадения результат.
+   - Можно указать Минимальное /максимальное кол- во повторов (min, max)
+   - Работает по „жадному" алгоритму.
+     Данный Parser<List<A>> является частю синтаксиса EBNF
+     В случае min = 0 & max = 1, это соответствует квадратным скобками в eBNF
+     В случае min = 0 & max > 0 - фигурным скобкам еBNF
 
 5. Операцию Мар/FlatМар для Parser и
    ParserResult
@@ -106,9 +81,9 @@ interface Suffix {
    Операция Мар применяется к каждому элементу Function< A,B> , кол- во элементов
    контейнер остается не изменным
 
-Контейнер может быть любым List, Optional,....
+6. Контейнер может быть любым List, Optional,....
 
-условно map выглядит так:
+7. условно map выглядит так:
    < A,B> List< В> mapList(List< А> list, Function< А,В> f)
    Операция Flat Map выполняет аналогичную функцию, за исключение ограничения на
    кол- во элементов в контейнере результата
@@ -116,12 +91,12 @@ interface Suffix {
    Лямбда f принимает элемент и должна возвращать какое - то кол- во элементов другого
    типа 0+
 
-Лямбда f не обязательно должна возвращать List, зависит от требований
+8. Лямбда f не обязательно должна возвращать List, зависит от требований
 
-Используя Flat map можно как фильтровать/уменьшать содержимое исходного
+9. Используя Flat map можно как фильтровать/уменьшать содержимое исходного
    контейнера, так и увеличивать
 
-Необходимо реализовать map для
+10. Необходимо реализовать map для
 - ParseResult
 - Parser
 - 
@@ -142,7 +117,6 @@ interface Suffix {
   ...
   default < В> Parser < B> flatmap ( Function< A,Optional< B> > f)
   }
-
 6. Реализовать кортеж
    Кортеж типизированная коллекция, где каждый элемент имеет свой тип. Обычно такая
    коллекция не допускает бесконечное кол- во элементов.
