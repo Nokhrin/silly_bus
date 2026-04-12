@@ -1,15 +1,21 @@
-package lambda_parser;
+package com.parser.core;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
+/**
+ * Функциональный интерфейс парсера.
+ *
+ * @param <A> тип результата успешного парсинга
+ */
 public interface Parser<A> {
     /**
      *
-     * @param source
-     * @param begin_offset - признак потребления строки
-     * @return
+     * @param source входная строка
+     * @param begin_offset смещение начала парсинга
+     * @return Optional.empty() если парсинг неудачен, иначе ParseResult со значением и новым offset
+     *
+     * Time: зависит от реализации, Space: O(1) для атомарных парсеров
      */
     Optional<ParseResult<A>> parse(String source, int begin_offset);
 

@@ -1,11 +1,34 @@
-package lambda_parser;
+package com.parser.core;
 
 import java.util.function.Function;
 
+/**
+ * Результат успешного парсинга.
+ * Ошибка парсинга -> Optional.empty()
+ *
+ * @param <A> тип распарсенного значения
+ */
 public interface ParseResult<A> {
     A value();
-
     int end_offset();
+
+    /**
+     * Создает результат парсинга
+     * Time: O(1), Space: O(1)
+     */
+    static <A> ParseResult<A> of(A value, int end_offset) {
+        return new ParseResult<A>() {
+            @Override
+            public A value() {
+                return value;
+            }
+
+            @Override
+            public int end_offset() {
+                return end_offset;
+            }
+        };
+    }
 
     /**
      * Операцию Мар/FlatМар для Parser и
