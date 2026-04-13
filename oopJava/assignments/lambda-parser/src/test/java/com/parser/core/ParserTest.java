@@ -5,6 +5,7 @@ import com.parser.atomic.IntParser;
 import com.parser.atomic.WhitespaceParser;
 import org.testng.annotations.Test;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.testng.Assert.*;
@@ -14,7 +15,12 @@ public class ParserTest {
      * Парсер Integer
      */
     IntParser integerParser = new IntParser();
-    
+
+    /**
+     * Парсер пробельных символов
+     */
+    WhitespaceParser whitespaceParser = new WhitespaceParser();
+
     /**
      * Мок-парсер строки "123"
      */
@@ -31,7 +37,8 @@ public class ParserTest {
     private final Parser<Character> characterParser = (source, offset) -> {
         if (offset < source.length() && source.charAt(offset) == 'a') {
             return Optional.of(ParseResult.of('a', offset + 1));
-        };
+        }
+        ;
         return Optional.empty();
     };
 
@@ -173,4 +180,32 @@ public class ParserTest {
         assertEquals(result.get().end_offset(), 5);
     }
     //endregion plus
+
+    //region repeat, optional
+    @Test(description = "Repeat: Успешный парсинг нескольких чисел (min=2, max=5)")
+    public void testRepeat_multiple_success() {
+        Parser<Integer> intWsParser = integerParser
+                .plus(whitespaceParser.optional())
+                .map(Tuple2::a);
+        Parser<List<Integer>> listParser = intWsParser.repeat(2, 5);
+        Optional<ParseResult<List<Integer>>> result = listParser.parse("10 20 30", 0);
+
+        assertTrue(result.isPresent());
+        assertEquals(result.get().value().size(), 3);
+        assertEquals(result.get().value().get(0), Integer.valueOf(10));
+        assertEquals(result.get().value().get(1), Integer.valueOf(20));
+        assertEquals(result.get().value().get(2), Integer.valueOf(30));
+    }
+
+    @Test(description = "Optional: Элемент найден")
+    public void testOptional_present() {
+        Parser<Optional<Integer>> optionalParser = integerParser.optional();
+        Optional<ParseResult<Optional<Integer>>> result = optionalParser.parse("42 text", 0);
+
+        assertTrue(result.isPresent());
+        assertTrue(result.get().value().isPresent());
+        assertEquals(result.get().value().get(), Integer.valueOf(42));
+    }
+
+    //endregion repeat, optional
 }

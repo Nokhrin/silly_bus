@@ -1,9 +1,12 @@
 package com.parser.core;
 
 import com.parser.Main;
+import com.parser.combinator.ListParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.management.OperatingSystemMXBean;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -93,7 +96,7 @@ public interface Parser<A> {
             log.debug("Успешно выполнен парсинг первого выражения");
             ParseResult<A> firstParseResult = firstResultOptional.get();
 
-            Optional<ParseResult<B>> secondResultOptional = secondParser.parse(src,firstParseResult.end_offset());
+            Optional<ParseResult<B>> secondResultOptional = secondParser.parse(src, firstParseResult.end_offset());
             if (secondResultOptional.isEmpty()) {
                 log.debug("Не удалось выполнить парсинг второго выражения");
                 return Optional.empty();
@@ -101,10 +104,33 @@ public interface Parser<A> {
             log.debug("Успешно выполнен парсинг второго выражения");
             ParseResult<B> secondParseResult = secondResultOptional.get();
 
-            Tuple2<A,B> result = new Tuple2<>(firstParseResult.value(), secondParseResult.value());
+            Tuple2<A, B> result = new Tuple2<>(firstParseResult.value(), secondParseResult.value());
             log.debug("Успешно создан кортеж результатов парсинга");
             return Optional.of(ParseResult.of(result, secondParseResult.end_offset()));
         };
     }
 
+    /**
+     * Повторяет парсер от min до max раз
+     * Реализует грамматику {}
+     */
+    default Parser<List<A>> repeat(int min, int max) {
+        return new ListParser<>(this, min, max);
+    }
+
+    /**
+     * Повторяет парсер от 0 до 1 раз
+     * Реализует грамматику []
+     * == repeat(0, 1)
+     */
+    default Parser<Optional<A>> optional() {
+        Parser<List<A>> parser = this.repeat(0, 1);
+        return parser.map(resultList -> {
+            if (resultList.isEmpty())  {
+                log.debug("Совпадений не найдено");
+                return Optional.empty();
+            }
+            return Optional.of(resultList.getFirst());
+        });
+    }
 }
