@@ -17,16 +17,18 @@ public interface Parser<A> {
 
     /**
      * Выполняет парсинг
-     * @param source входная строка
+     *
+     * @param source       входная строка
      * @param begin_offset смещение начала парсинга
      * @return Optional.empty() если парсинг неудачен, иначе ParseResult со значением и новым offset
-     *
+     * <p>
      * Time: зависит от реализации, Space: O(1) для атомарных парсеров
      */
     Optional<ParseResult<A>> parse(String source, int begin_offset);
 
     /**
      * Применяет функцию к результату парсинга
+     *
      * @param function
      * @param <B>
      * @return результат парсинга типа, возвращенного примененной функцией
@@ -44,6 +46,12 @@ public interface Parser<A> {
 
     /**
      * Фильтрует, уменьшает, увеличивает содержимое исходного контейнера
+     * <p>
+     * Пример:
+     * спарсили число 123, результат парсинга корректен
+     * требуется получить только четные числа
+     * данный метод делает значение 123 некорректным, то есть, фильтрует
+     *
      * @param function
      * @param <B>
      * @return
@@ -70,6 +78,33 @@ public interface Parser<A> {
             return Optional.empty();
         };
 
+    }
+
+    /**
+     * Реализует логику Sequence: A B
+     */
+    default <B> Parser<Tuple2<A, B>> plus(Parser<B> secondParser) {
+        return (src, offset) -> {
+            Optional<ParseResult<A>> firstResultOptional = this.parse(src, offset);
+            if (firstResultOptional.isEmpty()) {
+                log.debug("Не удалось выполнить парсинг первого выражения");
+                return Optional.empty();
+            }
+            log.debug("Успешно выполнен парсинг первого выражения");
+            ParseResult<A> firstParseResult = firstResultOptional.get();
+
+            Optional<ParseResult<B>> secondResultOptional = secondParser.parse(src,firstParseResult.end_offset());
+            if (secondResultOptional.isEmpty()) {
+                log.debug("Не удалось выполнить парсинг второго выражения");
+                return Optional.empty();
+            }
+            log.debug("Успешно выполнен парсинг второго выражения");
+            ParseResult<B> secondParseResult = secondResultOptional.get();
+
+            Tuple2<A,B> result = new Tuple2<>(firstParseResult.value(), secondParseResult.value());
+            log.debug("Успешно создан кортеж результатов парсинга");
+            return Optional.of(ParseResult.of(result, secondParseResult.end_offset()));
+        };
     }
 
 }
