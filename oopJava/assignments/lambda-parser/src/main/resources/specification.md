@@ -6,14 +6,16 @@
 integer {[whitespace] binary_operator [whitespace] integer}
 ```
 
+## Интерфейсы
+1. Парсер
+2. Результат парсинга
+
 ## Атомарные парсеры
 1. [Парсер integer](../java/lambda_parser/IntParser.java)
 2. [Парсер whitespace](../java/lambda_parser/WhitespaceParser.java)
 3. [Парсер binary_operator](../java/lambda_parser/BinaryOperatorParser.java)
 
 ## Комбинаторы
-1. [Структура Combined]()
-1. [Структура Suffix]()
 
 ---
 
@@ -70,59 +72,57 @@ interface Suffix {
    - Работает по „жадному" алгоритму.
      Данный Parser<List<A>> является частю синтаксиса EBNF
      В случае min = 0 & max = 1, это соответствует квадратным скобками в eBNF
-     В случае min = 0 & max > 0 - фигурным скобкам еBNF
+     В случае min = 0 & max> 0 - фигурным скобкам еBNF
 
-5. Операцию Мар/FlatМар для Parser и
-   ParserResult
-   Операция Мар замена содержимого контейнера.
-   Операция должна порождать новый контейнер.
-   В статически типизируемых языках операция Мар меняет тип содержимого:
-   пример: List < String> на List < Boolean>
-   Операция Мар применяется к каждому элементу Function< A,B> , кол- во элементов
-   контейнер остается не изменным
+5. Операцию Мар/FlatМар для Parser и ParserResult
+Операция Мар замена содержимого контейнера.
+Операция должна порождать новый контейнер.
+В статически типизируемых языках операция Мар меняет тип содержимого:
+пример: List<String> на List<Boolean>
+Операция Мар применяется к каждому элементу Function<A,B> , кол- во элементов
+контейнер остается не изменным
+Контейнер может быть любым List, Optional,....
+условно map выглядит так:
+<A,B> List<В> mapList(List<А> list, Function<А,В> f)
 
-6. Контейнер может быть любым List, Optional,....
+Операция Flat Map выполняет аналогичную функцию, за исключение ограничения на
+кол- во элементов в контейнере результата
+<A,B> List<B> flatMapList(List<А> list, Function<А, List<В>> f)
+Лямбда f принимает элемент и должна возвращать какое - то кол- во элементов другого
+типа 0+
+Лямбда f не обязательно должна возвращать List, зависит от требований
 
-7. условно map выглядит так:
-   < A,B> List< В> mapList(List< А> list, Function< А,В> f)
-   Операция Flat Map выполняет аналогичную функцию, за исключение ограничения на
-   кол- во элементов в контейнере результата
-   < A,B> List< B> flatMapList(List< А> list, Function< А, List< В> > f)
-   Лямбда f принимает элемент и должна возвращать какое - то кол- во элементов другого
-   типа 0+
+Используя Flat map можно как фильтровать/уменьшать содержимое исходного
+контейнера, так и увеличивать
 
-8. Лямбда f не обязательно должна возвращать List, зависит от требований
-
-9. Используя Flat map можно как фильтровать/уменьшать содержимое исходного
-   контейнера, так и увеличивать
-
-10. Необходимо реализовать map для
+Необходимо реализовать map для
 - ParseResult
-- Parser
-- 
+  - Parser
+  - 
 
-  interface ParseResult< А> {
-  ...
-  default < В> ParseResult< B> map ( Function< A,B> f)
-  }
+    interface ParseResult<А> {
+    ...
+    default <В> ParseResult<B> map ( Function<A,B> f)
+    }
 
-- interface Parser < А> {
-  ...
-  default < В> Parser < B> map ( Function< A,B> f)
-  }
+  - interface Parser <А> {
+    ...
+    default <В> Parser <B> map ( Function<A,B> f)
+    }
 
-- Необходимо реализовать flatmap для
-- Parser
-  interface Parser < А> {
-  ...
-  default < В> Parser < B> flatmap ( Function< A,Optional< B> > f)
-  }
+  - Необходимо реализовать flatmap для
+  - Parser
+    interface Parser <А> {
+    ...
+    default <В> Parser <B> flatmap ( Function<A,Optional<B>> f)
+    }
+
 6. Реализовать кортеж
    Кортеж типизированная коллекция, где каждый элемент имеет свой тип. Обычно такая
    коллекция не допускает бесконечное кол- во элементов.
    Кортеж из 2х элементов
 ```java
-   interface Тuple2< А,В> {
+   interface Тuple2<А,В> {
    A a();
    В b();
    }
@@ -132,69 +132,69 @@ interface Suffix {
    digit letter
    Тут после цифры (digit) должна следовать буква (letter)
    Допустим есть 2 парсера:
-   Parser< Digit>
-   Parser< Letter>
-   Для digit letter должен существовать Parser< Тuple2< Digit,Letter> >
+   Parser<Digit>
+   Parser<Letter>
+   Для digit letter должен существовать Parser<Тuple2<Digit,Letter>>
    Необходимо создать операцию + для Parser
-   interface Parser < А> {
+   interface Parser <А> {
    ...
-   default < В>
-   Parser< Тuple2< A,B> > plus( Parser< B> p)
+   default <В>
+   Parser<Тuple2<A,B>> plus( Parser<B> p)
    }
 8. Операция repeat для еBNF
    На шаге 4 уже описывался синтаксис {} и [], теперь эти операции должны
    быть выражены в Parser
-   interface Parser < А> {
+   interface Parser <А> {
    ...
    default
-   Parser< List< A> >
+   Parser<List<A>>
    repeat (int min, int max)
    default
-   Parser< Optional< А> >
+   Parser<Optional<А>>
    optional()
    }
 9. Сборка парсеров в единый объект
    Теперь собрать парсер
    integer { binary_operator integer}
    Допустим есть уже парсеры:
-   Parser < Integer> intР = ...
-   Parser < Whitespace> wsP =...
-   Parser < BinaryOperator> binР =...
+   Parser <Integer> intР = ...
+   Parser <Whitespace> wsP =...
+   Parser <BinaryOperator> binР =...
    Начать с простых конструкций:
    integer binary_operator
    Результат такого простого парсера record R1(Integer n, Binaryoperator о)
    Должно быть примерно так
-   intP.plus( binP ).map( tuple - > new R1( tuple.a(), tuple.b() ) )
+   intP.plus( binP ).map( tuple -> new R1( tuple.a(), tuple.b() ) )
    После по пробовать собрать такую конструкцию
    integer { binary_operator integer}
 10. Доработать операцию +
-    interface Parser < А> {
+    interface Parser <А> {
     ...
-    default < В>
-    Plus< A,B> plus( Parser< B> p)
+    default <В>
+    Plus<A,B> plus( Parser<B> p)
     }
     где Plus это
-    interface Plus< A,В> extends Parser< Тuple2 < A,B> > {
-    Parser< А> skipRight();
-    Parser< В> skipLeft();
+    interface Plus<A,В> extends Parser<Тuple2 <A,B>> {
+    Parser<А> skipRight();
+    Parser<В> skipLeft();
     }
     Skip Left, Right отбрасываем через map значение (например whitespace)
 11. Реализовать контейнер Или (Either)
-    interface Either< А,В> {
-    static < A,В> Either< А,В> left(A a, Class< В> b)
-    static < A,В> Either< А,В> right (B b, Class< A > а)
-    Optional< А> getLeft();
-    Optional< В> getRight();
+    interface Either<А,В> {
+    static <A,В> Either<А,В> left(A a, Class<В> b)
+    static <A,В> Either<А,В> right (B b, Class<A> а)
+    Optional<А> getLeft();
+    Optional<В> getRight();
     }
     Контейнер хранит строго либо одно, либо другое значение.
     Контейнер не может не хранить значений
     Контейнер не может хранить оба значения одновременно
 12. Реализовать операцию Или в eBNF.
-    interface Parser < А> {
+    interface Parser <А> {
     ...
-    default < В>
-    Parser< Eitherrj < A,B> >
-    or( Parser< B> p)
+    default <В>
+    Parser<Eitherrj <A,B>>
+    or( Parser<B> p)
     }
 13. Попровать совместить Или и +
     [whitespace] binary_operator
@@ -206,7 +206,7 @@ interface Suffix {
     В результате этого синтаксиса должен быть объект вида (условный синтаксис)
     interface {
     Integer head ();
-    List< Suffix> tail ();
+    List<Suffix> tail ();
     }
     interface Suffix {
     BinaryOperator operator ();

@@ -35,6 +35,12 @@ public class ListParser<A> implements Parser<List<A>> {
         this.max = max;
     }
 
+    /**
+     * Повторяет вызов парсера
+     * @param source входная строка
+     * @param begin_offset смещение начала парсинга
+     * @return
+     */
     @Override
     public Optional<ParseResult<List<A>>> parse(String source, int begin_offset) {
         List<A> resultList = new ArrayList<>();
