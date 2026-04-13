@@ -26,7 +26,7 @@ public class ParserTest {
      */
     private final Parser<String> stringParser = (source, offset) -> {
         if (source.startsWith("123", offset)) {
-            return Optional.of(ParseResult.of("123", offset + 3));
+            return Optional.of(new ParseResult<>("123", offset + 3));
         }
         return Optional.empty();
     };
@@ -36,7 +36,7 @@ public class ParserTest {
      */
     private final Parser<Character> characterParser = (source, offset) -> {
         if (offset < source.length() && source.charAt(offset) == 'a') {
-            return Optional.of(ParseResult.of('a', offset + 1));
+            return Optional.of(new ParseResult<>('a', offset + 1));
         }
         ;
         return Optional.empty();
@@ -163,7 +163,7 @@ public class ParserTest {
     public void testPlus_chain() {
         Parser<Tuple2<Integer, Character>> part1 = integerParser.plus(characterParser);
         Parser<String> charBParser = (s, o) -> (o < s.length() && s.charAt(o) == 'b')
-                ? Optional.of(ParseResult.of("b", o + 1))
+                ? Optional.of(new ParseResult<>("b", o + 1))
                 : Optional.empty();
 
         Parser<Tuple2<Tuple2<Integer, Character>, String>> fullSequence = part1.plus(charBParser);
@@ -182,6 +182,16 @@ public class ParserTest {
     //endregion plus
 
     //region repeat, optional
+    @Test(description = "Repeat: Успешный единичный повтор (min=max=1)")
+    public void testRepeat_single_success() {
+        var listParser = integerParser.repeat(1,1);
+        var result = listParser.parse("102030", 0);
+
+        assertTrue(result.isPresent());
+        assertEquals(result.get().value().getFirst(), 102030);
+        assertEquals(result.get().end_offset(), 6);
+    }
+
     @Test(description = "Repeat: Успешный парсинг нескольких чисел (min=2, max=5)")
     public void testRepeat_multiple_success() {
         Parser<Integer> intWsParser = integerParser
@@ -192,9 +202,9 @@ public class ParserTest {
 
         assertTrue(result.isPresent());
         assertEquals(result.get().value().size(), 3);
-        assertEquals(result.get().value().get(0), Integer.valueOf(10));
-        assertEquals(result.get().value().get(1), Integer.valueOf(20));
-        assertEquals(result.get().value().get(2), Integer.valueOf(30));
+        assertEquals(result.get().value().get(0), 10);
+        assertEquals(result.get().value().get(1), 20);
+        assertEquals(result.get().value().get(2), 30);
     }
 
     @Test(description = "Optional: Элемент найден")

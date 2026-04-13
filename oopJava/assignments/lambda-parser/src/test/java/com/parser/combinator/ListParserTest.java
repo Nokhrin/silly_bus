@@ -16,7 +16,7 @@ public class ListParserTest {
      */
     private final Parser<Character> mockParser = (source, offset) -> {
         if (offset < source.length() && source.charAt(offset) == 'a') {
-            return Optional.of(ParseResult.of('a', offset + 1));
+            return Optional.of(new ParseResult<>('a', offset + 1));
         }
         return Optional.empty();
     };
@@ -59,7 +59,7 @@ public class ListParserTest {
 
     @Test(description = "Зацикливание: Успешный парсинг без смещения")
     public void testParse_infinite_loop_protection() {
-        Parser<String> epsilonParser = (source, offset) -> Optional.of(ParseResult.of("", offset));
+        Parser<String> epsilonParser = (source, offset) -> Optional.of(new ParseResult<>("", offset));
         Parser<List<String>> parser = new ListParser<>(epsilonParser, 0, 100);
         assertThrows(IllegalStateException.class, () -> parser.parse("test", 0));
     }

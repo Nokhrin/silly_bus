@@ -72,6 +72,6 @@ public class ListParser<A> implements Parser<List<A>> {
             logger.log(Level.FINE, "Не удалось найти минимум совпадений");
             return Optional.empty();
         }
-        return Optional.of(ParseResult.of(resultList, offset));
+        return Optional.of(new ParseResult<>(resultList, offset));
     }
 }

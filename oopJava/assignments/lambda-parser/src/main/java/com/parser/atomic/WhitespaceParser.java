@@ -52,6 +52,6 @@ public class WhitespaceParser implements Parser<Whitespace> {
             return Optional.empty();
         }
 
-        return Optional.of(ParseResult.of(Whitespace.INSTANCE, offset));
+        return Optional.of(new ParseResult<>(Whitespace.INSTANCE, offset));
     }
 }

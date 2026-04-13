@@ -74,7 +74,7 @@ public interface Parser<A> {
 
             if (resultModified.isPresent()) {
                 log.info("Успешное применение функции {} к значению {}", function, offset);
-                return Optional.of(ParseResult.of(resultModified.get(), parseResult.end_offset()));
+                return Optional.of(new ParseResult<>(resultModified.get(), parseResult.end_offset()));
             }
 
             log.debug("Применение функции вернуло пустой результат");
@@ -106,7 +106,7 @@ public interface Parser<A> {
 
             Tuple2<A, B> result = new Tuple2<>(firstParseResult.value(), secondParseResult.value());
             log.debug("Успешно создан кортеж результатов парсинга");
-            return Optional.of(ParseResult.of(result, secondParseResult.end_offset()));
+            return Optional.of(new ParseResult<>(result, secondParseResult.end_offset()));
         };
     }
 

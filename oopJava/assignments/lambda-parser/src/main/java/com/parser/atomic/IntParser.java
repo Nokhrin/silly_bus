@@ -87,6 +87,6 @@ public class IntParser implements Parser<Integer> {
         logger.log(Level.FINE,
                 "Считано значение в диапазоне [{0};{1}]",
                 new Object[]{start, offset - 1});
-        return Optional.of(ParseResult.of(value, offset));
+        return Optional.of(new ParseResult<>(value, offset));
     }
 }

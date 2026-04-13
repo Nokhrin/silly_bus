@@ -13,7 +13,7 @@ public class ParseResultTest {
         String expectedValue = "test_data";
         int expectedOffset = 42;
 
-        ParseResult<String> result = ParseResult.of(expectedValue, expectedOffset);
+        ParseResult<String> result = new ParseResult<>(expectedValue, expectedOffset);
 
         assertEquals(result.value(), expectedValue);
         assertEquals(result.end_offset(), expectedOffset);
@@ -21,7 +21,7 @@ public class ParseResultTest {
 
     @Test(description = "Корректные трансформация значения, сохранение смещения")
     public void testMap_transformsValue() {
-        ParseResult<String> original = ParseResult.of("123", 10);
+        ParseResult<String> original = new ParseResult<>("123", 10);
 
         ParseResult<Integer> mapped = original.map(Integer::parseInt);
 
@@ -31,7 +31,7 @@ public class ParseResultTest {
 
     @Test(description = "Корректная цепочка вызовов map")
     public void testMap_chaining() {
-        ParseResult<Integer> result = ParseResult.of(10, 0)
+        ParseResult<Integer> result = new ParseResult<>(10, 0)
                 .map(val -> val * 2)      // 20
                 .map(val -> val + 5);     // 25
 

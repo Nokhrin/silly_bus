@@ -42,7 +42,7 @@ public class BinaryOperatorParser implements Parser<BinaryOperator> {
         if (operator != null) {
             logger.log(Level.FINE, "Считан бинарный оператор {0} по смещению {1}",
                     new Object[]{operator, begin_offset});
-            return Optional.of(ParseResult.of(operator, begin_offset + 1));
+            return Optional.of(new ParseResult<>(operator, begin_offset + 1));
         }
 
         logger.log(Level.FINE, "Бинарный оператор не найден");
