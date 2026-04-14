@@ -15,7 +15,7 @@ import java.util.Optional;
  * integer {[whitespace] binary_operator [whitespace] integer}
  */
 public class GrammarBuilder {
-    static final Logger log = LoggerFactory.getLogger(Parser.class);
+    static final Logger log = LoggerFactory.getLogger(GrammarBuilder.class);
 
     /**
      * Возвращает парсер грамматики

@@ -1,20 +1,19 @@
 package com.parser.atomic;
 
+import com.parser.combinator.GrammarBuilder;
 import com.parser.core.ParseResult;
 import com.parser.core.Parser;
 import com.parser.core.Whitespace;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Optional;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Парсер пробельных символов.
  */
 public class WhitespaceParser implements Parser<Whitespace> {
-
-    private static final Logger logger = Logger.getLogger(WhitespaceParser.class.getName());
-
+    static final Logger log = LoggerFactory.getLogger(WhitespaceParser.class);
     /**
      * Определение пробельных символов
      * Time: O(1)
@@ -35,23 +34,31 @@ public class WhitespaceParser implements Parser<Whitespace> {
     @Override
     public Optional<ParseResult<Whitespace>> parse(String source, int begin_offset) {
         if (source == null || begin_offset < 0 || begin_offset >= source.length()) {
-            logger.log(Level.FINE, "Ошибка ввода: source={0}, offset={1}",
-                    new Object[]{source, begin_offset});
+            log.debug("Ошибка ввода: source={0}, offset={}", source, begin_offset);
             return Optional.empty();
         }
 
         int offset = begin_offset;
 
         while (offset < source.length() && isWhitespace(source.charAt(offset))) {
-            logger.log(Level.FINEST, "Считан пробельный символ по смещению {0}", offset);
+            log.debug("Считан пробельный символ по смещению {}", offset);
             offset++;
         }
 
         if (offset == begin_offset) {
-            logger.log(Level.FINE, "Отсутствуют ожидаемые пробелы");
+            log.debug("Отсутствуют ожидаемые пробелы");
             return Optional.empty();
         }
 
         return Optional.of(new ParseResult<>(Whitespace.INSTANCE, offset));
+    }
+
+    /**
+     * Возвращает строковое представление парсера
+     * @return
+     */
+    @Override
+    public String toString() {
+        return "WhitespaceParser";
     }
 }

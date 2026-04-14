@@ -1,11 +1,10 @@
 package com.parser.core;
 
-import com.parser.Main;
 import com.parser.combinator.ListParser;
+import com.parser.combinator.PlusParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.management.OperatingSystemMXBean;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
@@ -39,11 +38,7 @@ public interface Parser<A> {
     default <B> Parser<B> map(Function<A, B> function) {
         return (src, offset) -> {
             Optional<ParseResult<A>> parseResultOptional = this.parse(src, offset);
-            if (parseResultOptional.isPresent()) {
-                log.info("Успешный парсинг в смещении {}", offset);
-                return Optional.of(parseResultOptional.get().map(function));
-            }
-            return Optional.empty();
+            return parseResultOptional.map(aParseResult -> aParseResult.map(function));
         };
     }
 
@@ -84,9 +79,10 @@ public interface Parser<A> {
     }
 
     /**
+     * Возвращает последовательность двух парсеров
      * Реализует логику Sequence: A B
      */
-    default <B> Parser<Tuple2<A, B>> plus(Parser<B> secondParser) {
+    default <B> Parser<Tuple2<A, B>> plusTupleExample(Parser<B> secondParser) {
         return (src, offset) -> {
             Optional<ParseResult<A>> firstResultOptional = this.parse(src, offset);
             if (firstResultOptional.isEmpty()) {
@@ -111,6 +107,14 @@ public interface Parser<A> {
     }
 
     /**
+     * Возвращает последовательность двух парсеров
+     * Реализует логику Sequence: A B
+     */
+    default <B> Plus<A, B> plus(Parser<B> secondParser) {
+        return new PlusParser<>(this, secondParser);
+    }
+
+    /**
      * Повторяет парсер от min до max раз
      * Реализует грамматику {}
      */
@@ -126,11 +130,12 @@ public interface Parser<A> {
     default Parser<Optional<A>> optional() {
         Parser<List<A>> parser = this.repeat(0, 1);
         return parser.map(resultList -> {
-            if (resultList.isEmpty())  {
+            if (resultList.isEmpty()) {
                 log.debug("Совпадений не найдено");
                 return Optional.empty();
             }
             return Optional.of(resultList.getFirst());
         });
     }
+
 }

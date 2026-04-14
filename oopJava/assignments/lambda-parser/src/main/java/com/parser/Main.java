@@ -1,8 +1,9 @@
 package com.parser;
 
+import com.parser.atomic.BinaryOperatorParser;
 import com.parser.atomic.IntParser;
-import com.parser.core.BinaryOperator;
-import com.parser.core.ParseResult;
+import com.parser.atomic.WhitespaceParser;
+import com.parser.core.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,9 +16,21 @@ public class Main {
     private static final Logger log = LoggerFactory.getLogger(Main.class);
 
     public static void main(String[] args) {
-        Optional<ParseResult<String>> parseResult = Optional.of(new ParseResult<>("123", 0));
-        log.info("value={}, offset={}", parseResult.get().value(), parseResult.get().end_offset());
-        log.info(parseResult.get().map(Integer::parseInt).value().toString());
-        log.info("value={}, offset={}", parseResult.get().value(), parseResult.get().end_offset());
+        var intParser = new IntParser();
+        var wsParser = new WhitespaceParser();
+        var boParser = new BinaryOperatorParser();
+
+        log.debug("Структура: {}", wsParser.optional().plus(boParser));
+        log.debug("Структура: {}", wsParser.optional().plus(boParser).skipLeft());
+
+        String input = "1 + 2";
+        log.info("Сборка суффикса: [ws] bo [ws] int, ввод: `{}`", input);
+        Parser<Suffix> suffixParser = wsParser.optional().plus(boParser).skipLeft()
+                .plus(wsParser.optional().plus(intParser).skipLeft())
+                .map(tuple2 -> new Suffix(tuple2.a(), tuple2.b()));
+        log.info("Выполнение парсера: {}", suffixParser);
+        Optional<ParseResult<Suffix>> result = suffixParser.parse(input, 0);
+
+        log.info("Результат парсинга: {}", result);
     }
 }

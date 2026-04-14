@@ -1,14 +1,13 @@
 package com.parser.combinator;
 
-import com.parser.atomic.WhitespaceParser;
 import com.parser.core.ParseResult;
 import com.parser.core.Parser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Комбинатор парсеров
@@ -18,7 +17,7 @@ import java.util.logging.Logger;
  * Выбрасывает исключение на эпсилон-цикл
  */
 public class ListParser<A> implements Parser<List<A>> {
-    private static final Logger logger = Logger.getLogger(ListParser.class.getName());
+    static final Logger log = LoggerFactory.getLogger(ListParser.class.getName());
     private final Parser<A> parser;
     private final int min;
     private final int max;
@@ -51,7 +50,7 @@ public class ListParser<A> implements Parser<List<A>> {
             Optional<ParseResult<A>> resultOptional = parser.parse(source, offset);
 
             if (resultOptional.isEmpty()) {
-                logger.log(Level.FINE, "Не удалось выполнить парсинг по смещению {0}", offset);
+                log.debug("Не удалось выполнить парсинг по смещению {}", offset);
                 break;
             }
 
@@ -69,9 +68,19 @@ public class ListParser<A> implements Parser<List<A>> {
 
         }
         if (repeatsCount < min) {
-            logger.log(Level.FINE, "Не удалось найти минимум совпадений");
+            log.debug("Не удалось найти минимум совпадений: {}", min);
             return Optional.empty();
         }
         return Optional.of(new ParseResult<>(resultList, offset));
+    }
+
+    /**
+     * Возвращает строковое представление комбинации парсеров
+     * @return
+     */
+    @Override
+    public String toString() {
+        return String.format("Repeat[%s, min=%d, max=%d]",
+                parser.getClass().getSimpleName(), min, max);
     }
 }

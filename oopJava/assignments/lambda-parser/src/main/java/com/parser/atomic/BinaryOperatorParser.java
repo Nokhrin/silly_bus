@@ -3,10 +3,10 @@ package com.parser.atomic;
 import com.parser.core.BinaryOperator;
 import com.parser.core.ParseResult;
 import com.parser.core.Parser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Optional;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Парсер мат операций.
@@ -16,7 +16,7 @@ import java.util.logging.Logger;
  */
 public class BinaryOperatorParser implements Parser<BinaryOperator> {
 
-    private static final Logger logger = Logger.getLogger(BinaryOperatorParser.class.getName());
+    static final Logger log = LoggerFactory.getLogger(BinaryOperatorParser.class);
 
     /**
      * Парсит оператор
@@ -30,22 +30,30 @@ public class BinaryOperatorParser implements Parser<BinaryOperator> {
     @Override
     public Optional<ParseResult<BinaryOperator>> parse(String source, int begin_offset) {
         if (source == null || begin_offset < 0 || begin_offset >= source.length()) {
-            logger.log(Level.FINE, "Ошибка ввода: source={0}, offset={1}",
+            log.debug("Ошибка ввода: source={0}, offset={1}",
                     new Object[]{source, begin_offset});
             return Optional.empty();
         }
 
         char charAt = source.charAt(begin_offset);
-        logger.log(Level.FINE, "Считан символ по смещению {0}", begin_offset);
+        log.debug("Считан символ по смещению {}", begin_offset);
         BinaryOperator operator = BinaryOperator.valueOf(charAt);
 
         if (operator != null) {
-            logger.log(Level.FINE, "Считан бинарный оператор {0} по смещению {1}",
-                    new Object[]{operator, begin_offset});
+            log.debug("Считан бинарный оператор {} по смещению {}", operator, begin_offset);
             return Optional.of(new ParseResult<>(operator, begin_offset + 1));
         }
 
-        logger.log(Level.FINE, "Бинарный оператор не найден");
+        log.debug("Бинарный оператор не найден");
         return Optional.empty();
+    }
+
+    /**
+     * Возвращает строковое представление парсера
+     * @return
+     */
+    @Override
+    public String toString() {
+        return this.getClass().getSimpleName();
     }
 }
