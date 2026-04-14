@@ -1,6 +1,5 @@
 package com.parser.atomic;
 
-import com.parser.TestConfig;
 import com.parser.core.ParseResult;
 import com.parser.core.Whitespace;
 import org.testng.annotations.BeforeMethod;
@@ -11,10 +10,6 @@ import java.util.Optional;
 import static org.testng.Assert.*;
 
 public class WhitespaceParserTest {
-
-    static {
-        TestConfig.enableDebugLogging(WhitespaceParser.class);
-    }
 
     private WhitespaceParser parser;
 

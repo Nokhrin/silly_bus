@@ -1,6 +1,5 @@
 package com.parser.atomic;
 
-import com.parser.TestConfig;
 import com.parser.core.ParseResult;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -16,9 +15,6 @@ import static org.testng.Assert.*;
  * Отчет: target/surefire-reports/emailable-report.html
  */
 public class IntParserTest {
-    static {
-        TestConfig.enableDebugLogging(IntParser.class);
-    }
 
     private IntParser parser;
 

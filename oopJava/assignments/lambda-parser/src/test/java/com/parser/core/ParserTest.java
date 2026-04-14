@@ -3,6 +3,7 @@ package com.parser.core;
 import com.parser.atomic.BinaryOperatorParser;
 import com.parser.atomic.IntParser;
 import com.parser.atomic.WhitespaceParser;
+import com.parser.testHelpers.MockStringParser;
 import org.testng.annotations.Test;
 
 import java.util.List;
@@ -218,4 +219,30 @@ public class ParserTest {
     }
 
     //endregion repeat, optional
+
+    //region or
+    @Test(description = "Успех на левом парсере")
+    public void testOr_leftSuccess() {
+        Parser<String> left = new MockStringParser("abc");
+        Parser<Integer> right = new MockStringParser("123").map(Integer::parseInt);
+
+        Parser<Either<String, Integer>> parser = left.or(right);
+        Optional<ParseResult<Either<String, Integer>>> result = parser.parse("abc", 0);
+
+        assertTrue(result.isPresent());
+        assertEquals(result.get().value().getLeft().get(), "abc");
+    }
+
+    @Test(description = "Успех на правом парсере")
+    public void testOr_rightSuccess() {
+        Parser<String> left = new MockStringParser("abc");
+        Parser<Integer> right = new MockStringParser("123").map(Integer::parseInt);
+
+        Parser<Either<String, Integer>> parser = left.or(right);
+        Optional<ParseResult<Either<String, Integer>>> result = parser.parse("123", 0);
+
+        assertTrue(result.isPresent());
+        assertEquals(result.get().value().getRight().get(), Integer.valueOf(123));
+    }
+    //endregion or
 }

@@ -138,4 +138,31 @@ public interface Parser<A> {
         });
     }
 
+    /**
+     * Выполняет операцию ИЛИ.
+     * Реализует грамматику альтернативы `A | B`
+     * 1. Парсинг A, при успехе - возвращает A, при неудаче парсит B
+     * 2. Парсинг B, при успехе - возвращает B, при неудаче возвращает empty
+     */
+    default <B> Parser<Either<A, B>> or(Parser<B> parserB) {
+        return (source, begin_offset) -> {
+            Optional<ParseResult<A>> resultA = this.parse(source, begin_offset);
+            if (resultA.isPresent()) {
+                log.debug("Успешный парсинг элемента A: {}", resultA.get().value());
+                return Optional.of(
+                        new ParseResult<>(Either.left(resultA.get().value()), resultA.get().end_offset())
+                );
+            }
+
+            Optional<ParseResult<B>> resultB = parserB.parse(source, begin_offset);
+            if (resultB.isPresent()) {
+                log.debug("Успешный парсинг элемента B: {}", resultB.get().value());
+                return Optional.of(
+                        new ParseResult<>(Either.right(resultB.get().value()), resultB.get().end_offset())
+                );
+            }
+            log.error("Не удалось выполнить парсинг ни A, ни B");
+            return Optional.empty();
+        };
+    }
 }

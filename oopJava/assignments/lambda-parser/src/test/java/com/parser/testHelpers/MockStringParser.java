@@ -13,6 +13,9 @@ public record MockStringParser(String mockString) implements Parser<String> {
 
     @Override
     public Optional<ParseResult<String>> parse(String source, int begin_offset) {
-        return Optional.of(new ParseResult<>(mockString, begin_offset + mockString.length()));
+        if (source.startsWith(mockString, begin_offset)) {
+            return Optional.of(new ParseResult<>(mockString, begin_offset + mockString.length()));
+        }
+        return Optional.empty();
     }
 }

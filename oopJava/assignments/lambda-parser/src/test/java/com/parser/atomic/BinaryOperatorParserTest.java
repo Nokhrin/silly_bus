@@ -1,6 +1,5 @@
 package com.parser.atomic;
 
-import com.parser.TestConfig;
 import com.parser.core.BinaryOperator;
 import com.parser.core.ParseResult;
 import org.testng.annotations.BeforeMethod;
@@ -11,10 +10,6 @@ import java.util.Optional;
 import static org.testng.Assert.*;
 
 public class BinaryOperatorParserTest {
-
-    static {
-        TestConfig.enableDebugLogging(IntParser.class);
-    }
 
     private BinaryOperatorParser parser;
 
