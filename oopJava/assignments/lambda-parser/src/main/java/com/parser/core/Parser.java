@@ -2,8 +2,6 @@ package com.parser.core;
 
 import com.parser.combinator.ListParser;
 import com.parser.combinator.PlusParser;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Optional;
@@ -15,8 +13,6 @@ import java.util.function.Function;
  * @param <A> тип результата успешного парсинга
  */
 public interface Parser<A> {
-    static final Logger log = LoggerFactory.getLogger(Parser.class);
-
     /**
      * Выполняет парсинг
      *
@@ -59,20 +55,16 @@ public interface Parser<A> {
         return (src, offset) -> {
             Optional<ParseResult<A>> parseResultOptional = this.parse(src, offset);
             if (parseResultOptional.isEmpty()) {
-                log.info("Парсинг вернул пустое значение");
                 return Optional.empty();
             }
 
-            log.info("Успешный парсинг в смещении {}", offset);
             ParseResult<A> parseResult = parseResultOptional.get();
             Optional<B> resultModified = function.apply(parseResult.value());
 
             if (resultModified.isPresent()) {
-                log.info("Успешное применение функции {} к значению {}", function, offset);
                 return Optional.of(new ParseResult<>(resultModified.get(), parseResult.end_offset()));
             }
 
-            log.debug("Применение функции вернуло пустой результат");
             return Optional.empty();
         };
 
@@ -86,22 +78,17 @@ public interface Parser<A> {
         return (src, offset) -> {
             Optional<ParseResult<A>> firstResultOptional = this.parse(src, offset);
             if (firstResultOptional.isEmpty()) {
-                log.debug("Не удалось выполнить парсинг первого выражения");
                 return Optional.empty();
             }
-            log.debug("Успешно выполнен парсинг первого выражения");
             ParseResult<A> firstParseResult = firstResultOptional.get();
 
             Optional<ParseResult<B>> secondResultOptional = secondParser.parse(src, firstParseResult.end_offset());
             if (secondResultOptional.isEmpty()) {
-                log.debug("Не удалось выполнить парсинг второго выражения");
                 return Optional.empty();
             }
-            log.debug("Успешно выполнен парсинг второго выражения");
             ParseResult<B> secondParseResult = secondResultOptional.get();
 
             Tuple2<A, B> result = new Tuple2<>(firstParseResult.value(), secondParseResult.value());
-            log.debug("Успешно создан кортеж результатов парсинга");
             return Optional.of(new ParseResult<>(result, secondParseResult.end_offset()));
         };
     }
@@ -131,7 +118,6 @@ public interface Parser<A> {
         Parser<List<A>> parser = this.repeat(0, 1);
         return parser.map(resultList -> {
             if (resultList.isEmpty()) {
-                log.debug("Совпадений не найдено");
                 return Optional.empty();
             }
             return Optional.of(resultList.getFirst());
@@ -148,7 +134,6 @@ public interface Parser<A> {
         return (source, begin_offset) -> {
             Optional<ParseResult<A>> resultA = this.parse(source, begin_offset);
             if (resultA.isPresent()) {
-                log.debug("Успешный парсинг элемента A: {}", resultA.get().value());
                 return Optional.of(
                         new ParseResult<>(Either.left(resultA.get().value()), resultA.get().end_offset())
                 );
@@ -156,12 +141,10 @@ public interface Parser<A> {
 
             Optional<ParseResult<B>> resultB = parserB.parse(source, begin_offset);
             if (resultB.isPresent()) {
-                log.debug("Успешный парсинг элемента B: {}", resultB.get().value());
                 return Optional.of(
                         new ParseResult<>(Either.right(resultB.get().value()), resultB.get().end_offset())
                 );
             }
-            log.error("Не удалось выполнить парсинг ни A, ни B");
             return Optional.empty();
         };
     }
