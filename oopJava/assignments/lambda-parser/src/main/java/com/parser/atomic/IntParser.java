@@ -74,8 +74,8 @@ public class IntParser implements Parser<Integer> {
         int start = offset;
         while (offset < source.length() && isDigit.test(source.charAt(offset))) {
             offset++;
-            log.debug("Считана подстрока в диапазоне [{};{}]", start, offset - 1);
         }
+        log.debug("Считано число в диапазоне [{};{}]", start, offset - 1);
 
         // результат
         String digits = source.substring(start, offset);

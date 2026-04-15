@@ -4,8 +4,9 @@ import java.util.List;
 
 /**
  * Результат парсинга выражения
- * Пример: `1 + 2 - 3`
- * head=1, tail=List[Suffix(add, 2), Suffix(sub, 3)]
+ * Пример:
+ * Combined(1, [Suffix(add, 2), Suffix(sub, 3)])
+ * для выражения `1 + 2 - 3`
  * @param head
  * @param tail
  */
