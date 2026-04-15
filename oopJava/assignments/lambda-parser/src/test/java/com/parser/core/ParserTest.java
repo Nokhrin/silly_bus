@@ -245,4 +245,55 @@ public class ParserTest {
         assertEquals(result.get().value().getRight().get(), Integer.valueOf(123));
     }
     //endregion or
+
+    //region `[A] B` === `(A B) | B`
+
+    @Test(description = "[A] B: optional(пробелы) plus(число)")
+    public void testOptionalPlus_withWhitespace() {
+        Parser<Tuple2<Optional<Whitespace>, Integer>> parser =
+                whitespaceParser.optional().plus(integerParser);
+
+        Optional<ParseResult<Tuple2<Optional<Whitespace>, Integer>>> result =
+                parser.parse(" 8", 0);
+
+        assertTrue(result.isPresent());
+        assertTrue(result.get().value().a().isPresent());
+        assertEquals(result.get().value().b(), 8);
+        assertEquals(result.get().end_offset(), 2);
+    }
+
+    @Test(description = "(A B) | B: (пробелы)plus(число) ИЛИ (число)")
+    public void testEitherPlus_withWhitespace() {
+        Parser<Either<Tuple2<Whitespace, Integer>, Integer>> parser =
+                whitespaceParser.plus(integerParser).or(integerParser);
+
+        Optional<ParseResult<Either<Tuple2<Whitespace, Integer>, Integer>>> result =
+                parser.parse(" 8", 0);
+
+        assertTrue(result.isPresent());
+        assertTrue(result.get().value().getLeft().isPresent());
+        assertTrue(result.get().value().getRight().isEmpty());
+
+        assertEquals(result.get().value().getLeft().get().a(), Whitespace.INSTANCE);
+        assertEquals(result.get().value().getLeft().get().b(), 8);
+    }
+
+    @Test(description = "Эквивалентность: оба способа дают одинаковый offset")
+    public void testEquivalence_sameOffset() {
+        Parser<Tuple2<Optional<Whitespace>, Integer>> optParser =
+                whitespaceParser.optional().plus(integerParser);
+        Parser<Either<Tuple2<Whitespace, Integer>, Integer>> altParser =
+                whitespaceParser.plus(integerParser).or(integerParser);
+
+        Optional<ParseResult<Tuple2<Optional<Whitespace>, Integer>>> optParserResult =
+                optParser.parse(" 8", 0);
+        Optional<ParseResult<Either<Tuple2<Whitespace, Integer>, Integer>>> altParserResult =
+                altParser.parse(" 8", 0);
+
+        assertEquals(optParserResult.get().end_offset(), 2);
+        assertEquals(altParserResult.get().end_offset(), 2);
+    }
+    //endregion
+
+
 }
