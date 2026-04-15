@@ -19,6 +19,15 @@ public class BinaryOperatorParser implements Parser<BinaryOperator> {
     static final Logger log = LoggerFactory.getLogger(BinaryOperatorParser.class);
 
     /**
+     * Возвращает строковое представление парсера
+     * @return
+     */
+    @Override
+    public String toString() {
+        return this.getClass().getSimpleName();
+    }
+
+    /**
      * Парсит оператор
      * Обработка унарных +/- происходит в парсере Integer
      * Данный парсер ожидает один оператор между двумя Integer
@@ -46,14 +55,5 @@ public class BinaryOperatorParser implements Parser<BinaryOperator> {
 
         log.debug("Бинарный оператор не найден");
         return Optional.empty();
-    }
-
-    /**
-     * Возвращает строковое представление парсера
-     * @return
-     */
-    @Override
-    public String toString() {
-        return this.getClass().getSimpleName();
     }
 }

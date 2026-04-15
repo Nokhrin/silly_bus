@@ -1,6 +1,5 @@
 package com.parser.atomic;
 
-import com.parser.combinator.GrammarBuilder;
 import com.parser.core.ParseResult;
 import com.parser.core.Parser;
 import com.parser.core.Whitespace;
@@ -13,7 +12,18 @@ import java.util.Optional;
  * Парсер пробельных символов.
  */
 public class WhitespaceParser implements Parser<Whitespace> {
+
     static final Logger log = LoggerFactory.getLogger(WhitespaceParser.class);
+
+    /**
+     * Возвращает строковое представление парсера
+     * @return
+     */
+    @Override
+    public String toString() {
+        return this.getClass().getSimpleName();
+    }
+
     /**
      * Определение пробельных символов
      * Time: O(1)
@@ -53,12 +63,4 @@ public class WhitespaceParser implements Parser<Whitespace> {
         return Optional.of(new ParseResult<>(Whitespace.INSTANCE, offset));
     }
 
-    /**
-     * Возвращает строковое представление парсера
-     * @return
-     */
-    @Override
-    public String toString() {
-        return "WhitespaceParser";
-    }
 }

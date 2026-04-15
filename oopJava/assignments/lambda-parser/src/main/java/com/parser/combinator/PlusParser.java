@@ -59,7 +59,7 @@ public class PlusParser<A, B> implements Plus<A, B> {
     @Override
     public String toString() {
         return String.format("Plus[%s -> %s]",
-                parserLeft.getClass().getSimpleName(),
-                parserRight.getClass().getSimpleName());
+                parserLeft.toString(),
+                parserRight.toString());
     }
 }

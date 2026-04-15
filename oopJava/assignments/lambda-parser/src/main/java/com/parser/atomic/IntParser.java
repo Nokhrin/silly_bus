@@ -22,6 +22,15 @@ public class IntParser implements Parser<Integer> {
     static final Logger log = LoggerFactory.getLogger(IntParser.class);
 
     /**
+     * Возвращает строковое представление парсера
+     * @return
+     */
+    @Override
+    public String toString() {
+        return this.getClass().getSimpleName();
+    }
+
+    /**
      * Лямбда верификации цифры
      */
     private final Predicate<Character> isDigit = c -> c >= '0' && c <= '9';
@@ -82,15 +91,6 @@ public class IntParser implements Parser<Integer> {
         int value = (int) longValue;
         log.debug("Считано значение в диапазоне [{};{}]", start, offset - 1);
         return Optional.of(new ParseResult<>(value, offset));
-    }
-
-    /**
-     * Возвращает строковое представление парсера
-     * @return
-     */
-    @Override
-    public String toString() {
-        return "IntParser";
     }
 
 }
