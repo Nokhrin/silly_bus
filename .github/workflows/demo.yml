@@ -1,0 +1,40 @@
+# workflow
+name: Demo WF
+
+# events
+on:
+  push:
+    branches:
+      - main
+
+# sets of instructions
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    # steps of instruction
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Print environment
+        run: |
+          echo "Workspace: ${{ github.workspace }}"
+          echo "Repository: ${{ github.repository }}"
+          echo "Ref: ${{ github.ref }}"
+          pwd
+          ls -la
+
+      - name: Hello from Docker
+        run: docker run --rm hello-world
+
+      - name: Verify lambda-parser docs
+        run: |
+          echo "Checking for architecture.xml:"
+          if [ -f "oopJava/assignments/lambda-parser/docs/architecture.xml" ]; then
+          echo "File found"
+          head -n 1 oopJava/assignments/lambda-parser/docs/architecture.xml
+          else
+          echo "File not found"
+          find . -name "architecture.xml" -o -name "architecture.drawio"
+          fi

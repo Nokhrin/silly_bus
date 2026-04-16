@@ -39,7 +39,7 @@ public class BinaryOperatorParser implements Parser<BinaryOperator> {
     @Override
     public Optional<ParseResult<BinaryOperator>> parse(String source, int begin_offset) {
         if (source == null || begin_offset < 0 || begin_offset >= source.length()) {
-            log.error("Ошибка ввода: source={}, offset={}", source, begin_offset);
+            log.debug("Ошибка ввода: source={}, offset={}", source, begin_offset);
             return Optional.empty();
         }
 
@@ -48,11 +48,11 @@ public class BinaryOperatorParser implements Parser<BinaryOperator> {
         BinaryOperator operator = BinaryOperator.valueOf(charAt);
 
         if (operator != null) {
-            log.info("Считан бинарный оператор {} по смещению {}", operator, begin_offset);
+            log.debug("Считан бинарный оператор {} по смещению {}", operator, begin_offset);
             return Optional.of(new ParseResult<>(operator, begin_offset + 1));
         }
 
-        log.error("Бинарный оператор не найден");
+        log.debug("Бинарный оператор не найден");
         return Optional.empty();
     }
 }

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-    <property name="LOG_LEVEL" value="${LOG_LEVEL:-DEBUG}"/>
+    <property name="LOG_LEVEL" value="${LOG_LEVEL:-INFO}"/>
 
     <!-- Вывод в консоль -->
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
