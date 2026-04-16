@@ -1,0 +1,39 @@
+name: Export Diagrams
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'oopJava/assignments/lambda-parser/docs/**/*.drawio'
+  pull_request:
+    paths:
+      - 'oopJava/assignments/lambda-parser/docs/**/*.drawio'
+  workflow_dispatch:  # Ручной запуск
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    environment: github-pages
+    permissions:
+      pages: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Export drawio files
+        uses: rlespinasse/drawio-export-action@v2
+        with:
+          format: svg
+          transparent: true
+          output: ${{ github.workspace }}/oopJava/assignments/lambda-parser/docs/drawio-assets
+          path: ${{ github.workspace }}/oopJava/assignments/lambda-parser/docs
+
+      - name: Upload to Pages
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v4
