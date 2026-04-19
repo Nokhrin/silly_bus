@@ -1,0 +1,11 @@
+# === NASM/Assembly build artifacts ===
+*.o
+*.elf
+*.bin
+*.map
+fastlog
+fastlog_test
+main
+
+# === Generated output ===
+*.log
