@@ -26,5 +26,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: jacoco-report-lambda-parser
-          path: oopJava/assignments/lambda-parser/target/site/jacoco/
+          path: assignments/lambda-parser/target/site/jacoco/
           if-no-files-found: ignore

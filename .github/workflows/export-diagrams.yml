@@ -4,10 +4,10 @@ on:
   push:
     branches: [main]
     paths:
-      - 'oopJava/assignments/lambda-parser/docs/**/*.drawio'
+      - 'assignments/lambda-parser/docs/**/*.drawio'
   pull_request:
     paths:
-      - 'oopJava/assignments/lambda-parser/docs/**/*.drawio'
+      - 'assignments/lambda-parser/docs/**/*.drawio'
   workflow_dispatch:  # Ручной запуск
 
 jobs:
@@ -27,8 +27,8 @@ jobs:
         with:
           format: svg
           transparent: true
-          output: ${{ github.workspace }}/oopJava/assignments/lambda-parser/docs/drawio-assets
-          path: ${{ github.workspace }}/oopJava/assignments/lambda-parser/docs
+          output: ${{ github.workspace }}/assignments/lambda-parser/docs/drawio-assets
+          path: ${{ github.workspace }}/assignments/lambda-parser/docs
 
       - name: Upload to Pages
         uses: actions/upload-pages-artifact@v3

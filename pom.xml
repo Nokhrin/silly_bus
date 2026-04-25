@@ -7,8 +7,8 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>oopJava</module>
-        <module>popJava</module>
+        <module>assignments</module>
+        <module>concepts</module>
     </modules>
 
     <properties>

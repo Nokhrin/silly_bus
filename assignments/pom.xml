@@ -4,7 +4,7 @@
 
     <parent>
         <groupId>org.example</groupId>
-        <artifactId>oopJava</artifactId>
+        <artifactId>silly-bus</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
 
@@ -12,9 +12,9 @@
     <packaging>pom</packaging>
 
     <modules>
+        <module>task-tracker</module>
         <module>calc-parser</module>
         <module>fin-calc</module>
-        <module>line-appender</module>
         <module>lambda-parser</module>
     </modules>
 
