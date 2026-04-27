@@ -23,3 +23,16 @@ step2_test:
 	@./step2_task; test $$? -eq 150 && echo "PASS: exit code 150" || echo "FAIL: expected 150, got $$?"
 	@echo "=== Чистка ==="
 	rm -f step2_task.o step2_task
+
+step3_test:
+	@echo "=== Сборка ==="
+	nasm -f elf64 -g src/step3_task.asm -o step3_task.o
+	@echo "=== Линковка ==="
+	ld -no-pie -m elf_x86_64 step3_task.o -o step3_task
+	@echo "=== Проверка выравнивания ==="
+	readelf -lW step3_task | grep LOAD
+	@echo "=== Проверка результата ==="
+	@./step3_task; echo $?
+	@./step3_task; test $$? -eq 2 && echo "PASS: exit code 2" || echo "FAIL: expected 2, got $$?"
+	@echo "=== Чистка ==="
+	rm -f step3_task.o step3_task
