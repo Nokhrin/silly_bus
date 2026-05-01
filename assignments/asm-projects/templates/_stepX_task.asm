@@ -4,7 +4,6 @@
 ; ld -no-pie -m elf_x86_64 step4_demo2_int2ascii.o -o step4_demo2_int2ascii
 default rel
 global _start
-global _finish
 
 section .data
     msg db 'hi', 10 ; "hi\n"
