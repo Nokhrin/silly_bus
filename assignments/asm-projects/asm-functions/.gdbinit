@@ -5,12 +5,16 @@ set confirm off
 set verbose off
 set pagination off
 
+# === Точки останова ===
+#break *0x401000+0x00000000
+break _start
+
 # === Авто-отображение при запуске ===
 define hook-run
     display/i $pc
     display/x $ss
-    display/x $esp
-    display/x $ebp
+    display/x $rsp
+    display/x $rbp
     display/x $rip
     display/x $rcx
     display/x $rax
@@ -58,4 +62,20 @@ define verbose-run
     run
     info registers
     info proc all
+end
+
+# === форматирование ===
+# Печать регистров с заполнением нулями
+define pr32
+    printf "EAX: 0x%08x  EBX: 0x%08x  ECX: 0x%08x  EDX: 0x%08x\n", $eax, $ebx, $ecx, $edx
+    printf "ESI: 0x%08x  EDI: 0x%08x  ESP: 0x%08x  EBP: 0x%08x\n", $esi, $edi, $esp, $ebp
+end
+
+define pr64
+    printf "RAX: 0x%016x  RBX: 0x%016x  RCX: 0x%016x  RDX: 0x%016x\n", $rax, $rbx, $rcx, $rdx
+    printf "RSI: 0x%016x  RDI: 0x%016x  RSP: 0x%016x  RBP: 0x%016x\n", $rsi, $rdi, $rsp, $rbp
+end
+
+define pr8
+    printf "AL: 0x%02x  AH: 0x%02x  BL: 0x%02x  BH: 0x%02x\n", $al, $ah, $bl, $bh
 end

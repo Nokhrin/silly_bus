@@ -1,58 +1,81 @@
-# =============================================================================
-# GDB Configuration for asm-projects (x86-64 Linux)
-# =============================================================================
-#
-# УСТАНОВКА:
-#   1. Скопировать в директорию проекта
-#   2. Разрешить загрузку: echo "add-auto-load-safe-path /path/to/project" >> ~/.gdbinit
-#   3. Запустить GDB из директории проекта
-#
-# ДОСТУПНЫЕ КОМАНДЫ:
-#   show-regs      - Показать все регистры
-#   show-flags     - Расшифровка флагов EFLAGS
-#   show-stack     - Дамп 16 значений со стека
-#   show-frame     - Кадр стека: RBP, адрес возврата, аргументы
-#   r              - Короткая версия show-regs
-#
-# ИСПОЛЬЗОВАНИЕ:
-#   gdb -q ./program
-#   (gdb) break _start
-#   (gdb) run
-#   (gdb) show-regs
-#
-# =============================================================================
-# GDB настройки для asm-projects
+# === Базовые настройки ===
 set debuginfod enabled off
 set disassembly-flavor intel
 set confirm off
+set verbose off
 set pagination off
 
-# Регистры
-define regs
-    printf "RAX:%-16lx RBX:%-16lx RCX:%-16lx RDX:%-16lx\n", $rax, $rbx, $rcx, $rdx
-    printf "RSI:%-16lx RDI:%-16lx RSP:%-16lx RBP:%-16lx\n", $rsi, $rdi, $rsp, $rbp
-    printf "R8:%-16lx R9:%-16lx R10:%-16lx R11:%-16lx\n", $r8, $r9, $r10, $r11
-    printf "RIP:%-16lx EFLAGS:%-8lx\n", $rip, $eflags
+# === Точки останова ===
+#break *0x401000+0x00000000
+break _start
+
+# === Авто-отображение при запуске ===
+define hook-run
+    display/i $pc
+    display/x $ss
+    display/x $rsp
+    display/x $rbp
+    display/x $rip
+    display/x $rcx
+    display/x $rax
+    display/x $rbx
+    display/x $rdx
+    display/x $rsi
+    display/x $rdi
 end
 
-# Флаги
-define flags
-    printf "CF:%d ZF:%d SF:%d OF:%d IF:%d\n", (($eflags>>0)&1), (($eflags>>6)&1), (($eflags>>7)&1), (($eflags>>11)&1), (($eflags>>9)&1)
+# === Показать флаги ===
+define show-flags
+    info registers eflags
+    printf "CF=%d (Carry)\n", (($eflags >> 0) & 1)
+    printf "ZF=%d (Zero)\n", (($eflags >> 6) & 1)
+    printf "SF=%d (Sign)\n", (($eflags >> 7) & 1)
+    printf "OF=%d (Overflow)\n", (($eflags >> 11) & 1)
+    printf "IF=%d (Interrupt)\n", (($eflags >> 9) & 1)
 end
 
-# Стек
-define stack
-    printf "RSP:%lx\n", $rsp
+# === Показать стек ===
+define show-stack
+    printf "RSP=0x%lx\n", $rsp
+    printf "RBP=0x%lx\n", $rbp
     x/8gx $rsp
 end
 
-# Кадр стека
-define frame
-    printf "RBP:%lx [RBP]:%lx [RBP+8]:%lx\n", $rbp, *((long*)$rbp), *((long*)($rbp+8))
+# === Показать кадр стека ===
+define show-frame
+    printf "=== Stack Frame ===\n"
+    printf "RBP=0x%lx -> [RBP]=0x%lx (старый RBP)\n", $rbp, *((long*)$rbp)
+    printf "[RBP+8]=0x%lx (адрес возврата)\n", *((long*)($rbp+8))
+    x/4gx $rbp
 end
 
-# Авто-запуск
-define hook-run
-    regs
-    display/i $pc
+# === verbose запуск ===
+define verbose-run
+    set verbose on
+    info target
+    info files
+    info variables
+    info functions
+    info proc mappings
+    maintenance info sections
+    break _start
+    run
+    info registers
+    info proc all
+end
+
+# === форматирование ===
+# Печать регистров с заполнением нулями
+define pr8
+    printf "AL: 0x%02x  AH: 0x%02x  BL: 0x%02x  BH: 0x%02x\n", $al, $ah, $bl, $bh
+end
+
+define pr32
+    printf "EAX: 0x%08x  EBX: 0x%08x  ECX: 0x%08x  EDX: 0x%08x\n", $eax, $ebx, $ecx, $edx
+    printf "ESI: 0x%08x  EDI: 0x%08x  ESP: 0x%08x  EBP: 0x%08x\n", $esi, $edi, $esp, $ebp
+end
+
+define pr64
+    printf "RAX: 0x%016x  RBX: 0x%016x  RCX: 0x%016x  RDX: 0x%016x\n", $rax, $rbx, $rcx, $rdx
+    printf "RSI: 0x%016x  RDI: 0x%016x  RSP: 0x%016x  RBP: 0x%016x\n", $rsi, $rdi, $rsp, $rbp
 end
