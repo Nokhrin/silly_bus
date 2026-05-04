@@ -16,6 +16,7 @@
         <module>calc-parser</module>
         <module>fin-calc</module>
         <module>lambda-parser</module>
+        <module>parser-combinator</module>
     </modules>
 
 </project>
