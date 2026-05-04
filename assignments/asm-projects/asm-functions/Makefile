@@ -53,3 +53,20 @@ step3_test:
 
 step4_test:
 	$(MAKE) STEP=4 stepN_test
+
+# === 2 ===
+
+step2_run:
+	$(MAKE) STEP=2-1 stepN_run
+
+step2_1_test:
+	$(MAKE) STEP=2-1 stepN_test
+
+step2_2_test:
+	$(MAKE) STEP=2-2 stepN_test
+
+step2_3_test:
+	$(MAKE) STEP=2-3 stepN_test
+
+step2_4_test:
+	$(MAKE) STEP=2-4 stepN_test

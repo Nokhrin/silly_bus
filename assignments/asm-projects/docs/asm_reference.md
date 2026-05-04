@@ -20,26 +20,33 @@
 
 ### Регистры общего назначения
 
-| 64-бит | 32-бит | 16-бит | 8-бит (low) | 8-бит (high) | Назначение по ABI             |
-|--------|--------|--------|-------------|--------------|-------------------------------|
-| RAX    | EAX    | AX     | AL          | AH           | аккумулятор                   |
-| RBX    | EBX    | BX     | BL          | BH           | базовый                       |
-| RCX    | ECX    | CX     | CL          | CH           | счетчик loop                  |
-| RDX    | EDX    | DX     | DL          | DH           | данные                        |
-| RSI    | ESI    | SI     | SIL         | -            | источник                      |
-| RDI    | EDI    | DI     | DIL         | -            | приемник                      |
-| RSP    | ESP    | SP     | SPL         | -            | указатель на вершину стека    |
-| RBP    | EBP    | BP     | BPL         | -            | указатель на базу кадра стека |
-| R8     | R8D    | R8W    | R8B         | -            | 4-й аргумент syscall          |
-| R9     | R9D    | R9W    | R9B         | -            | 5-й аргумент syscall          |
-| R10    | R10D   | R10W   | R10B        | -            | 6-й аргумент syscall          |
-| R11    | R11D   | R11W   | R11B        | -            | Временный (clobbered syscall) |
-| R12    | R12D   | R12W   | R12B        | -            | Сохраняемый (callee-saved)    |
-| R13    | R13D   | R13W   | R13B        | -            | Сохраняемый (callee-saved)    |
-| R14    | R14D   | R14W   | R14B        | -            | Сохраняемый (callee-saved)    |
-| R15    | R15D   | R15W   | R15B        | -            | Сохраняемый (callee-saved)    |
+| 64-бит | 32-бит | 16-бит | 8-бит (low) | 8-бит (high) | Свойства по ABI                              | "Owner" |
+|--------|--------|--------|-------------|--------------|----------------------------------------------|---------|
+| RAX    | EAX    | AX     | AL          | AH           | аккумулятор                                  |         |
+| RBX    | EBX    | BX     | BL          | BH           | базовый  (callee-saved)                      | caller  |
+| RCX    | ECX    | CX     | CL          | CH           | счетчик loop                                 |         |
+| RDX    | EDX    | DX     | DL          | DH           | данные                                       |         |
+| RSI    | ESI    | SI     | SIL         | -            | источник                                     |         |
+| RDI    | EDI    | DI     | DIL         | -            | приемник                                     |         |
+| RSP    | ESP    | SP     | SPL         | -            | указатель на вершину стека                   |         |
+| RBP    | EBP    | BP     | BPL         | -            | указатель на базу кадра стека (callee-saved) | caller  |
+| R8     | R8D    | R8W    | R8B         | -            | 4-й аргумент syscall                         |         |
+| R9     | R9D    | R9W    | R9B         | -            | 5-й аргумент syscall                         |         |
+| R10    | R10D   | R10W   | R10B        | -            | 6-й аргумент syscall                         |         |
+| R11    | R11D   | R11W   | R11B        | -            | Временный (clobbered syscall)                |         |
+| R12    | R12D   | R12W   | R12B        | -            | callee-saved                                 | caller  |
+| R13    | R13D   | R13W   | R13B        | -            | callee-saved                                 | caller  |
+| R14    | R14D   | R14W   | R14B        | -            | callee-saved                                 | caller  |
+| R15    | R15D   | R15W   | R15B        | -            | callee-saved                                 | caller  |
 
-Примечание: Запись в 32-битный регистр (EAX) обнуляет старшие 32 бита 64-битного (RAX). Запись в 8-битный (AL) затрагивает только младшие 8 бит.
+Запись в 32-битный регистр (EAX) обнуляет старшие 32 бита 64-битного (RAX). 
+Запись в 8-битный (AL) затрагивает только младшие 8 бит.
+
+caller-saved - `сохраняет вызывающий`
+регистры, которые сохраняет **вызывающая** функция (caller) перед вызовом **вызываемой** функции (callee)
+
+callee-saved - `сохраняет вызванный`
+регистры, которые **вызываемая** функция (callee) обязана сохранить и восстановить перед возвратом
 
 ### Сегментные регистры
 
@@ -323,6 +330,12 @@ RSP -> вершина стека
 
 ## Массив
 
+```
+; 1. Объявление (NASM §3.2)
+section .data
+array dd 10, 20, 30, 40, 50   ; 5 элементов, 4 байта каждый
+```
+
 Массив не является примитивом ISA x86-64, ABI или синтаксиса NASM. 
 Это паттерн использования памяти, составленный из: 
 (1) директив размещения данных, 
@@ -335,9 +348,6 @@ RSP -> вершина стека
 3. Границы и размер
 
 ```asm
-; 1. Объявление (NASM §3.2)
-section .data
-array dd 10, 20, 30, 40, 50   ; 5 элементов, 4 байта каждый
 
 ; 2. Получение базового адреса (NASM §3.7)
 lea rsi, [array]              ; rsi = &array[0]
@@ -659,3 +669,45 @@ break *0x40101a
 break *0x401028
 break *0x401013
 ```
+
+---
+
+## Авторитетные спецификации Linux x86-64 Assembly
+
+### 1
+Tool Interface Standard (TIS)
+Executable and Linking Format (ELF)
+Specification
+Version 1.2
+
+> ответственность линкера
+
+### 2
+System V Application Binary Interface
+AMD64 Architecture Processor Supplement
+Draft Version 0.99.6
+
+> регистры, стек, аргументы
+
+### 3
+Intel® 64 and IA-32 Architectures
+Software Developer’s Manual
+Volume 1: Basic Architecture
+Volume 2 (2A & 2B): Instruction Set Reference, A-Z
+Volume 3 (3A, 3B, 3C, & 3D): System Programming Guide
+
+> инструкции, регистры, флаги
+
+### 4
+NASM – The Netwide Assembler
+version 3.02rc6
+
+> директивы, макросы, метки
+
+### 5
+Linux syscall table
+> номера системных вызовов
+
+### 6
+GDB documentation
+> отладка
