@@ -13,15 +13,20 @@ break _start
 define hook-run
     display/i $pc
     display/x $ss
-    display/x $rsp
-    display/x $rbp
-    display/x $rip
-    display/x $rcx
     display/x $rax
     display/x $rbx
+    display/x $rcx
     display/x $rdx
-    display/x $rsi
     display/x $rdi
+    display/x $rsi
+    display/x $rbp
+    display/x $rip
+    display/x $rsp
+    display/x $r8
+    display/x $r9
+    display/x $r10
+    display/x $r11
+    display/x $r12
 end
 
 # === Показать флаги ===
