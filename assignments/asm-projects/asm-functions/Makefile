@@ -51,4 +51,4 @@ step2_run:
 	$(MAKE) STEP=2-1 stepN_run
 
 step2_test:
-	$(MAKE) STEP=2-1 stepN_test
+	$(MAKE) STEP=2 stepN_test

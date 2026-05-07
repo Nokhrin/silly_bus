@@ -19,9 +19,9 @@ define hook-run
     display/x $rdx
     display/x $rdi
     display/x $rsi
-    display/x $rbp
     display/x $rip
     display/x $rsp
+    display/x $rbp
     display/x $r8
     display/x $r9
     display/x $r10
@@ -30,7 +30,7 @@ define hook-run
 end
 
 # === Показать флаги ===
-define show-flags
+define sfl
     info registers eflags
     printf "CF=%d (Carry)\n", (($eflags >> 0) & 1)
     printf "ZF=%d (Zero)\n", (($eflags >> 6) & 1)
@@ -40,7 +40,7 @@ define show-flags
 end
 
 # === Показать стек ===
-define show-stack
+define ss
     printf "RSP=0x%lx\n", $rsp
     printf "RBP=0x%lx\n", $rbp
     x/8gx $rsp
