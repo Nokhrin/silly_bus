@@ -8,6 +8,7 @@ set pagination off
 # === Точки останова ===
 #break *0x401000+0x00000000
 break _start
+break _start.end
 
 # === Авто-отображение при запуске ===
 define hook-run
