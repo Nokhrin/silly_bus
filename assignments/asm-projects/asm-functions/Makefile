@@ -36,7 +36,7 @@ stepN_test:
 	$(GDB) -q ./$(BIN)
 
 clean:
-	rm -f step*_test.lst step*_test.o step*_test
+	rm -f step*
 
 
 step1_run:
