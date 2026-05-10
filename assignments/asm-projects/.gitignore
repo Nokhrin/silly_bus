@@ -2,3 +2,6 @@ step*
 *.o
 *.lst
 !*.asm
+*_test.asm
+.gdbinit
+!templates/.gdbinit
