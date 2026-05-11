@@ -8,7 +8,7 @@ set pagination off
 # === Точки останова ===
 #break *0x401000+0x00000000
 break _start
-break _end
+break _start.end
 
 # === Авто-отображение при запуске ===
 define hook-run
@@ -84,4 +84,6 @@ end
 
 define pr8
     printf "AL: 0x%02x  AH: 0x%02x  BL: 0x%02x  BH: 0x%02x\n", $al, $ah, $bl, $bh
+    printf "CL: 0x%02x  CH: 0x%02x  DL: 0x%02x  DH: 0x%02x\n", $cl, $ch, $dl, $dh
+    printf "SIL: 0x%02x  DIL: 0x%02x  SPL: 0x%02x  BPL: 0x%02x\n", $sil, $dil, $spl, $bpl
 end

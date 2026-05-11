@@ -10,10 +10,10 @@ SRC := src/$(BASE_NAME).asm
 OBJ := $(BASE_NAME).o
 BIN := $(BASE_NAME)
 
-NASM_FLAGS_QUIET := -f elf64 -F dwarf -g
-NASM_FLAGS := -f elf64 -F dwarf -g -Werror -Wlabel -l $(BIN).lst
+NASM_FLAGS_QUIET := -f elf64 -g
+NASM_FLAGS := $(NASM_FLAGS_QUIET) -Werror -Wlabel -l $(BIN).lst
 LD_FLAGS_QUIET := -m elf_x86_64
-LD_FLAGS := -m elf_x86_64 --verbose --print-output-format --trace --cref
+LD_FLAGS := $(LD_FLAGS_QUIET) --verbose --print-output-format --trace --cref
 
 stepN_run:
 # 	@echo "=== Сборка ($(SRC)) ==="
