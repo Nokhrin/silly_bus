@@ -343,6 +343,60 @@ syscall
 message         db      'hello, world'
 msglen          equ     $-message
 
+
+
+## Функции ABI
+
+subprogram == callee
+
+### Метки
+
+| Компонент     | Инструкция    | Назначение             |
+|---------------|---------------|------------------------|
+| Вход          | `jmp .label`  | Переход к коду функции |
+| Аргументы     | RDI, RSI, RDX | Передача значений      |
+| Возврат       | RAX           | Результат функции      |
+| Возврат в код | `jmp .return` | Переход обратно        |
+
+Пример:
+```nasm
+section .text
+global _start
+_start:
+    mov rdi, 42          ; аргумент
+    jmp .double          ; вызов
+    
+.double:
+    shl rdi, 1           ; тело
+    mov rax, rdi         ; результат
+    jmp .return          ; возврат
+    
+.return:
+    ; RAX = 84
+    mov rdi, rax
+    mov rax, 231
+    syscall
+```
+
+### call / ret
+
+call
+RSP = RSP - 8 (выделение места в стеке)
+[RSP] = RIP (сохранение адреса следующей инструкции)
+RIP = .function (переход)
+
+ret
+RIP = [RSP] (загрузка адреса возврата)
+RSP = RSP + 8 (освобождение места в стеке)
+
+
+### Рекурсия
+| Регистр | Назначение   | Сохранение              |
+|---------|--------------|-------------------------|
+| RDI     | Аргумент (n) | Caller-saved            |
+| RAX     | Результат    | Caller-saved            |
+| RBX     | Временное n  | Callee-saved (push/pop) |
+
 ---
 
 # Директивы NASM
@@ -504,51 +558,6 @@ readelf -S ./program | grep -E '\.bss|\.data'
 
 ---
 
-## Функции
-
-subprogram == callee
-
-### Метки как функции
-
-| Компонент     | Инструкция    | Назначение             |
-|---------------|---------------|------------------------|
-| Вход          | `jmp .label`  | Переход к коду функции |
-| Аргументы     | RDI, RSI, RDX | Передача значений      |
-| Возврат       | RAX           | Результат функции      |
-| Возврат в код | `jmp .return` | Переход обратно        |
-
-Пример:
-```nasm
-section .text
-global _start
-_start:
-    mov rdi, 42          ; аргумент
-    jmp .double          ; вызов
-    
-.double:
-    shl rdi, 1           ; тело
-    mov rax, rdi         ; результат
-    jmp .return          ; возврат
-    
-.return:
-    ; RAX = 84
-    mov rdi, rax
-    mov rax, 231
-    syscall
-```
-
-### call / ret - вызов процедур
-
-call
-RSP = RSP - 8 (выделение места в стеке)
-[RSP] = RIP (сохранение адреса следующей инструкции)
-RIP = .function (переход)
-
-ret
-RIP = [RSP] (загрузка адреса возврата)
-RSP = RSP + 8 (освобождение места в стеке)
-
-
 ---
 
 
@@ -621,6 +630,40 @@ x/5i 0x401018    ->  5 инструкций (переменная длина)
 x/dw 0x402010    ->  1 × 4 байта = 4 байта памяти
 x/3db $rdi       ->  3 байта начиная с адреса в rdi (3 однобайтовых элемента массива)
 
+
+
+### Стек
+
+ Показать цепочку вызовов (самая важная команда)
+bt
+ или
+backtrace
+
+ Детали текущего кадра
+info frame
+info args
+info locals
+
+ Смотреть содержимое стека вокруг RSP
+x/8gx $rsp           8 значений по 8 байт (в формате giant)
+x/2gx $rsp           адрес возврата + сохранённый RBP
+
+ Авто-отображение ключевых регистров при каждом шаге
+display/x $rsp
+display/x $rbp
+display/x $rip
+display/i $pc
+
+
+Выполнять по одной инструкции, наблюдая за RSP
+si                   # stepi — одна машинная инструкция
+ni                   # nexti — следующая инструкция (не заходит в call)
+
+После выполнения ret RSP увеличится на 8, RIP перейдёт по адресу возврата
+дизассемблировать инструкцию по адресу возврата
+x/i *(void)(0xffffd948)
+x/i *(void)($rsp)
+x/i *(void)($rsp+8)
 
 ### Работа с метками
 Привести к char* для побайтовой арифметики
@@ -906,39 +949,19 @@ readelf -l ./program | grep LOAD
 
 ---
 
-# Авторитетные спецификации Linux x86-64 Assembly
+# Ресурсы
 
-### ответственность линкера
-Tool Interface Standard (TIS)
-Executable and Linking Format (ELF)
-Specification
-Version 1.2
-
-
-### регистры, стек, аргументы
-System V Application Binary Interface
-AMD64 Architecture Processor Supplement
-Draft Version 0.99.6
-
-
-### инструкции, регистры, флаги
-Intel® 64 and IA-32 Architectures
-Software Developer’s Manual
-Volume 1: Basic Architecture
-Volume 2 (2A & 2B): Instruction Set Reference, A-Z
-Volume 3 (3A, 3B, 3C, & 3D): System Programming Guide
-
-
-
-### директивы, макросы, метки
-NASM – The Netwide Assembler
-version 3.02rc6
-
-
-
-### номера системных вызовов
-Linux syscall table
-
-
-### отладка
-GDB documentation
+| Ресурс                       | Задача / Область ответственности                                                   | Ссылка                                                              |
+|------------------------------|------------------------------------------------------------------------------------|---------------------------------------------------------------------|
+| NASM Manual                  | Синтаксис директив, макросов, меток; препроцессор                                  | https://www.nasm.us/doc/                                            |
+| Intel SDM Vol 1              | Базовая архитектура: регистры, режимы адресации, исключения                        | https://www.intel.com/sdm                                           |
+| Intel SDM Vol 2A/2B          | Форматы инструкций, encoding, допустимые операнды (`r/m8` и т.д.)                  | https://www.intel.com/sdm                                           |
+| Intel SDM Vol 3A-D           | Системное программирование: сегментация, paging, прерывания                        | https://www.intel.com/sdm                                           |
+| System V AMD64 ABI           | Соглашения о вызовах: регистры аргументов, выравнивание стека, callee/caller-saved | https://refspecs.linuxfoundation.org/elf/x86_64-abi-0.99.pdf        |
+| ELF Specification (TIS)      | Формат объектных файлов: секции, релокации, таблица символов                       | https://refspecs.linuxfoundation.org/elf/elf.pdf                    |
+| Linux syscall table          | Номера системных вызовов и их сигнатуры                                            | https://blog.rchapman.org/posts/Linux_System_Call_Table_for_x86_64/ |
+| x86-64 Instruction Reference | Быстрый поиск инструкций с примерами encoding                                      | https://www.felixcloutier.com/x86/                                  |
+| GDB Documentation            | Отладка: команды `x`, `p`, breakpoints, inspect stack                              | https://sourceware.org/gdb/current/onlinedocs/gdb.html              |
+| NASM Cheat Sheet             | Краткая справка по синтаксису NASM                                                 | https://github.com/paul-gauthier/nasm-cheat-sheet                   |
+| Linux man pages (syscalls)   | Детали поведения `read`, `write`, `exit_group` и др.                               | https://man7.org/linux/man-pages/man2/                              |
+| Compiler Explorer (godbolt)  | Визуализация encoding инструкций, сравнение оптимизаций                            | https://godbolt.org/                                                |
