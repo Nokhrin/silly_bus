@@ -1,2 +1,2 @@
-public record Parsed<T>(T value, Integer offset) {
+public record Parsed<T>(T value, int offset) {
 }
