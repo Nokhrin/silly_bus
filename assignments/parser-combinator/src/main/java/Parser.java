@@ -43,4 +43,23 @@ public interface Parser<T> {
             return nextParser.apply(source, leftResult.get().offset());
         };
     }
+
+    default <R> Parser<Either<T,R>> or(Parser<R> right){
+        return (String source, int offset) ->{
+            Optional<Parsed<T>> leftResult = this.apply(source, offset);
+            //or => или успех, или неудача левого => вызвать правый
+            if (leftResult.isEmpty()){
+                Optional<Parsed<R>> rightResult = right.apply(source, offset);
+                if (rightResult.isEmpty()) {
+                    return Optional.empty();
+                }
+                return Optional.of(new Parsed<>(
+                        Either.right(rightResult.get().value()),
+                        rightResult.get().offset()));
+            }
+            return Optional.of(new Parsed<>(
+                    Either.left(leftResult.get().value()),
+                    leftResult.get().offset()));
+        };
+    }
 }

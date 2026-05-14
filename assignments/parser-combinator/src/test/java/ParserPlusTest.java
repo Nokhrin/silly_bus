@@ -4,11 +4,7 @@ import java.util.Optional;
 
 import static org.testng.Assert.*;
 
-public class ParserTest {
-
-    @Test
-    public void testApply() {
-    }
+public class ParserPlusTest {
 
     @Test
     public void testPlusTwoParsersMatch() {
@@ -20,9 +16,10 @@ public class ParserTest {
         assertTrue(result.isPresent());
         assertEquals(result.get().value().left(), 'a');
         assertEquals(result.get().value().right(), 'b');
+        assertEquals(result.get().offset(), 2);
     }
 
-    @Test
+    @Test(description = "Наследование отказа: отказ левого парсера приводит к отказу всей цепочки")
     public void testPlusLeftFailed() {
         Parser<Character> p1 = Parsers.characterParser('a');
         Parser<Character> p2 = Parsers.characterParser('b');
@@ -32,8 +29,8 @@ public class ParserTest {
         assertTrue(result.isEmpty());
     }
 
-    @Test
-    public void testPlusRightFailed() {
+    @Test(description = "Наследование отказа: успех левого + отказ правого парсера приводит к отказу всей цепочки")
+    public void testPlusLeftSucceedsRightFailed() {
         Parser<Character> p1 = Parsers.characterParser('a');
         Parser<Character> p2 = Parsers.characterParser('b');
         Parser<Tuple<Character, Character>> twoChars = p1.plus(p2);
@@ -55,4 +52,5 @@ public class ParserTest {
         assertEquals(result.get().value().left().right(), 'b');
         assertEquals(result.get().value().right(), 'c');
     }
+
 }
