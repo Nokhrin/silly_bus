@@ -1,31 +1,31 @@
 # Дорожная карта проектов asm-* (root roadmap)
 
-| Проект                                                                | Цель                                                        | Архитектура | План (часы) | Факт (часы) |
-|-----------------------------------------------------------------------|-------------------------------------------------------------|-------------|-------------|-------------|
-| [asm-fundamentals](../asm-fundamentals/docs/specification.md)         | Регистры, арифметика, память, циклы, ввод-вывод             | x86-64      | 20          | 60          |
-| [asm-functions](../asm-functions/docs/specification.md)               | Стек, call/ret, ABI, рекурсия, отладка                      | x86-64      | 16          | 48          |
-| [asm-string](../asm-string/docs/specification.md)                     | Строковые операции, переполнение буфера, безопасные функции | x86-64      | 16          | —           |
-| [asm-cpu-pipeline](../asm-cpu-pipeline/docs/specification.md)         | Пайплайн, hazards, forwarding, академическое изучение CPU   | RISC-V      | 24          | —           |
-| [fastlog](../fastlog/docs/specification.md)                           | Обработка логов, парсинг, сортировка, кэш-локальность       | x86-64      | 48          | —           |
-| [turing-machine-asm](../turing-machine-asm/docs/specification.md)     | Эмуляция МТ на ассемблере                                   | x86-64      | 24          | —           |
-| [lowlevel-runtime-asm](../lowlevel-runtime-asm/docs/specification.md) | Стек, куча, структуры, прерывания                           | x86-64      | 50          | —           |
-| [os-bootloader](../os-bootloader/docs/specification.md)               | Real Mode, Protected Mode, GDT, paging, Ring 0/3            | RISC-V      | 40          | —           |
-| **Итого**                                                             |                                                             |             | **238**     | **108**     |
+| Проект                                                                | Цель                                                                        | Архитектура | План (часы) |
+|-----------------------------------------------------------------------|-----------------------------------------------------------------------------|-------------|-------------|
+| [asm-fundamentals](../asm-fundamentals/docs/specification.md)         | Регистры, арифметика, память, циклы, ввод-вывод, знаковые/беззнаковые числа | x86-64      | 22          |
+| [asm-functions](../asm-functions/docs/specification.md)               | Стек, call/ret, ABI, рекурсия, отладка                                      | x86-64      | 16          |
+| [asm-string](../asm-string/docs/specification.md)                     | Строковые операции, переполнение буфера, безопасные функции                 | x86-64      | 16          |
+| [asm-cpu-pipeline](../asm-cpu-pipeline/docs/specification.md)         | Пайплайн, hazards, forwarding, академическое изучение CPU                   | RISC-V      | 24          |
+| [fastlog](../fastlog/docs/specification.md)                           | Обработка логов, парсинг, сортировка, кэш-локальность                       | x86-64      | 48          |
+| [turing-machine-asm](../turing-machine-asm/docs/specification.md)     | Эмуляция МТ на ассемблере                                                   | x86-64      | 24          |
+| [lowlevel-runtime-asm](../lowlevel-runtime-asm/docs/specification.md) | Стек, куча, структуры, прерывания                                           | x86-64      | 50          |
+| [os-bootloader](../os-bootloader/docs/specification.md)               | Machine Mode, Supervisor Mode, paging, прерывания                           | RISC-V      | 40          |
+| **Итого**                                                             |                                                                             |             | **240**     |
 
 ---
 
 ## Архитектурный трек
 
-| Проект               | x86-64 | RISC-V | Почему                                      |
+| Проект               | x86-64 | RISC-V | Обоснование                                 |
 |----------------------|--------|--------|---------------------------------------------|
-| asm-fundamentals     | ✅      | —      | Базовые концепции, Linux syscall            |
-| asm-functions        | ✅      | —      | ABI, рекурсия, отладка GDB                  |
-| asm-string           | ✅      | —      | Безопасность памяти, DEP/NX                 |
-| asm-cpu-pipeline     | —      | ✅      | Чистая архитектура, видимый пайплайн        |
-| fastlog              | ✅      | —      | Практическая оптимизация (SIMD)             |
-| turing-machine-asm   | ✅      | —      | Сложная логика, x86 удобнее                 |
-| lowlevel-runtime-asm | ✅      | —      | Linux syscall, malloc/free                  |
-| os-bootloader        | —      | ✅      | Проще для bare-metal, открытая спецификация |
+| asm-fundamentals     | да     | нет    | Базовые концепции, Linux syscall            |
+| asm-functions        | да     | нет    | ABI, рекурсия, отладка GDB                  |
+| asm-string           | да     | нет    | Безопасность памяти, DEP/NX                 |
+| asm-cpu-pipeline     | нет    | да     | Чистая архитектура, видимый пайплайн        |
+| fastlog              | да     | нет    | Практическая оптимизация (SIMD)             |
+| turing-machine-asm   | да     | нет    | Сложная логика, x86 удобнее                 |
+| lowlevel-runtime-asm | да     | нет    | Linux syscall, malloc/free                  |
+| os-bootloader        | нет    | да     | Проще для bare-metal, открытая спецификация |
 
 ---
 
