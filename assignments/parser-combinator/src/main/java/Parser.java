@@ -62,4 +62,20 @@ public interface Parser<T> {
                     leftResult.get().offset()));
         };
     }
+
+    /**
+     * получает значение типа T
+     * вызывает преобразование T->R
+     * возвращает значение типа R
+     * не изменяет offset
+     */
+    default <R> Parser<R> map(Function<T,R> transformer) {
+        return ((source, offset) -> {
+            Optional<Parsed<T>> result = this.apply(source, offset);
+            if (result.isEmpty()) return Optional.empty();
+            Parsed<T> parsed = result.get();
+            R parsedTransformed = transformer.apply(parsed.value());
+            return Optional.of(new Parsed<>(parsedTransformed, parsed.offset()));
+        });
+    }
 }
