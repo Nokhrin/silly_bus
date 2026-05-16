@@ -1,0 +1,9 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="Parser-Combinator-All">
+    <test name="all-parser-tests">
+        <classes>
+            <class name="ParserTest"/>
+            <class name="ParsersTest"/>
+        </classes>
+    </test>
+</suite>

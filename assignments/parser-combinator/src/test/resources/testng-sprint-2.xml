@@ -1,0 +1,26 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="Parser-Combinator-All">
+    <!-- flatMap -->
+    <test name="flatMap-tests">
+        <groups><run><include name="flatMap"/></run></groups>
+        <classes><class name="ParserTest"/></classes>
+    </test>
+
+    <!-- or + plus -->
+    <test name="or-plus-tests">
+        <groups><run><include name="or"/><include name="plus"/></run></groups>
+        <classes><class name="ParserTest"/></classes>
+    </test>
+
+    <!-- map -->
+    <test name="map-tests">
+        <groups><run><include name="map"/></run></groups>
+        <classes><class name="ParserTest"/></classes>
+    </test>
+
+    <!-- skip -->
+    <test name="skip-tests">
+        <groups><run><include name="skip"/></run></groups>
+        <classes><class name="ParserTest"/></classes>
+    </test>
+</suite>

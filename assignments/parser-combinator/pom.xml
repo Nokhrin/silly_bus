@@ -17,6 +17,7 @@
         <testng.version>7.9.0</testng.version>
         <jacoco-maven-plugin.version>0.8.14</jacoco-maven-plugin.version>
         <maven-checkstyle-plugin.version>3.6.0</maven-checkstyle-plugin.version>
+        <maven-surefire-plugin.version>3.5.5</maven-surefire-plugin.version>
     </properties>
 
     <dependencies>
@@ -47,6 +48,16 @@
                 <version>${maven-compiler-plugin.version}</version>
                 <configuration>
                     <release>${java.version}</release>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${maven-surefire-plugin.version}</version>
+                <configuration>
+                    <suiteXmlFiles>
+                        <suiteXmlFile>src/test/resources/testng-all.xml</suiteXmlFile>
+                    </suiteXmlFiles>
                 </configuration>
             </plugin>
         </plugins>
