@@ -78,4 +78,21 @@ public interface Parser<T> {
             return Optional.of(new Parsed<>(parsedTransformed, parsed.offset()));
         });
     }
+
+    /**
+     * Пропускает левое выражение
+     * Сохраняет offset
+     */
+    default <R> Parser<R> skipLeft(Parser<R> right) {
+        return this.plus(right)
+                .map(Tuple::right);
+    }
+    /**
+     * Пропускает правое выражение
+     * Сохраняет offset
+     */
+    default <R> Parser<T> skipRight(Parser<R> right) {
+        return this.plus(right)
+                .map(Tuple::left);
+    }
 }

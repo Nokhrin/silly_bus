@@ -7,7 +7,9 @@ import static org.testng.Assert.*;
 
 public class ParserTest {
 
-    @Test
+    //region ===== flatMap =====
+
+    @Test(groups = "flatMap")
     public void testFlatMapLeftFailed_MapperNotCalled() {
         Parser<Character> failedParser = (source, offset) -> Optional.empty();
         boolean[] mapperCalled = {false};
@@ -19,7 +21,7 @@ public class ParserTest {
         assertFalse(mapperCalled[0]);
     }
 
-    @Test
+    @Test(groups = "flatMap")
     public void testLeftSucceed_MapperFailed() {
         Parser<Character> leftParserSuccess = Parsers.characterParser('a');
         Parser<Character> result = leftParserSuccess.flatMap(parser ->
@@ -28,7 +30,7 @@ public class ParserTest {
         assertTrue(result.apply("ab", 0).isEmpty());
     }
 
-    @Test
+    @Test(groups = "flatMap")
     public void testFlatMapOffsetCorrect() {
         Parser<Character> parserA = Parsers.characterParser('a');
         Parser<String> resultParser = parserA.flatMap(characterParsed ->
@@ -45,8 +47,11 @@ public class ParserTest {
         assertEquals(result.get().offset(), 2);
     }
 
+    //endregion
 
-    @Test
+    //region ===== or =====
+
+    @Test(groups = "or")
     public void testOrLeftFailed() {
         Parser<Character> p1 = Parsers.characterParser('a');
         Parser<Character> p2 = Parsers.characterParser('b');
@@ -59,7 +64,7 @@ public class ParserTest {
         assertEquals(result.get().offset(), 1);
     }
 
-    @Test
+    @Test(groups = "or")
     public void testOrOffsetLeftSuccessRightFail() {
         Parser<Character> p1 = Parsers.characterParser('a');
         Parser<Character> p2 = Parsers.characterParser('b');
@@ -71,10 +76,9 @@ public class ParserTest {
         assertFalse(result.get().value().isRight());
         assertEquals(result.get().value().left(), 'a');
         assertEquals(result.get().offset(), 1);
-
     }
 
-    @Test
+    @Test(groups = "or")
     public void testOrLeftFailRightFail() {
         Parser<Character> p1 = Parsers.characterParser('a');
         Parser<Character> p2 = Parsers.characterParser('b');
@@ -84,7 +88,7 @@ public class ParserTest {
         assertTrue(result.isEmpty());
     }
 
-    @Test
+    @Test(groups = "or")
     public void testOrOffsetLeftSuccessRightSkipped() {
         Parser<Character> p1 = Parsers.characterParser('a');
         Parser<Character> p2 = Parsers.characterParser('b');
@@ -96,10 +100,9 @@ public class ParserTest {
         assertTrue(result.get().value().isLeft());
         assertFalse(result.get().value().isRight());
         assertEquals(result.get().offset(), 1);
-
     }
 
-    @Test
+    @Test(groups = "or")
     public void testLeftSuccessRightNotCalled() {
         AtomicBoolean isRightCalled = new AtomicBoolean(false);
 
@@ -119,7 +122,11 @@ public class ParserTest {
         assertFalse(result.get().value().isRight());
     }
 
-    @Test
+    //endregion
+
+    //region ===== plus =====
+
+    @Test(groups = "plus")
     public void testPlusTwoParsersMatch() {
         Parser<Character> p1 = Parsers.characterParser('a');
         Parser<Character> p2 = Parsers.characterParser('b');
@@ -132,7 +139,7 @@ public class ParserTest {
         assertEquals(result.get().offset(), 2);
     }
 
-    @Test(description = "Наследование отказа: отказ левого парсера приводит к отказу всей цепочки")
+    @Test(groups = "plus")
     public void testPlusLeftFailed() {
         Parser<Character> p1 = Parsers.characterParser('a');
         Parser<Character> p2 = Parsers.characterParser('b');
@@ -142,7 +149,7 @@ public class ParserTest {
         assertTrue(result.isEmpty());
     }
 
-    @Test(description = "Наследование отказа: успех левого + отказ правого парсера приводит к отказу всей цепочки")
+    @Test(groups = "plus")
     public void testPlusLeftSucceedsRightFailed() {
         Parser<Character> p1 = Parsers.characterParser('a');
         Parser<Character> p2 = Parsers.characterParser('b');
@@ -152,7 +159,7 @@ public class ParserTest {
         assertTrue(result.isEmpty());
     }
 
-    @Test
+    @Test(groups = "plus")
     public void testPlusThreeParsersMatch() {
         Parser<Character> p1 = Parsers.characterParser('a');
         Parser<Character> p2 = Parsers.characterParser('b');
@@ -166,17 +173,20 @@ public class ParserTest {
         assertEquals(result.get().value().right(), 'c');
     }
 
-    @Test(description = "Успех + трансформация + проверка смещения")
-    public void testMapTransformSuccess() {
+    //endregion
+
+    //region ===== map =====
+
+    @Test(groups = "map")
+    public void testMapTransformSuccessOffsetCorrect() {
         Parser<Character> characterParser = Parsers.digitParser();
         Parser<Integer> integerParser = characterParser.map(Character::getNumericValue);
         Optional<Parsed<Integer>> result = integerParser.apply("1", 0);
 
         assertEquals(result.get().value(), 1);
-
     }
 
-    @Test
+    @Test(groups = "map")
     public void testMapParserFailedTransformSkipped() {
         AtomicBoolean isTransformed = new AtomicBoolean(false);
         Parser<Character> characterParser = Parsers.digitParser();
@@ -189,10 +199,9 @@ public class ParserTest {
 
         assertTrue(result.isEmpty());
         assertFalse(isTransformed.get());
-
     }
 
-    @Test
+    @Test(groups = "map")
     public void testMapChainTwoDifferentTypes() {
         Parser<Character> characterParser = Parsers.digitParser();
         Parser<String> stringParser = characterParser
@@ -202,4 +211,43 @@ public class ParserTest {
 
         assertEquals(result.get().value(), "1");
     }
+
+    //endregion
+
+    //region ===== skip =====
+    @Test(groups = "skip")
+    public void testRightSkippedOffsetComplete() {
+        Parser<String> p1 = Parsers.stringParser("hello");
+        Parser<String> p2 = Parsers.stringParser(" world");
+        Parser<String> chainedParser = p1.skipRight(p2);
+
+        Optional<Parsed<String>> result = chainedParser.apply("hello world", 0);
+
+        assertEquals(result.get().value(), "hello");
+        assertEquals(result.get().offset(), 11);
+    }
+
+    @Test(groups = "skip")
+    public void testLeftSkippedOffsetComplete() {
+        Parser<String> p1 = Parsers.stringParser("(");
+        Parser<String> p2 = Parsers.stringParser("123");
+        Parser<String> chainedParser = p1.skipLeft(p2);
+
+        Optional<Parsed<String>> result = chainedParser.apply("(123)", 0);
+
+        assertEquals(result.get().value(), "123");
+        assertEquals(result.get().offset(), 4);
+    }
+
+    @Test(groups = "skip")
+    public void testRightFailedParsingFailed() {
+        Parser<String> p1 = Parsers.stringParser("(");
+        Parser<String> p2 = Parsers.stringParser("123");
+        Parser<String> chainedParser = p1.skipLeft(p2);
+
+        Optional<Parsed<String>> result = chainedParser.apply("()", 0);
+
+        assertTrue(result.isEmpty());
+    }
+    //endregion
 }
