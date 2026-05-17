@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -44,11 +46,11 @@ public interface Parser<T> {
         };
     }
 
-    default <R> Parser<Either<T,R>> or(Parser<R> right){
-        return (String source, int offset) ->{
+    default <R> Parser<Either<T, R>> or(Parser<R> right) {
+        return (String source, int offset) -> {
             Optional<Parsed<T>> leftResult = this.apply(source, offset);
             //or => или успех, или неудача левого => вызвать правый
-            if (leftResult.isEmpty()){
+            if (leftResult.isEmpty()) {
                 Optional<Parsed<R>> rightResult = right.apply(source, offset);
                 if (rightResult.isEmpty()) {
                     return Optional.empty();
@@ -69,7 +71,7 @@ public interface Parser<T> {
      * возвращает значение типа R
      * не изменяет offset
      */
-    default <R> Parser<R> map(Function<T,R> transformer) {
+    default <R> Parser<R> map(Function<T, R> transformer) {
         return ((source, offset) -> {
             Optional<Parsed<T>> result = this.apply(source, offset);
             if (result.isEmpty()) return Optional.empty();
@@ -87,6 +89,7 @@ public interface Parser<T> {
         return this.plus(right)
                 .map(Tuple::right);
     }
+
     /**
      * Пропускает правое выражение
      * Сохраняет offset
@@ -94,5 +97,61 @@ public interface Parser<T> {
     default <R> Parser<T> skipRight(Parser<R> right) {
         return this.plus(right)
                 .map(Tuple::left);
+    }
+
+    /**
+     * Комбинатор-итератор
+     * Выполняет повторения,
+     * накапливает результаты в список,
+     * сохраняет смещение
+     * Реализует грамматику {min,max}
+     * Ищет все совпадения до max (жадность) или до отказа парсера
+     */
+    default Parser<List<T>> repeat(int min, int max) {
+        if (min > max || min < 0) throw new IllegalArgumentException("Количество повторов указано некорректно");
+        return ((source, offset) -> {
+            List<T> results = new ArrayList<>();
+            int currentOffset = offset;
+
+            for (int i = 0; i < max; i++) {
+                Optional<Parsed<T>> result = this.apply(source, currentOffset);
+                if (result.isEmpty()) break;
+                results.add(result.get().value());
+
+                if (result.get().offset() == currentOffset) {
+                    throw new IllegalStateException("Зацикливание - успешный парсинг без смещения");
+                }
+                currentOffset = result.get().offset();
+            }
+
+            if (results.size() < min) return Optional.empty();
+            return Optional.of(new Parsed<>(results, currentOffset));
+        });
+    }
+
+    /**
+     * Грамматика *
+     */
+    default <R> Parser<List<T>> zeroOrMore() {
+        return this.repeat(0, Integer.MAX_VALUE);
+    }
+
+    /**
+     * Грамматика +
+     */
+    default <R> Parser<List<T>> oneOrMore() {
+        return this.repeat(1, Integer.MAX_VALUE);
+    }
+
+    /**
+     * Грамматика ?
+     */
+    default <R> Parser<Optional<T>> optionally(){
+        return (source, offset) -> {
+            Optional<Parsed<T>> result = this.apply(source, offset);
+            if (result.isEmpty()) return Optional.of(new Parsed<>(Optional.empty(), offset));
+            return Optional.of(new Parsed<>(
+                    Optional.of(result.get().value()), result.get().offset()));
+        };
     }
 }
