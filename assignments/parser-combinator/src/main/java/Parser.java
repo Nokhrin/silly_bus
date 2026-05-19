@@ -1,3 +1,6 @@
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -152,6 +155,23 @@ public interface Parser<T> {
             if (result.isEmpty()) return Optional.of(new Parsed<>(Optional.empty(), offset));
             return Optional.of(new Parsed<>(
                     Optional.of(result.get().value()), result.get().offset()));
+        };
+    }
+
+    static Logger LOGGER = LoggerFactory.getLogger("ParserDebug");
+    /**
+     * Формирует строку логирования.
+     */
+    default <R> Parser<T> debug(String parserName){
+        return (source, offset)->{
+            LOGGER.debug(">>> Парсер: {}: смещение={}, строка={}", parserName, offset, source);
+            Optional<Parsed<T>> result = this.apply(source, offset);
+
+            if (result.isEmpty()){
+                LOGGER.debug("<<< Выполнен: {}: ОШИБКА парсинга на смещении {}", parserName, offset);
+            }
+            LOGGER.debug("<<< Выполнен: {}: УСПЕХ парсинга, значение: {}, смещение: {}", parserName, result.get().value(), offset);
+            return result;
         };
     }
 }

@@ -48,4 +48,27 @@ public class ProxyParserTest {
 
 
     }
+
+    @Test
+    public void testProxyParser_NestedParenthesesWithDigit_ReturnsInnerValueAndOffset(){
+        ProxyParser<String> proxyParser = new ProxyParser<>();
+
+        Parser<String> baseParser = Parsers.digitParser()
+                .map(String::valueOf);
+
+        Parser<String> recursiveParser =Parsers.characterParser('(')
+                .skipLeft(proxyParser)
+                .skipRight(Parsers.characterParser(')'));
+
+        proxyParser.setDelegate(
+                recursiveParser
+                        .or(baseParser)
+                        .map(either->either.isLeft() ? either.left() : either.right())
+        );
+
+        var result = proxyParser.apply("((4))", 0);
+
+        assertEquals(result.get().value(), "4");
+        assertEquals(result.get().offset(),5);
+    }
 }
