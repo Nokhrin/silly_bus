@@ -81,4 +81,15 @@ public class Parsers {
         };
     }
 
+    /**
+     * Проверяет условие "весь ввод распознан"
+     */
+    public static Parser<String> eof(){
+        return (source, offset) -> {
+            if (offset==source.length()) {
+                return Optional.of(new Parsed<>("", offset));
+            }
+            return Optional.empty();
+        };
+    }
 }
