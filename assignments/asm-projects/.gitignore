@@ -4,4 +4,4 @@ step*
 !*.asm
 *_test.asm
 .gdbinit
-!templates/.gdbinit
+!templates/

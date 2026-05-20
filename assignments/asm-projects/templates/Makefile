@@ -15,7 +15,7 @@ NASM_FLAGS := $(NASM_FLAGS_QUIET) -Werror -Wlabel -l $(BIN).lst
 LD_FLAGS_QUIET := -m elf_x86_64
 LD_FLAGS := $(LD_FLAGS_QUIET) --verbose --print-output-format --trace --cref
 
-stepN_run:
+step_run:
 # 	@echo "=== Сборка ($(SRC)) ==="
 	@$(NASM) $(NASM_FLAGS_QUIET) $(SRC) -o $(OBJ)
 # 	@echo "=== Линковка ==="
@@ -23,7 +23,7 @@ stepN_run:
 # 	@echo "=== Выполнение ==="
 	./$(BIN); echo $$?
 
-stepN_test:
+step_test:
 	@echo "=== Сборка ($(SRC)) ==="
 	$(NASM) $(NASM_FLAGS) $(SRC) -o $(OBJ)
 	@echo "=== Линковка ==="
