@@ -71,4 +71,38 @@ public class ProxyParserTest {
         assertEquals(result.get().value(), "4");
         assertEquals(result.get().offset(),5);
     }
-}
+
+    @Test
+    public void testProxyParser_VariableWhitespaces() {
+        ProxyParser<String> proxyParser = new ProxyParser<>();
+
+        // digit
+        Parser<String> baseParser = Parsers.digitParser()
+                .map(String::valueOf);
+
+        // ['('] digit [')']
+        Parser<String> recursiveParser =Parsers.characterParser('(')
+                .skipLeft(proxyParser)
+                .skipRight(Parsers.characterParser(')'));
+
+        // {ws}
+        Parser<List<Character>> wsParser = Parsers.whitespaceParser().zeroOrMore();
+
+        // как в грамматике описать чередование пробелов и скобок?
+
+        // {ws} ['('] digit [')'] {ws}
+        var expr = wsParser.skipLeft(proxyParser).skipRight(wsParser);
+
+        // ['('] digit [')'] | digit
+        proxyParser.setDelegate(recursiveParser
+                .or(expr)
+                .map(either->either.isLeft() ? either.left() : either.right()));
+        // => java.lang.StackOverflowError
+
+        var result = expr.apply("  (( 4    )  )", 0);
+
+//        assertEquals(result.get().value());
+        assertEquals(result.get().offset(), 1);
+    }
+
+    }

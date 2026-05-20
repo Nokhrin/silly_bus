@@ -435,4 +435,38 @@ public class ParserTest {
         assertEquals(result.get().offset(), expectedOffset);
     }
     //endregion
+
+    //region ===== debug =====
+    @Test
+    public void testDebug_OneParser_ValueAndOffsetPreserved(){
+        Parser<Character> characterParser = Parsers.characterParser('a');
+        Parser<Character> characterParserDebug = Parsers.characterParser('a').debug("aParser");
+
+        Optional<Parsed<Character>> result=characterParser.apply("a",0);
+        Optional<Parsed<Character>> resultDebug=characterParserDebug.apply("a",0);
+
+        assertEquals(result.get().value(), resultDebug.get().value());
+        assertEquals(result.get().offset(), resultDebug.get().offset());
+        //19:54:12.676 [main] DEBUG ParserDebug -- >>> Парсер: aParser: строка=a, стартовое смещение=0
+        //19:54:12.677 [main] DEBUG ParserDebug -- <<< Выполнен: aParser: УСПЕХ парсинга, значение: a на смещении: 0
+    }
+
+    @Test
+    public void testDebug_ChainedParser_ValueAndOffsetPreserved(){
+        var chainedParser =
+                Parsers.characterParser('a')
+                        .debug("leftParser")
+                        .plus(Parsers.characterParser('b').debug("rightParser"));
+
+        Optional<Parsed<Tuple<Character, Character>>> result=chainedParser.apply("ab",0);
+
+        assertEquals(result.get().value().left(), 'a');
+        assertEquals(result.get().value().right(), 'b');
+
+        //20:02:13.905 [main] DEBUG ParserDebug -- >>> Парсер: leftParser: строка=ab, стартовое смещение=0
+        //20:02:13.907 [main] DEBUG ParserDebug -- <<< Выполнен: leftParser: УСПЕХ парсинга, значение: a на смещении: 0
+        //20:02:13.912 [main] DEBUG ParserDebug -- >>> Парсер: rightParser: строка=ab, стартовое смещение=1
+        //20:02:13.913 [main] DEBUG ParserDebug -- <<< Выполнен: rightParser: УСПЕХ парсинга, значение: b на смещении: 1
+    }
+    //endregion
 }

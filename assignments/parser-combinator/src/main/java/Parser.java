@@ -164,13 +164,13 @@ public interface Parser<T> {
      */
     default <R> Parser<T> debug(String parserName){
         return (source, offset)->{
-            LOGGER.debug(">>> Парсер: {}: смещение={}, строка={}", parserName, offset, source);
+            LOGGER.debug(">>> Парсер: {}: строка={}, стартовое смещение={}", parserName, source, offset);
             Optional<Parsed<T>> result = this.apply(source, offset);
 
             if (result.isEmpty()){
                 LOGGER.debug("<<< Выполнен: {}: ОШИБКА парсинга на смещении {}", parserName, offset);
             }
-            LOGGER.debug("<<< Выполнен: {}: УСПЕХ парсинга, значение: {}, смещение: {}", parserName, result.get().value(), offset);
+            LOGGER.debug("<<< Выполнен: {}: УСПЕХ парсинга, значение: {} на смещении: {}", parserName, result.get().value(), offset);
             return result;
         };
     }
