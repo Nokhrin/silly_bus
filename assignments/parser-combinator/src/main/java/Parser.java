@@ -174,4 +174,15 @@ public interface Parser<T> {
             return result;
         };
     }
+
+    /**
+     * Комбинатор однотипных альтернатив
+     */
+    default Parser<T> alt(Parser<T> other){
+        return (source, offset) -> {
+            Optional<Parsed<T>> leftResult = this.apply(source, offset);
+            if (leftResult.isPresent()) return leftResult;
+            return other.apply(source, offset);
+        };
+    }
 }

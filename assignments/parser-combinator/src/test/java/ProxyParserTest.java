@@ -50,59 +50,60 @@ public class ProxyParserTest {
     }
 
     @Test
-    public void testProxyParser_NestedParenthesesWithDigit_ReturnsInnerValueAndOffset(){
+    public void testProxyParser_NestedParenthesesWithDigit_ReturnsInnerValueAndOffset() {
         ProxyParser<String> proxyParser = new ProxyParser<>();
 
         Parser<String> baseParser = Parsers.digitParser()
                 .map(String::valueOf);
 
-        Parser<String> recursiveParser =Parsers.characterParser('(')
+        Parser<String> recursiveParser = Parsers.characterParser('(')
                 .skipLeft(proxyParser)
                 .skipRight(Parsers.characterParser(')'));
 
         proxyParser.setDelegate(
                 recursiveParser
                         .or(baseParser)
-                        .map(either->either.isLeft() ? either.left() : either.right())
+                        .map(either -> either.isLeft() ? either.left() : either.right())
         );
 
         var result = proxyParser.apply("((4))", 0);
 
         assertEquals(result.get().value(), "4");
-        assertEquals(result.get().offset(),5);
+        assertEquals(result.get().offset(), 5);
     }
 
     @Test
     public void testProxyParser_VariableWhitespaces() {
-        ProxyParser<String> proxyParser = new ProxyParser<>();
+        // {ws}
+        Parser<List<Character>> ws = Parsers.whitespaceParser().zeroOrMore();
+
+        // (
+        Parser<Character> leftPar = Parsers.characterParser('(');
+
+        // )
+        Parser<Character> rightPar = Parsers.characterParser(')');
 
         // digit
-        Parser<String> baseParser = Parsers.digitParser()
-                .map(String::valueOf);
+        Parser<String> digit = Parsers.digitParser().map(String::valueOf);
 
-        // ['('] digit [')']
-        Parser<String> recursiveParser =Parsers.characterParser('(')
-                .skipLeft(proxyParser)
-                .skipRight(Parsers.characterParser(')'));
+        ProxyParser<String> expr = new ProxyParser<>();
 
-        // {ws}
-        Parser<List<Character>> wsParser = Parsers.whitespaceParser().zeroOrMore();
+        // ( {ws} expr {ws} )
+        Parser<String> exprInPar = leftPar
+                .skipRight(ws)
+                .skipLeft(expr)
+                .skipRight(ws)
+                .skipRight(rightPar);
 
-        // как в грамматике описать чередование пробелов и скобок?
+        // {ws} ( digit | ( {ws} expr {ws} ) ) {ws}
+        expr.setDelegate(ws.skipLeft(digit.or(exprInPar))
+                .map(either -> either.isLeft() ? either.left() : either.right())
+                .skipRight(ws));
 
-        // {ws} ['('] digit [')'] {ws}
-        var expr = wsParser.skipLeft(proxyParser).skipRight(wsParser);
+                var result = expr.apply("  (( 4    )  )", 0);
 
-        // ['('] digit [')'] | digit
-        proxyParser.setDelegate(recursiveParser
-                .or(expr)
-                .map(either->either.isLeft() ? either.left() : either.right()));
-        // => java.lang.StackOverflowError
-
-        var result = expr.apply("  (( 4    )  )", 0);
-
-//        assertEquals(result.get().value());
-        assertEquals(result.get().offset(), 1);
+        assertEquals(result.get().value(), "4");
+        assertEquals(result.get().offset(), 14);
     }
 
-    }
+}

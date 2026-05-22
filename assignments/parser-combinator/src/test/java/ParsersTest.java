@@ -125,4 +125,34 @@ public class ParsersTest {
         assertEquals(result.get().offset(), 5);
     }
     //endregion
+
+    //region ===== whitespaces =====
+    @Test(groups = "whitespaces")
+    public void testWhitespaces_Empty_ZeroOffset(){
+        Optional<Parsed<String>> result = Parsers.whitespaces().apply("", 0);
+
+        assertEquals(result.get().value(), "");
+        assertEquals(result.get().offset(), 0);
+    }
+
+    @Test(groups = "whitespaces")
+    public void testWhitespaces_StopAtNonWhitespace(){
+        Optional<Parsed<String>> result = Parsers.whitespaces().apply("  a", 0);
+
+        assertEquals(result.get().value(), "");
+        assertEquals(result.get().offset(), 2);
+    }
+
+    @Test(groups = "whitespaces")
+    public void testWhitespaces_MixedWhitespacesOnly_OffsetEqualsLength(){
+        Optional<Parsed<String>> result = Parsers.whitespaces().apply(" \t\n\n\n\r \f", 0);
+
+        assertEquals(result.get().value(), "");
+        assertEquals(result.get().offset(), 8);
+
+    }
+
+    //endregion
+
+
 }

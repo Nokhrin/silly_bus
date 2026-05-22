@@ -469,4 +469,32 @@ public class ParserTest {
         //20:02:13.913 [main] DEBUG ParserDebug -- <<< Выполнен: rightParser: УСПЕХ парсинга, значение: b на смещении: 1
     }
     //endregion
+
+    //region ===== alt =====
+    @Test
+    public void testAlt_LeftParsed_RightSkipped(){
+        Parser<Character> leftParser = Parsers.characterParser('a');
+        Parser<Character> rightParser = Parsers.characterParser('b');
+        Optional<Parsed<Character>> result = leftParser.alt(rightParser).apply("ab", 0);
+        assertEquals(result.get().value(), 'a');
+        assertEquals(result.get().offset(), 1);
+    }
+
+    @Test
+    public void testAlt_LeftFailed_RightParsed(){
+        Parser<Character> leftParser = Parsers.characterParser('a');
+        Parser<Character> rightParser = Parsers.characterParser('b');
+        Optional<Parsed<Character>> result = leftParser.alt(rightParser).apply("ba", 0);
+        assertEquals(result.get().value(), 'b');
+        assertEquals(result.get().offset(), 1);
+    }
+
+    @Test
+    public void testAlt_BothFailed_ReturnsEmpty(){
+        Parser<Character> leftParser = Parsers.characterParser('a');
+        Parser<Character> rightParser = Parsers.characterParser('b');
+        Optional<Parsed<Character>> result = leftParser.alt(rightParser).apply("cd", 0);
+        assertTrue(result.isEmpty());
+    }
+    //endregion
 }

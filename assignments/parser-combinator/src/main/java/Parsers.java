@@ -1,4 +1,5 @@
 import java.util.Optional;
+import java.util.Set;
 
 public class Parsers {
 
@@ -63,7 +64,7 @@ public class Parsers {
     }
 
     /**
-     * Парсит символ класса "цифры"
+     * Парсит пробельные символы
      * @return
      */
     public static Parser<Character> whitespaceParser() {
@@ -90,6 +91,21 @@ public class Parsers {
                 return Optional.of(new Parsed<>("", offset));
             }
             return Optional.empty();
+        };
+    }
+
+    private static final Set<Character> WHITESPACES = Set.of(' ', '\t', '\n', '\r', '\f');
+    /**
+     * Поглощает {ws}
+     */
+    public static Parser<String> whitespaces(){
+        return (source, offset) -> {
+            int wsOffset = offset;
+            while (wsOffset < source.length()
+            && WHITESPACES.contains(source.charAt(wsOffset))){
+                wsOffset++;
+            }
+            return Optional.of(new Parsed<>("", wsOffset));
         };
     }
 }

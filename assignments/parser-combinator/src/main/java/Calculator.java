@@ -1,5 +1,6 @@
+import java.util.Optional;
+
 public class Calculator {
-    private final Parser<Expr> exprParser;
 
     /**
      * Число
@@ -25,57 +26,108 @@ public class Calculator {
      * sum ::= mul { ( + | - ) mul }
      */
     private final ProxyParser<Expr> sum;
+    private final Parser<Expr> exprParser;
 
     public Calculator(Parser<Expr> exprParser) {
-        this.exprParser = exprParser;
-        this.mul= new ProxyParser<>();
-        this.sum= new ProxyParser<>();
-
-        // num ::= [digit]
-        this.num = Parsers.digitParser().map(character -> new Num(character-'0'));
-
-        // prime ::= num | '(' expr ')'
+        this.mul = new ProxyParser<>();
+        this.sum = new ProxyParser<>();
         this.prime = new ProxyParser<>();
 
-        // mul ::= prime { ( * | / ) } prime
-        Parser<Tuple<String, Expr>> mulOp =
-                Parsers.characterParser('*').or(Parsers.characterParser('/'))
-                        .map(c -> c.toString())
-                        .plus(this.prime);
+        // num ::= [digit]
+        this.num = Parsers.digitParser().oneOrMore().map(characters -> {
+            StringBuilder stringBuilder = new StringBuilder();
+            for (Character character : characters) {
+                stringBuilder.append(character);
+            }
+            return new Num(Integer.parseInt(stringBuilder.toString()));
+        });
+
+        // ( * | / ) prime
+        Parser<Tuple<String, Expr>> mulOp = Parsers
+                .characterParser('*')
+                .alt(Parsers.characterParser('/'))
+                .map(String::valueOf)
+                .plus(this.prime);
+
+        // ( + | - ) mul
+        Parser<Tuple<String, Expr>> sumOp = Parsers.characterParser('+')
+                .alt(Parsers.characterParser('-'))
+                .map(String::valueOf)
+                .plus(this.mul);
+
+        // ( expr )
+        Parser<Expr> parenthesisExpr = Parsers.characterParser('(')
+                .skipLeft(this.sum)
+                .skipRight(Parsers.characterParser(')'));
+
+        // prime ::= num | '(' expr ')'
+        this.prime.setDelegate(this.num.alt(parenthesisExpr));
+
+        // mul ::= prime { ( * | / ) prime }
+        this.mul.setDelegate(
+                this.prime.flatMap(head ->
+                        mulOp.zeroOrMore()
+                                .map(tail -> {
+                                    Expr result = head.value();
+                                    for (var pair : tail) {
+                                        result = new BinOp(result, pair.left(), pair.right());
+                                    }
+                                    return result;
+                                }))
+        );
 
         // sum ::= mul { ( + | - ) mul }
-        Parser<Tuple<String, Expr>> sumOp =
-                Parsers.characterParser('+').or(Parsers.characterParser('-'))
-                        .map(c -> c.toString())
-                        .plus(this.mul);
-
-        // sum AST
-        this.sum.setDelegate(this.mul.flatMap(head->
-                sumOp.zeroOrMore().map(tail->{
+        this.sum.setDelegate(this.mul.flatMap(head ->
+                sumOp.zeroOrMore().map(tail -> {
                     Expr result = head.value();
-                    for (var pair:tail){
-                        result= new BinOp(result, pair.left(), pair.right());
+                    for (var pair : tail) {
+                        result = new BinOp(result, pair.left(), pair.right());
                     }
                     return result;
                 })));
+
+        this.exprParser = this.sum.skipRight(Parsers.eof());
     }
 
 
     /**
      * Возвращает AST
      */
-public Expr parse(String input){
-    return null;
-}
+    public Expr parse(String input) {
+
+        Optional<Parsed<Expr>> parsedOptional = exprParser.apply(input, 0);
+        if (parsedOptional.isEmpty()) {
+            throw new IllegalArgumentException("Синтаксическая ошибка");
+        }
+        return parsedOptional.get().value();
+    }
 
     /**
-     * Обходит AST, вычисляет
+     * Вычисляет узел AST
      */
-//    evaluate(Expr astSource)
+    private double evaluate(Expr astNode) {
+        return switch (astNode) {
+            case Num(int value) -> value;
+            case BinOp(Expr left, String op, Expr right) -> {
+                double leftVal = evaluate(left);
+                double rightVal = evaluate(right);
+                yield switch (op) {
+                    case "+" -> leftVal + rightVal;
+                    case "-" -> leftVal - rightVal;
+                    case "*" -> leftVal * rightVal;
+                    case "/" -> leftVal / rightVal; //todo - проверка rightVal==0
+                    default -> throw new IllegalArgumentException("Неизвестный оператор");
+
+                };
+            }
+        };
+    }
 
     /**
-     * Предоставляет интерфейс: вызывает парсер -> evaluate
+     * Предоставляет интерфейс: парсинг -> вычисление
      */
-//    calculate(String input)
+    public double calculate(String input) {
+        return evaluate(parse(input));
+    }
 
 }
