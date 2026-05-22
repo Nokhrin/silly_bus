@@ -1,11 +1,10 @@
 <!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
-<suite name="Parser-Combinator-All">
-    <test name="all-tests">
+<suite name="Parser-Core-Tests" parallel="methods" thread-count="4">
+    <test name="parser-unit-tests">
         <classes>
-            <class name="ParsersTest"/>
             <class name="ParserTest"/>
+            <class name="ParsersTest"/>
             <class name="ProxyParserTest"/>
-            <class name="CalculatorTest"/>
         </classes>
     </test>
 </suite>

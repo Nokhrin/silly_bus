@@ -1,0 +1,8 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="Calculator-App-Tests">
+    <test name="calculator-integration-tests">
+        <classes>
+            <class name="CalculatorTest"/>
+        </classes>
+    </test>
+</suite>
