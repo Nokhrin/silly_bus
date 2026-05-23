@@ -21,7 +21,7 @@ step_run:
 # 	@echo "=== Линковка ==="
 	@$(LD) $(LD_FLAGS_QUIET) $(OBJ) -o $(BIN)
 # 	@echo "=== Выполнение ==="
-	./$(BIN); echo $$?
+	@./$(BIN); echo $$?
 
 step_test:
 	@echo "=== Сборка ($(SRC)) ==="
