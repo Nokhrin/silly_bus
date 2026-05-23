@@ -1,27 +1,25 @@
-# Функциональный парсер-комбинатор
+# Функциональный калькулятор
 
-Функциональный парсер-комбинатор на Java 21 для разбора подмножества eBNF.
-Контракт: Parser<A> = (String, int) → Optional<Parsed<A>>, без null.
-Базовые парсеры (char, digit, string) комбинируются через plus, or, repeat для построения правил грамматики.
-Рекурсивные ссылки поддерживаются через ProxyParser с отложенной инициализацией.
-Целевое применение: валидация DSL, предобработка ввода для аналитических пайплайнов, прототипирование бизнес-правил.
+Построен на парсер-комбинаторах
 
+## Установка и запуск
+**Требования:** JDK 25+, Maven 3.8+
 
-## Тесты
+**Сборка:**
+```bash
+mvn clean package -DskipTests
+```
 
-```shell
-# Выполнить все тесты проекта
-mvn test
+**Запуск:**
+```bash
+java -jar target/parser-combinator-1.0.0.jar
+```
 
-# Выполнить тесты группы "flatMap"
-mvn test -Dgroups=flatMap
+**Примеры:**
+```text
+Expression: 2+3*4
+Result: 14.0
 
-# Выполнить тесты нескольких групп (логическое ИЛИ)
-mvn test -Dgroups=flatMap,or
-
-# Исключить группу
-mvn test -DexcludedGroups=map
-
-# Выполнить тест-комплект по конфигу
-mvn test -Dsurefire.suiteXmlFiles=src/test/resources/testng-sprint-2.xml
+Expression: (10-5)/0
+Arithmetic Error: Делитель равен нулю
 ```
