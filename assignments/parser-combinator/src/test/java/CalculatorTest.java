@@ -1,32 +1,49 @@
 import org.testng.annotations.Test;
 
-import static org.testng.Assert.*;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertThrows;
 
 public class CalculatorTest {
+    private static Calculator calculator = new Calculator();
 
     @Test
-    public void testCalculator_SimpleSum(){
-        Parser<Expr> num = Parsers.digitParser()
-                .map(character -> new Num(character-'0'));
+    public void testCalculator_SimpleSum() {
 
-        Parser<Tuple<String, Expr>> opAndNum =
-                Parsers.characterParser('+')
-                .or(Parsers.characterParser('-'))
-                        .map(c->c.toString())
-                        .plus(num);
-
-        Parser<Expr> sumParser=num.flatMap(head->
-            opAndNum.zeroOrMore().map(tail-> {
-                Expr result = head.value();
-                for (var pair : tail) {
-                    result = new BinOp(result, pair.left(), pair.right());
-                }
-                return result;
-            })
-                    );
-        Calculator calculator = new Calculator(sumParser.skipRight(Parsers.eof()));
 
         assertEquals(calculator.calculate("1+2-3"), 0.0);
+        assertEquals(calculator.calculate("11+22-33"), 0.0);
     }
 
+    @Test
+    public void testCalculator_DivisorZero_ThrowsException() {
+
+        assertThrows(ArithmeticException.class, () -> {
+            calculator.calculate("1/0");
+        });
+    }
+
+    @Test
+    public void testPrecedence_MultiplicationBeforeAddition() {
+        assertEquals(calculator.calculate("1+2*3"), 7.0);
+    }
+
+    @Test
+    public void testAssociativity_LeftToRightSubtraction() {
+        assertEquals(calculator.calculate("10-5-2"), 3.0);
+    }
+
+    @Test
+    public void testDivision_PriorityOverAddition() {
+        assertEquals(calculator.calculate("9/3+1"), 4.0);
+    }
+
+    @Test
+    public void testParentheses_OverridePrecedence() {
+        assertEquals(calculator.calculate("(1+2)*3"), 9.0);
+    }
+
+    @Test
+    public void testMultiDigit_ParsedCorrectly() {
+        assertEquals(calculator.calculate("12+34"), 46.0);
+    }
 }
