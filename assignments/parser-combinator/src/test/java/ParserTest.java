@@ -497,4 +497,16 @@ public class ParserTest {
         assertTrue(result.isEmpty());
     }
     //endregion
+
+    //region ===== lexeme =====
+    @Test
+    public void testLexeme_digitWithWs_DigitParsedWsSkipped(){
+        Parser<Character> digitParser = Parsers.digitParser();
+        Optional<Parsed<Character>> result = digitParser.lexeme().apply("   1  ", 0);
+        assertEquals(result.get().value(), '1');
+        assertEquals(result.get().offset(), 6);
+    }
+
+    //endregion
+
 }

@@ -29,7 +29,7 @@ public class CalculatorTest {
 
     @Test
     public void testAssociativity_LeftToRightSubtraction() {
-        assertEquals(calculator.calculate("10-5-2"), 3.0);
+        assertEquals(calculator.calculate("10-5\t-2"), 3.0);
     }
 
     @Test
@@ -39,11 +39,11 @@ public class CalculatorTest {
 
     @Test
     public void testParentheses_OverridePrecedence() {
-        assertEquals(calculator.calculate("(1+2)*3"), 9.0);
+        assertEquals(calculator.calculate(" ( 1  +2   )*3"), 9.0);
     }
 
     @Test
     public void testMultiDigit_ParsedCorrectly() {
-        assertEquals(calculator.calculate("12+34"), 46.0);
+        assertEquals(calculator.calculate("12+\n34"), 46.0);
     }
 }

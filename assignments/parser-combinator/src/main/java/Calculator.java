@@ -22,6 +22,14 @@ public class Calculator {
         ProxyParser<Expr> sum = new ProxyParser<>();
         ProxyParser<Expr> prime = new ProxyParser<>();
 
+        // атомарные токены с игнором пробелов
+        Parser<Character> leftPar = Parsers.characterParser('(').lexeme();
+        Parser<Character> rightPar = Parsers.characterParser(')').lexeme();
+        Parser<Character> addSign = Parsers.characterParser('+').lexeme();
+        Parser<Character> subSign = Parsers.characterParser('-').lexeme();
+        Parser<Character> mulSign = Parsers.characterParser('*').lexeme();
+        Parser<Character> divSign = Parsers.characterParser('/').lexeme();
+
         // num ::= [digit]
         Parser<Expr> num = Parsers.digitParser()
                 .oneOrMore()
@@ -35,25 +43,21 @@ public class Calculator {
 
         // prime ::= num | '(' sum ')'
         // '(' sum ')'
-        Parser<Expr> parSum = Parsers.characterParser('(')
-                .skipLeft(sum)
-                .skipRight(Parsers.characterParser(')'));
+        Parser<Expr> parSum = leftPar.skipLeft(sum).skipRight(rightPar);
         // prime ::= num | '(' sum ')'
         prime.setDelegate(num.alt(parSum));
 
         // mul   ::= prime { ('*' | '/') prime }
         // { ('*' | '/') prime }
-        Parser<List<Tuple<String, Expr>>> mulTail = Parsers
-                .characterParser('*')
-                .alt(Parsers.characterParser('/'))
-                .map(String::valueOf)
+        Parser<List<Tuple<Character, Expr>>> mulTail = mulSign
+                .alt(divSign)
                 .plus(prime)
                 .zeroOrMore();
         // mul   ::= prime { ('*' | '/') prime }
         mul.setDelegate(prime.flatMap(head->
                 mulTail.map(tail->{
                     Expr astNode = head.value();
-                    for (Tuple<String, Expr> pair:tail){
+                    for (Tuple<Character, Expr> pair:tail){
                         astNode=new BinOp(astNode, pair.left(), pair.right());
                     }
                     return astNode;
@@ -61,16 +65,15 @@ public class Calculator {
 
         // sum   ::= mul { ('+' | '-') mul }
         // { ('+' | '-') mul }
-        Parser<List<Tuple<String, Expr>>> sumTail = Parsers.characterParser('+')
-                .alt(Parsers.characterParser('-'))
-                .map(String::valueOf)
+        Parser<List<Tuple<Character, Expr>>> sumTail = addSign
+                .alt(subSign)
                 .plus(mul)
                 .zeroOrMore();
         // mul { ('+' | '-') mul }
         sum.setDelegate(mul.flatMap(head->
                 sumTail.map(tail->{
                     Expr astNode = head.value();
-                    for (Tuple<String, Expr> pair:tail){
+                    for (Tuple<Character, Expr> pair:tail){
                         astNode=new BinOp(astNode, pair.left(), pair.right());
                     }
                     return astNode;
@@ -98,14 +101,14 @@ public class Calculator {
     private double evaluate(Expr astNode) {
         return switch (astNode) {
             case Num(int value) -> value;
-            case BinOp(Expr left, String op, Expr right) -> {
+            case BinOp(Expr left, char op, Expr right) -> {
                 double leftVal = evaluate(left);
                 double rightVal = evaluate(right);
                 yield switch (op) {
-                    case "+" -> leftVal + rightVal;
-                    case "-" -> leftVal - rightVal;
-                    case "*" -> leftVal * rightVal;
-                    case "/" -> {
+                    case '+' -> leftVal + rightVal;
+                    case '-' -> leftVal - rightVal;
+                    case '*' -> leftVal * rightVal;
+                    case '/' -> {
                         if (rightVal == 0) throw new ArithmeticException("Делитель равен нулю");
                         yield leftVal / rightVal;
                     }

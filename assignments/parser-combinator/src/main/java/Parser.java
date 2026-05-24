@@ -185,4 +185,12 @@ public interface Parser<T> {
             return other.apply(source, offset);
         };
     }
+
+    /**
+     * Возвращает лексему без пробелов
+     */
+    default Parser<T> lexeme(){
+        Parser<String> ws = Parsers.whitespaces();
+        return ws.skipLeft(this.skipRight(ws));
+    }
 }
