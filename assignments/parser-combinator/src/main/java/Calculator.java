@@ -14,7 +14,7 @@ public class Calculator {
      * sum   ::= mul { ('+' | '-') mul }
      * mul   ::= prime { ('*' | '/') prime }
      * prime ::= num | '(' sum ')'
-     * num   ::= [digit]
+     * num   ::= digit {digit}
      * digit ::= '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9'
      */
     private Parser<Expr> buildGrammar() {

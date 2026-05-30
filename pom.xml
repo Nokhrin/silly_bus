@@ -9,6 +9,7 @@
     <modules>
         <module>assignments</module>
         <module>concepts</module>
+        <module>antlr-expr</module>
     </modules>
 
     <properties>
