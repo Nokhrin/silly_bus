@@ -35,5 +35,17 @@ step_test:
 	@echo "=== Отладка ==="
 	$(GDB) -q ./$(BIN)
 
+step_test_extended:
+	@echo "=== Сборка ($(SRC)) ==="
+	$(NASM) $(NASM_FLAGS) $(SRC) -o $(OBJ)
+	@echo "=== Линковка ==="
+	$(LD) lib_io.o $(LD_FLAGS) $(OBJ) -o $(BIN)
+	@echo "=== Проверка выравнивания ==="
+	$(READELF) -aW $(BIN) | grep -E 'LOAD|\.data|\.bss' || true
+	@echo "=== Дизассемблирование ==="
+	$(OBJDUMP) -d $(BIN)
+	@echo "=== Отладка ==="
+	$(GDB) -q ./$(BIN)
+
 clean:
 	rm -f step*

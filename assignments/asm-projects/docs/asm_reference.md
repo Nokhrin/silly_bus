@@ -486,6 +486,8 @@ _start:
 
 ### call / ret
 
+Правило ABI: RSP % 16 == 0 требуется перед инструкцией call
+
 call 
 процессор записывает значение rip (=адресу инструкции, следующей за call) в стек
 
@@ -686,10 +688,15 @@ $4 = 0x7fffffffd9a8
 
 ### Стек
 
- Показать цепочку вызовов (самая важная команда)
-bt
- или
-backtrace
+## Workflow отладки в GDB
+
+| Действие                      | Команда                 | Ожидаемый вывод при сломанном стеке                                |
+|-------------------------------|-------------------------|--------------------------------------------------------------------|
+| Трассировка вызовов           | `bt`                    | `#0 0x0000... in ?? ()` `#1 0x401xxx in .sum_recursive ()` `#2 ??` |
+| Инспекция кадра               | `info frame`            | `Saved registers: rbp at 0x7fff..., rip at 0x7fff...`              |
+| Дамп стека                    | `x/8gx $rsp`            | Покажет мусор, нули или перезаписанные адреса возврата             |
+| Инструкция по адресу возврата | `x/i *(void**)$rsp`     | `Cannot access memory at address 0x0` (если перезаписан)           |
+| Просмотр аргументов           | `p/d *(long*)($rbp+16)` | Значение аргумента, переданного через стек                         |
 
  Детали текущего кадра
 info frame
@@ -1106,29 +1113,17 @@ mov eax, ebx      ; ebx - регистровый операнд (не памят
 ---
 
 
-# Сборка для Linux x86-64
+# Сборка и линковка для Linux x86-64
 
 ### Финальная
 ```shell
 nasm -f elf64 file.asm -o file.o
-```
-
-### Отладочная
-```shell
-nasm -f elf64 -g -F dwarf -Werror -Wlabel -l file.lst file.asm -o file.o
-```
-
----
-
-# Линковка для Linux x86-64
-
-### Финальная
-```shell
 ld -m elf_x86_64 file.o -o file
 ```
 
 ### Отладочная
 ```shell
+nasm -f elf64 -g -F dwarf -Werror -Wlabel -l file.lst file.asm -o file.o
 ld -m elf_x86_64 \
    --verbose \
    --print-output-format \
@@ -1137,7 +1132,13 @@ ld -m elf_x86_64 \
    file.o -o file
 ```
 
+### Несколько объектных файлов
 
+```shell
+nasm -f elf64 src/lib_io.asm -o lib_io.o
+nasm -f elf64 src/step_test.asm -o step_test.o
+ld lib_io.o step_test.o -o step_test
+```
 
 
 ---

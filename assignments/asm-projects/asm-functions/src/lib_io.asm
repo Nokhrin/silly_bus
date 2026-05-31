@@ -6,7 +6,6 @@ SYS_READ equ 0
 SYS_WRITE equ 1
 
 LINE_LEN_MAX equ 64
-INPUT_NUM equ 3628800
 
 section .bss
     line_buffer resb LINE_LEN_MAX + 1 ; +1 для \0
@@ -22,63 +21,12 @@ section .data
     new_line_len equ $ - new_line
 
 section .text
-global _start
+    global write_line
+    global read_line
+    global string_of
+    global ascii_to_int
 
-_start:
-;=== запрос ввода vvv ===
-    push msg_prompt_len ; длина значения
-    push msg_prompt ; адрес значения
-    call .write_line ; строка в stdout
-    add rsp, 2*8 ; "удалить" значения размера буфера, адреса буфера
-;=== запрос ввода ^^^ ===
-
-    push LINE_LEN_MAX
-    push line_buffer ; адрес буфера
-    call .read_line ; ret rax=количество байт
-    add rsp, 2*8 ; "удалить" значения размера буфера, адреса буфера
-
-    push rax ; длина значения
-    push line_buffer ; адрес буфера
-    call .ascii_to_int ; ret rax=бинарное представление числа
-    add rsp, 2*8 ; чистка стека
-
-    push LINE_LEN_MAX ; арг3: размер буфера
-    push line_buffer ; арг2: адрес буфера
-    push rax ; арг1: число для конвертации
-    call .string_of ; ret rdx=длина, rax=адрес
-    add rsp, 3*8 ; чистка стека
-
-    sub rsp, 2*8 ; сохранить значения
-    mov [rsp+1*8], rdx
-    mov [rsp+2*8], rax
-
-;=== вывод результата vvv ===
-    push msg_result_len
-    push msg_result
-    call .write_line
-    add rsp, 2*8
-
-    mov rax, [rsp+2*8] ; восстановить значения
-    mov rdx, [rsp+1*8]
-    add rsp, 2*8
-
-    push rdx ; количество байт
-    push rax ; адрес буфера
-    call .write_line ; строка в stdout
-    add rsp, 2*8 ; чистка стека
-
-    push new_line_len ; длина значения
-    push new_line ; адрес значения
-    call .write_line ; строка в stdout
-    add rsp, 2*8 ; "удалить" значения размера буфера, адреса буфера
-;=== вывод результата ^^^ ===
-
-.exit:
-    xor edi, edi
-    mov eax, SYS_EXIT
-    syscall
-
-.write_line: ; буфер -> stdout
+write_line: ; буфер -> stdout
     push rbp
     mov rbp, rsp
 
@@ -92,7 +40,7 @@ _start:
     pop rbp
     ret ; количество записанных байт в rax
 
-.read_line: ; stdin -> буфер
+read_line: ; stdin -> буфер
     push rbp
     mov rbp, rsp
 
@@ -110,7 +58,7 @@ _start:
     pop rbp
     ret ; значение в rax
 
-.string_of: ; int -> str
+string_of: ; int -> str
     push rbp
     mov rbp, rsp
 
@@ -150,7 +98,7 @@ _start:
     pop rbp
     ret
 
-.ascii_to_int:
+ascii_to_int:
     push rbp
     mov rbp, rsp
 
