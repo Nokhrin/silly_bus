@@ -17,6 +17,7 @@
         <module>fin-calc</module>
         <module>lambda-parser</module>
         <module>parser-combinator</module>
+        <module>load-test-target</module>
     </modules>
 
 </project>
