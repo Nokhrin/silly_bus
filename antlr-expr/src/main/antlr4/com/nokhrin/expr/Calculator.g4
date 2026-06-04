@@ -1,26 +1,36 @@
-// Грамматика калькулятора
-// expr  ::= sum
-// sum   ::= mul { ('+' | '-') mul }
-// mul   ::= prime { ('*' | '/') prime }
-// prime ::= num | '(' sum ')'
-// num   ::= digit {digit}
-// digit ::= '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9'
-
 grammar Calculator;
 
-// правила
-expr  : sum;
+// программа
+program : statement+ EOF;
+
+// инструкция
+statement : assignment | expression;
+
+// присваивание
+assignment : ID '=' expression;
+
+// выражения
+expression  : sum;
 sum   : mul ((PLUS | MINUS) mul)*;
-mul   : prime ((MUL | DIV) prime)*;
-prime : num | LPAR sum RPAR;
-num   : DIGIT+;
+mul   : pow ((MUL | DIV) pow)*;
+pow   : unary (POW pow)?;
+unary : (PLUS | MINUS) unary | fact;
+fact  : prime (EXCL)?;
+prime : NUM | ID | MOD expression MOD | LPAR expression? RPAR;
 
 // лексемы
+ID    : LETTER (LETTER | DIGIT)*;
+NUM   : DIGIT+ (SEP DIGIT*)? | SEP DIGIT+;
+EXCL: '!';
+POW : '^';
+MOD : '|';
 PLUS : '+';
 MINUS : '-';
 MUL : '*';
 DIV : '/';
 LPAR : '(';
 RPAR : ')';
+SEP : '.';
 DIGIT : [0-9];
+LETTER : [a-zA-Z];
 WS : [ \t\n\r]+ ->skip;
