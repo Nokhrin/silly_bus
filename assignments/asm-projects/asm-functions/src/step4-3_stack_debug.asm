@@ -45,7 +45,7 @@ add rsp, 8
 add rsp, 16
 mov rsp, rbp
 pop rbp ; дефект (rip = 0x1) проявляется при использовании некорректного значения в качестве адреса
-;rip = 0x40112e in _start.base_case (src/step_test.asm:47); saved rip = 0x1
+;rip = 0x40112e in _start.base_case (src/main_entry.asm:47); saved rip = 0x1
 ;(gdb) x $rsp
 ;0x7fffffffd910:	0x00000001
 ret
