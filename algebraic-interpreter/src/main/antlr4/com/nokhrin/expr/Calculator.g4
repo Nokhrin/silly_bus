@@ -7,7 +7,7 @@ program : statement+ EOF;
 statement : assignment | expression;
 
 // присваивание
-assignment : ID '=' expression;
+assignment : id '=' expression;
 
 // выражения
 expression  : sum;
@@ -16,8 +16,9 @@ mul   : pow ((MUL | DIV) pow)*;
 pow   : unary (POW pow)?;
 unary : (PLUS | MINUS) unary | factorial;
 factorial  : prime (EXCL)?;
-prime : NUM | ID | MOD expression MOD | LPAR expression? RPAR;
+prime : num | id | MOD expression MOD | LPAR expression? RPAR;
 num   : NUM;
+id    : ID;
 
 // лексемы
 ID    : LETTER (LETTER | DIGIT)*;

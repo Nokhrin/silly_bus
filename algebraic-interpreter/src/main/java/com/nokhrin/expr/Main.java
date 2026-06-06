@@ -3,21 +3,21 @@ package com.nokhrin.expr;
 import java.util.Scanner;
 
 public class Main {
-    public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
-        Calculator calculator=new Calculator();
-        System.out.println("Введите выражение (\\q для выхода)");
-        while (scanner.hasNextLine()){
-            String input = scanner.nextLine().trim();
-            if (input.isEmpty() || input.equals("\\q")){
-                break;
-            }
-            try {
-                Object result =calculator.parse(input);
-                System.out.println(result);
-            } catch (Exception e){
-                System.err.println("Ошибка вычисления: " + e);
-            }
-        }
+  public static void main(String[] args) {
+    Scanner scanner = new Scanner(System.in);
+    Calculator calculator = new Calculator();
+    System.out.println("Введите выражение (\\q для выхода)");
+    while (scanner.hasNextLine()) {
+      String input = scanner.nextLine().trim();
+      if (input.isEmpty() || input.equals("\\q")) {
+        break;
+      }
+      try {
+        Object result = calculator.parse(input);
+        System.out.println(result);
+      } catch (Exception e) {
+        System.err.println("Ошибка вычисления: " + e);
+      }
     }
+  }
 }

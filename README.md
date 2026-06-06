@@ -80,8 +80,9 @@ mvn spotless:check
 # исправление
 mvn spotless:apply
 # для конкретного модуля
-mvn spotless:check -pl task-tracker
-mvn spotless:check -pl asm-projects,an
+mvn spotless:check -pl task-tracker,asm-projects
+# проверки определенного типа файлов
+mvn spotless:check -DspotlessFiles=.*\.md
 ```
 
 ---

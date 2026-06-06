@@ -9,50 +9,36 @@ public class CalculatorTest {
     private final Calculator calculator = new Calculator();
 
     @DataProvider(name = "expressions")
-    public Object[][] provideExpressions() {
-        return new Object[][]{
-                {"1 + 2 + 3", 6},
-                {"10 - 2 - 3", 5},
-                {"2 * 3 + 4", 10},
-                {"10 / 2 * 3", 15},
-                {"(1 + 2) * 3", 9},
-                {"10 + 2 * 3 - 4 / 2", 14},
-                {"100", 100}
-        };
-    }
-
-    @DataProvider(name = "operators")
     public Object[][] provideOperators() {
         return new Object[][]{
-                {"1 + 2", 3},
-                {"5 - 2", 3},
-                {"3 * 4", 12},
-                {"10 / 2", 5},
+                // арифметика и приоритеты
+                {"1 + 2", new ExprValue.IntValue(3)},
+                {"10 - 2 - 3", new ExprValue.IntValue(5)},
+                {"2 * 3 + 4", new ExprValue.IntValue(10)},
+                {"10 / 2 * 3", new ExprValue.IntValue(15)},
+                {"(1 + 2) * 3", new ExprValue.IntValue(9)},
+                {"100", new ExprValue.IntValue(100)},
 
-//                {"2 ^ 3", 8},TODO: 2026-06-04
+                // Унарные операторы
+                {"-1 + 2", new ExprValue.IntValue(1)},
+                {"+5", new ExprValue.IntValue(5)},
 
-//                {"-5", -5},
-                {"+5", 5},
+                // Дробные числа и вывод типов
+                {"1.5 + 2.5", new ExprValue.DoubleValue(4.0)},
+                {"5 / 2", new ExprValue.DoubleValue(2.5)},
 
-//                {"5!", 120},
+                {"2 ^ 3", new ExprValue.IntValue(8)},
+                {"5!", new ExprValue.IntValue(120)},
+                {"|-5|", new ExprValue.IntValue(5)},
 
-                {"|-5|", 5},
-
-                {"(2 + 3) * 2", 10},
-//                {"() + 1", 1},
-
-                {"x = 5", 5},
+                // Переменные
+                {"x = 5", new ExprValue.IntValue(5)},
         };
     }
-    @Test(dataProvider = "expressions")
-    public void testValidExpr(String expression, int expected) {
+
+    @Test(groups = "integration", dataProvider = "expressions")
+    public void testValidExpr(String expression, ExprValue expected) {
         assertEquals(calculator.parse(expression), expected);
     }
-
-    @Test(dataProvider = "operators")
-    public void testValidOperators(String expression, int expected) {
-        assertEquals(calculator.parse(expression), expected);
-    }
-
 
 }

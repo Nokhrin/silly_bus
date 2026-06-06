@@ -144,6 +144,12 @@
                             <include>src/test/antlr4/**/*.g4</include>
                         </includes>
                     </antlr4>
+                    <markdown>
+                        <includes>
+                            <include>**/*.md</include>
+                        </includes>
+                        <flexmark/>
+                    </markdown>
                     <formats>
                         <format>
                             <includes>
