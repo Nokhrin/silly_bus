@@ -9,6 +9,6 @@ public class Calculator{
         CalculatorLexer lexer = new CalculatorLexer(CharStreams.fromString(input));
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         CalculatorParser parser = new CalculatorParser(tokens);
-        return new ASTBuilder().visit(parser.expr());
+        return new ASTBuilder().visit(parser.expression());
     }
 }

@@ -30,9 +30,9 @@ import java.util.stream.Collectors;
  * <b>Важно:</b> Экземпляр доступен только через статический метод {@link #getInstance()}.
  * Прямое создание через конструкторы запрещено.
  *
- * @see Task
  * @author nohal
  * @version 1.0
+ * @see Task
  */
 public class TasksList {
     // единственный экземпляр списка
@@ -66,8 +66,10 @@ public class TasksList {
 
         this.tasks = new ArrayList<>(tasks);
     }
+
     /**
      * Добавляю задачу в список
+     *
      * @param task
      */
     public void addTask(Task task) {
@@ -90,6 +92,7 @@ public class TasksList {
 
     /**
      * Читаю задачи из файла
+     *
      * @param filePath путь к файлу с задачами
      * @throws IOException - файл не найден или ошибка чтения файла
      */
@@ -113,6 +116,7 @@ public class TasksList {
 
     /**
      * Записываю задачи в файл
+     *
      * @param filePath путь к файлу с задачами
      */
     public void toStore(String filePath) {
@@ -131,6 +135,7 @@ public class TasksList {
 
     /**
      * Создаю строковое представление списка задач
+     *
      * @return строка - задачи, разделенные переносом строки
      */
     @Override
@@ -177,6 +182,7 @@ public class TasksList {
     }
 
     // геттер
+
     /**
      * Возвращаю список задач
      */

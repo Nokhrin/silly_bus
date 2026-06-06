@@ -39,7 +39,7 @@ public class TaskTracker {
                                 --read=путь/к/файлу   Загрузить задачи из файла
                                 --about   Сведения о программе
                                 --help   Помощь
-                                                            
+                                
                                 Пример
                                 java -jar TaskTracker.jar --read=bkp/tasks.csv
                                 java -jar TaskTracker.jar --about
@@ -62,17 +62,17 @@ public class TaskTracker {
                                     tasksList.fromStore(fileName);
                                 } catch (FileNotFoundException e) {
                                     bw.write(String.format("""
-                                    Файл '%s' не найден
-                                    
-                                    """, fileName));
+                                            Файл '%s' не найден
+                                            
+                                            """, fileName));
                                     bw.flush();
                                     return;
                                 }
 
                                 bw.write(String.format("""
-                                Добавлены задачи из файла '%s'
-                                
-                                """, fileName));
+                                        Добавлены задачи из файла '%s'
+                                        
+                                        """, fileName));
 
                                 bw.flush();
                                 break;
@@ -86,11 +86,11 @@ public class TaskTracker {
 
             // старт меню
             bw.write("""
-                                        
+                    
                     >>> Трекер задач <<<
-                                        
+                    
                     help    справка о командах
-                                        
+                    
                     """);
 
             String input;
@@ -109,7 +109,7 @@ public class TaskTracker {
                 }
                 if ("help".equalsIgnoreCase(input)) {
                     bw.write("""
-                                                
+                            
                             list    напечатать список задач
                             add     создать задачу
                             show    напечатать задачу
@@ -120,7 +120,7 @@ public class TaskTracker {
                             read    импорт списка задач из файла
                             
                             quit    завершить работу
-                                                
+                            
                             """);
                 } else if ("list".equalsIgnoreCase(input)) {
                     if (tasksList.isEmpty()) {
@@ -133,16 +133,16 @@ public class TaskTracker {
                         }
                     } else {
                         bw.write(String.format(
-                            """
-
-                            Список задач
-                            ============
-                            %s
-                            
-                            ============
-                            
-                            """,
-                                tasksList
+                                        """
+                                                
+                                                Список задач
+                                                ============
+                                                %s
+                                                
+                                                ============
+                                                
+                                                """,
+                                        tasksList
                                 )
                         );
                     }
@@ -188,13 +188,13 @@ public class TaskTracker {
                     if (tasksList.isEmpty()) {
                         bw.write("""
                                 Список задач пуст
-                                                            
+                                
                                 """);
                     } else {
                         bw.write("""
-                                                            
+                                
                                 Удалить задачу
-                                                            
+                                
                                 """);
 
                         String taskId = "";
@@ -213,7 +213,7 @@ public class TaskTracker {
                                         Задача
                                         id=%s
                                         не существует
-                                                                            
+                                        
                                         """, taskId));
                                 bw.flush();
                                 continue;
@@ -223,14 +223,14 @@ public class TaskTracker {
                                         Задача
                                         id=%s
                                         успешно удалена
-                                                                            
+                                        
                                         """, taskId));
                             } else {
                                 bw.write(String.format("""
                                         Удаление задачи
                                         id=%s
                                         провалилось
-                                                                            
+                                        
                                         """, taskId));
                             }
                         }
@@ -239,16 +239,16 @@ public class TaskTracker {
                     if (tasksList.isEmpty()) {
                         bw.write("""
                                 Список задач пуст
-                                                            
+                                
                                 """);
                         bw.flush();
                     } else {
 
                         bw.write("""
-                            
-                            Записать задачи в файл
-                            
-                            """);
+                                
+                                Записать задачи в файл
+                                
+                                """);
                         bw.flush();
 
                         String fileName = "";
@@ -264,9 +264,9 @@ public class TaskTracker {
                             tasksList.toStore(fileName);
 
                             bw.write(String.format("""
-                                Задачи записаны в файл '%s'
-                                
-                                """, fileName));
+                                    Задачи записаны в файл '%s'
+                                    
+                                    """, fileName));
                         }
                     }
 
@@ -308,14 +308,14 @@ public class TaskTracker {
                     if (tasksList.isEmpty()) {
                         bw.write("""
                                 Список задач пуст
-                                                            
+                                
                                 """);
                     } else {
 
                         bw.write("""
-                                                            
+                                
                                 Редактировать задачу
-                                                            
+                                
                                 """);
 
                         String taskId = "";
@@ -337,14 +337,14 @@ public class TaskTracker {
 
                             bw.write(String.format("""
                                     Задача
-                                                                    
+                                    
                                     %s
-                                                                    
+                                    
                                     Поля для редактирования
                                       definition - постановка
                                       owner      - владелец
                                       done       - выполнена/не выполнена
-                                                            
+                                    
                                     """, taskToEdit));
                             bw.flush();
 
@@ -406,7 +406,7 @@ public class TaskTracker {
                                     }
                                     bw.write("""
                                             Статус задачи изменен
-                                                                                        
+                                            
                                             """);
                                     bw.flush();
                                 }
@@ -448,11 +448,11 @@ public class TaskTracker {
                             Task taskToPrint = tasksList.getTaskById(taskId);
 
                             bw.write(String.format("""
-                                
-                                Задача
-                                %s
-                                
-                                """, taskToPrint));
+                                    
+                                    Задача
+                                    %s
+                                    
+                                    """, taskToPrint));
                         }
 
                     }
@@ -469,7 +469,7 @@ public class TaskTracker {
                 bw.write("Введи команду\n> ");
                 bw.flush();
 
-           }
+            }
 
         } catch (IOException e) {
             be.write(String.format("""

@@ -73,6 +73,17 @@ export PATH=$JAVA_HOME/bin:$PATH
 -Djdk.invoke.MethodHandle.dumpMethodHandleInternals=/tmp
 ```
 
+### Линтер + Форматтер
+```shell
+# проверка
+mvn spotless:check
+# исправление
+mvn spotless:apply
+# для конкретного модуля
+mvn spotless:check -pl task-tracker
+mvn spotless:check -pl asm-projects,an
+```
+
 ---
 
 

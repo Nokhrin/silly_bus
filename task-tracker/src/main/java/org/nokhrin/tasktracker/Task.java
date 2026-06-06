@@ -7,18 +7,19 @@ import java.util.UUID;
 /**
  * Сущность "Задача"
  * Минимальная единица, которой манипулирует трекер
+ *
  * @see Task
  * ---
  * Задача поддерживает операции
  * - создание
  * @see Task#Task(String, String, String, LocalDateTime, LocalDateTime, boolean)
  * - обновление - для изменения доступны
- *  - заголовок задачи
- *  @see Task#setDefinition(String)
- *  - владелец задачи
- *  @see Task#setOwner(String)
- *  - статуч задачи
- *  @see Task#setDone(boolean)
+ * - заголовок задачи
+ * @see Task#setDefinition(String)
+ * - владелец задачи
+ * @see Task#setOwner(String)
+ * - статуч задачи
+ * @see Task#setDone(boolean)
  * - печать текстового представления
  * @see Task#toString()
  * ---
@@ -26,7 +27,7 @@ import java.util.UUID;
  * список задач - хранилище ссылок на задачи
  * @see TasksList
  * удаление задачи из списка задач есть удаление ссылки на задачу
- *  и, как следствие, удаление экземпляра задачи
+ * и, как следствие, удаление экземпляра задачи
  */
 public class Task {
     private final String id; // уникальное неизменяемое значение
@@ -49,6 +50,7 @@ public class Task {
 
     /**
      * Конструктор - для импорта из файла - требует значения для всех полей Task
+     *
      * @param id
      * @param definition
      * @param owner
@@ -85,10 +87,11 @@ public class Task {
 
     /**
      * Создаю текстовое представление задачи для записи в файл
-     * @return  значения полей, разделенный символом ";"
+     *
+     * @return значения полей, разделенный символом ";"
      */
     public String toStore() {
-        return String.join(";", this.id,  this.definition,  this.owner,  this.create.toString(),  this.modify.toString(),  Boolean.toString(this.done));
+        return String.join(";", this.id, this.definition, this.owner, this.create.toString(), this.modify.toString(), Boolean.toString(this.done));
     }
 
     public static Task fromStore(String taskAsString) {
@@ -107,6 +110,7 @@ public class Task {
 
     /**
      * Создаю строковое представление задачи
+     *
      * @return строка со значениями всех атрибутов
      */
     public String toString() {
@@ -122,18 +126,23 @@ public class Task {
     public String getId() {
         return this.id;
     }
+
     public String getDefinition() {
         return this.definition;
     }
+
     public String getOwner() {
         return this.owner;
     }
+
     public LocalDateTime getCreate() {
         return this.create;
     }
+
     public LocalDateTime getModify() {
         return this.modify;
     }
+
     public boolean isDone() {
         return this.done;
     }
