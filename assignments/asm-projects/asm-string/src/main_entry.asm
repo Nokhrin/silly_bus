@@ -2,7 +2,7 @@
 ;копирование заголовка и полезной нагрузки в общий буфер, вычисление итоговой длины
 ;nasm -f elf64 src/lib_string.asm -o lib.o
 ;nasm -f elf64 src/main_entry.asm -o main.o
-;ld lib.o main.o -o asm_string_app
+;ld lib.o main.o -o asm_string1_app
 default rel
 SYS_EXIT equ 231
 EXIT_SUCCESS equ 0

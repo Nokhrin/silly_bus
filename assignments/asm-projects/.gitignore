@@ -5,3 +5,4 @@ step*
 *_test.asm
 .gdbinit
 !templates/
+*_app
