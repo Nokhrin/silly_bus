@@ -15,7 +15,7 @@ global _start
 _start:
     mov eax, [value] ; поместить dd (32 битное) значение в регистр eax из метки value
     mov qword [storage], rax ; инициализировать 64битным значением из rax значение storage
-    
+
     mov rdi, rax
     mov rax, 231
     syscall

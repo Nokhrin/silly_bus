@@ -7,10 +7,12 @@ integer {[whitespace] binary_operator [whitespace] integer}
 ```
 
 ## Интерфейсы
+
 1. Парсер
 2. Результат парсинга
 
 ## Атомарные парсеры
+
 1. [Парсер integer](../java/lambda_parser/IntParser.java)
 2. [Парсер whitespace](../java/lambda_parser/WhitespaceParser.java)
 3. [Парсер binary_operator](../java/lambda_parser/BinaryOperatorParser.java)
@@ -24,6 +26,7 @@ integer {[whitespace] binary_operator [whitespace] integer}
 <details><summary>развернуть</summary>
 
 парсер
+
 ```java
 interface Parser<А> {
     Optional<ParseResult<A>> parse(String source, int begin_offset);
@@ -31,6 +34,7 @@ interface Parser<А> {
 ```
 
 результат парсинга
+
 ```java
 interface ParseResult<A> {
     A value();
@@ -73,17 +77,16 @@ interface Suffix {
      Данный Parser<List<A>> является частю синтаксиса EBNF
      В случае min = 0 & max = 1, это соответствует квадратным скобками в eBNF
      В случае min = 0 & max> 0 - фигурным скобкам еBNF
-
 5. Операцию Мар/FlatМар для Parser и ParserResult
-Операция Мар замена содержимого контейнера.
-Операция должна порождать новый контейнер.
-В статически типизируемых языках операция Мар меняет тип содержимого:
-пример: List<String> на List<Boolean>
-Операция Мар применяется к каждому элементу Function<A,B> , кол- во элементов
-контейнер остается не изменным
-Контейнер может быть любым List, Optional,....
-условно map выглядит так:
-<A,B> List<В> mapList(List<А> list, Function<А,В> f)
+   Операция Мар замена содержимого контейнера.
+   Операция должна порождать новый контейнер.
+   В статически типизируемых языках операция Мар меняет тип содержимого:
+   пример: List<String> на List<Boolean>
+   Операция Мар применяется к каждому элементу Function<A,B> , кол- во элементов
+   контейнер остается не изменным
+   Контейнер может быть любым List, Optional,....
+   условно map выглядит так:
+   <A,B> List<В> mapList(List<А> list, Function<А,В> f)
 
 Операция Flat Map выполняет аналогичную функцию, за исключение ограничения на
 кол- во элементов в контейнере результата
@@ -97,36 +100,39 @@ interface Suffix {
 
 Необходимо реализовать map для
 - ParseResult
-  - Parser
-  - 
+- Parser
+-
 
-    interface ParseResult<А> {
-    ...
-    default <В> ParseResult<B> map ( Function<A,B> f)
-    }
+        interface ParseResult<А> {
+        ...
+        default <В> ParseResult<B> map ( Function<A,B> f)
+        }
 
-  - interface Parser <А> {
-    ...
-    default <В> Parser <B> map ( Function<A,B> f)
-    }
+- interface Parser <А> {
+  ...
+  default <В> Parser <B> map ( Function<A,B> f)
+  }
 
-  - Необходимо реализовать flatmap для
-  - Parser
-    interface Parser <А> {
-    ...
-    default <В> Parser <B> flatmap ( Function<A,Optional<B>> f)
-    }
+- Необходимо реализовать flatmap для
+
+- Parser
+  interface Parser <А> {
+  ...
+  default <В> Parser <B> flatmap ( Function<A,Optional<B>> f)
+  }
 
 6. Реализовать кортеж
    Кортеж типизированная коллекция, где каждый элемент имеет свой тип. Обычно такая
    коллекция не допускает бесконечное кол- во элементов.
    Кортеж из 2х элементов
+
 ```java
-   interface Тuple2<А,В> {
-   A a();
-   В b();
-   }
+interface Тuple2<А,В> {
+A a();
+В b();
+}
 ```
+
 7. Операция sequence/ + в еBNF
    В синтаксисе eBNF есть конструкция когда за одной частю следует другая, пример:
    digit letter
@@ -213,6 +219,5 @@ interface Suffix {
     Integer value ();
     }
 
-
-
 </details>
+

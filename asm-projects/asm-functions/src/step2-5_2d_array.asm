@@ -36,7 +36,7 @@ _start:
     ; поэлементное суммирование
     xor rdx, rdx ; matrix_2d[i][j] - значение или адрес?
     xor rax, rax ; сумма=0 - значение или адрес?
-    
+
     xor rsi, rsi ; i=строка
     .loop_row:
 

@@ -20,7 +20,7 @@
 ; === ТОЧКА ОСТАНОВА - После call (в функции): [RSP] = адрес возврата, RSP = RSP_до - 8
 ; === ТОЧКА ОСТАНОВА - Перед ret: RSP = 0x7FFFXX00
 ; === ТОЧКА ОСТАНОВА - После ret (в main): RIP = адрес после call, RSP = 0x7FFFXX08
- 
+
 ; nasm -f elf64 -g -Werror -Wlabel src/step1-1_call-ret.asm -o step1-1_test.o
 ; ld -no-pie -m elf_x86_64 step1-1_test.o -o step1-1_test
 ; gdb -q ./step1-1_test

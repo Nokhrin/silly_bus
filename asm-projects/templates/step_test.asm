@@ -5,6 +5,7 @@ SYS_WRITE equ 1
 
 section .bss
 section .data
+section .rodata
 section .text
 global _start
 

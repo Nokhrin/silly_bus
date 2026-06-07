@@ -67,4 +67,3 @@ _start:
     pop rbp ; адрес возврата - rip
     mov eax, 0 ; fib(0)=0
     ret
-

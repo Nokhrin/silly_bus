@@ -7,52 +7,64 @@ default rel
 SYS_EXIT equ 231
 EXIT_SUCCESS equ 0
 EXIT_MISMATCH equ 1
+UPPER_LIMIT equ 25
 
 extern memcpy
 extern strlen
+extern strcpy
 
 section .bss
-    work_buf resb 32
-section .data
-    ; строка нулевой длины
-;    test_str db "", 0x00
-;    test_str_len equ $ - test_str
-    ; strlen -> 0
-
-    ; минимальная ненулевая
-;    test_str db "s", 0x00
-;    test_str_len equ $ - test_str
-    ; strlen -> 1
-
-    ; остановка на null-term
-;    test_str db "read", 0x00, "skipped"
-;    test_str_len equ $ - test_str
-    ; strlen -> 4
-
-    ; корректная строка
-    test_str db "hello asm", 0x00
-    test_str_len equ $ - test_str
-    ; strlen -> 9
+    dst resb 64
+section .rodata
+;    src db 0x00
+    src db "test_value", 0x00
+    src_len equ $ - src
 
 section .text
 global _start
-_start:
-    ; тест - .bss неинициализирован, остановка на первом символе (0x00)
-    ; strlen -> 0
-;     push test_str_len-1 ; арг3 = test_str_len
-;     push test_str ; арг2 = test_str
-;     push work_buf+1 ; арг1 = work_buf
+_start: ; сценарий: src - литерал только для чтения, dst - буфер, N - передается в runtime
 
-    ; прод
-    push test_str_len ; арг3 = test_str_len
-    push test_str ; арг2 = test_str
-    push work_buf ; арг1 = work_buf
+    ;Тестовые данные и ожидаемый результат
+     ; проверить значение dst (адрес в rax)
+     ;| Источник (`src`)       | Ожидаемое состояние `dst`          | Возврат `RAX` | Примечание                                                              |
+     ;|------------------------|------------------------------------|---------------|-------------------------------------------------------------------------|
+     ;| `db 0x00`              | `[0x00, ...]`                      | Адрес `dst`   | Пустая строка. Копируется только терминальный байт.                     |
+     ;| `db "AB", 0x00`        | `[0x41, 0x42, 0x00, ...]`          | Адрес `dst`   | Стандартный случай. Длина = 2.                                          |
+     ;| `db "X", 0x00, "Y"`    | `[0x58, 0x00, ...]`                | Адрес `dst`   | Встроенный `\0`. Копирование останавливается на `X`. `Y` не копируется. |
+     ;| Буфер 80 байт без `\0` | Перезапись `dst` и соседних секций | Не определён  | Демонстрация отсутствия проверки границ. Повреждение кадра/памяти.      |
 
-    call memcpy ; memcpy(арг1=адрес_приемника, арг2=адрес_источника, арг3=количество_байт) -> адрес приемника в rax
+    sub rsp, 3*8 ; резервирование для 2 значений + выравнивание до rsp%16==0
+    lea r11, [src] ; арг2=адрес_src
+    mov [rsp+2*8], r11
+    lea r11, [dst] ; арг1=адрес_dst
+    mov [rsp+1*8], r11 ; арг1=адрес_dst
+    call strcpy ; (арг1=адрес_dst, арг2=адрес_src)
     add rsp, 3*8
 
-    push work_buf ; арг1=адрес_первого_байта_значения
-    call strlen ; strlen(арг1=адрес_первого_байта_значения) -> rax==итоговое смещение
+
+;
+;тестовые сценарии
+;| Значение `UPPER_LIMIT` | Сценарий               | Ожидаемое поведение функции                                                               |
+;|------------------------|------------------------|-------------------------------------------------------------------------------------------|
+;| `0`                    | Нулевая длина          | `strncpy`/`safecpy` не пишут, `strcpy` копирует до `\0`                                   |
+;| `5`                    | `LIMIT < len(src)`     | `strncpy` копирует 5 байт + 20 нулей. `safecpy` копирует 4 байта + `\0`                   |
+;| `11`                   | `LIMIT == len(src)`    | Точная граница. Проверка записи терминального нуля                                        |
+;| `64`                   | `LIMIT == sizeof(dst)` | Максимально допустимое заполнение                                                         |
+;| `70`                   | `LIMIT > sizeof(dst)`  | **Переполнение буфера.** `strncpy` запишет за пределы `.bss`. `safecpy` возвращает ошибку |
+
+;    sub rsp, 3*8
+;    mov [rsp+2*8], UPPER_LIMIT ; арг3=макс_длина
+;    mov [rsp+1*8], src ; арг2=адрес_src
+;    mov [rsp+0*8], dst ; арг1=адрес_dst
+;    call strncpy ; (арг1=адрес_dst, арг2=адрес_src, арг3=макс_длина)
+;    add rsp, 3*8
+;
+;    sub rsp, 3*8
+;    mov [rsp+2*8], UPPER_LIMIT ; арг3=макс_длина
+;    mov [rsp+1*8], src ; арг2=адрес_src
+;    mov [rsp+0*8], dst ; арг1=адрес_dst
+;    call safecpy ; (арг1=адрес_dst, арг2=адрес_src, арг3=макс_длина)
+;    add rsp, 3*8
 
 .exit:
     mov rdi, rax

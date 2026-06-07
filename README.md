@@ -1,6 +1,6 @@
 # Учебный репозиторий с модульной структурой
 
-| Модуль           | Назначение                                                                              | Ключевые концепции                                         |
+|      Модуль      |                                       Назначение                                        |                     Ключевые концепции                     |
 |------------------|-----------------------------------------------------------------------------------------|------------------------------------------------------------|
 | `task-tracker/`  | Консольный трекер задач (поэтапное развитие от базового синтаксиса до финальной версии) | Java Core, Collections, File I/O, Maven, SLF4J, JUnit 5    |
 | `fin-calc/`      | Система управления банковскими счетами                                                  | Command Pattern, State Machine, UML, TestNG, JaCoCo        |
@@ -8,15 +8,14 @@
 | `lambda-parser/` | Библиотека комбинаторных парсеров                                                       | Функциональные комбинаторы, Generics, Java Records, TestNG |
 | `asm-projects/`  | Основы ассемблера x86-64 и системные вызовы                                             | NASM, LD, GDB, Syscalls, ELF-структуры                     |
 
-
 # Настройка окружения
-
 
 ## Установка пакета разработки Java
 
 > установка определенной версии, выбор используемой по умолчанию
 
 ### Путь к исполняемому файлу в PATH
+
 ```shell
 which java
 ### Выбор версии по умолчанию
@@ -31,6 +30,7 @@ java --version
 ```
 
 ## Установка определенной версии Java в openSUSE Tumbleweed
+
 ```shell
 ### Список доступных неустановленных RPM-пакетов Java
 zypper search --not-installed-only java*openjdk*devel
@@ -44,18 +44,21 @@ find / -type d -iname "*jdk*" -not -iname "*runtime*" 2>/dev/null | grep -i "21"
 ```
 
 Ожидаемый вывод:
+
 ```
 /home/.devtools/java/jdk-21.0.5
 /usr/lib/jvm/axiomjdk-java21-pro-amd64
 ```
 
 ### Настроить `JAVA_HOME` и `PATH`
+
 > пример для текущей сессии
 > для установки по умолчанию указать эти команды в `.bashrc`
-```shell
-export JAVA_HOME=/usr/lib/jvm/axiomjdk-java21-pro-amd64
-export PATH=$JAVA_HOME/bin:$PATH
-```
+>
+> ```shell
+> export JAVA_HOME=/usr/lib/jvm/axiomjdk-java21-pro-amd64
+> export PATH=$JAVA_HOME/bin:$PATH
+> ```
 
 ### Настройки компилятора для отладки
 
@@ -74,6 +77,7 @@ export PATH=$JAVA_HOME/bin:$PATH
 ```
 
 ### Линтер + Форматтер
+
 ```shell
 # проверка
 mvn spotless:check
@@ -86,7 +90,6 @@ mvn spotless:check -DspotlessFiles=.*\.md
 ```
 
 ---
-
 
 ## [Наставник - Георгий Камнев](https://github.com/gochaorg)
 

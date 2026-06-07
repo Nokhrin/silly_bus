@@ -3,12 +3,12 @@ LD := ld
 GDB := gdb
 READELF := readelf
 OBJDUMP := objdump
-
-BASE_NAME := step$(STEP)_test
-
-SRC := src/$(BASE_NAME).asm
-OBJ := $(BASE_NAME).o
-BIN := $(BASE_NAME)
+#
+# BASE_NAME := step$(STEP)_test
+#
+# SRC := src/$(BASE_NAME).asm
+# OBJ := $(BASE_NAME).o
+# BIN := $(BASE_NAME)
 
 NASM_FLAGS_QUIET := -f elf64 -g
 NASM_FLAGS := $(NASM_FLAGS_QUIET) -Werror -Wlabel -l $(BIN).lst

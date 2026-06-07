@@ -3,19 +3,23 @@
 Построен на парсер-комбинаторах
 
 ## Установка и запуск
+
 **Требования:** JDK 25+, Maven 3.8+
 
 **Сборка:**
+
 ```shell
 mvn clean package -DskipTests
 ```
 
 **Запуск:**
+
 ```shell
 java -jar target/parser-combinator-1.0.0.jar
 ```
 
 **Примеры:**
+
 ```text
 Expression: 2+3*4
 Result: 14.0
@@ -27,6 +31,7 @@ Arithmetic Error: Делитель равен нулю
 ## Разработка
 
 ### Тестирование
+
 ```shell
 # Базовый запуск всех тестов
 mvn test
@@ -39,6 +44,7 @@ mvn test -DexcludedGroups=debug
 ```
 
 ### Отчеты и метрики
+
 ```shell
 # Генерация Allure-отчета
 mvn test allure:serve
@@ -52,3 +58,4 @@ mvn checkstyle:check
 mvn test jacoco:report
 # Открытие: target/site/jacoco/index.html
 ```
+
