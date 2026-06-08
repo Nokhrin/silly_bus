@@ -14,9 +14,6 @@ public class Calculator {
 
     ParseTree parseTree = parser.program();
 
-    System.out.println("ast: " + parseTree.toStringTree(parser));
-    System.out.println("errors total: " + parser.getNumberOfSyntaxErrors());
-
     return new ASTBuilder(symbolTable).visit(parseTree);
   }
 }

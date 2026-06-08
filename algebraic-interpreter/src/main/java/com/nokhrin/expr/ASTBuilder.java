@@ -221,13 +221,12 @@ public class ASTBuilder extends CalculatorBaseVisitor<ExprValue> {
   public ExprValue visitPrime(CalculatorParser.PrimeContext primeContext) {
     if (primeContext.num() != null) return visit(primeContext.num());
     if (primeContext.id() != null) return visit(primeContext.id());
-    if (primeContext.expression() != null) {
-      ExprValue value = visit(primeContext.expression());
-      if (primeContext.MOD() != null) {
-        return applyAbs(value);
+    if (primeContext.LPAR() != null) {
+      if (primeContext.expression() != null) {
+        return visit(primeContext.expression());
       }
-      return value;
     }
+    if (primeContext.MOD() != null) return applyAbs(visit(primeContext.expression()));
     throw new IllegalArgumentException("Неизвестная грамматика");
   }
 

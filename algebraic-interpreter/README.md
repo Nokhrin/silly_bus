@@ -64,6 +64,6 @@ mvn clean package
 ## Запуск
 
 ```shell
-java -jar target/antlr-expr-1.0-SNAPSHOT.jar
+java -jar target/algebraic-interpreter-1.0-SNAPSHOT.jar
 ```
 

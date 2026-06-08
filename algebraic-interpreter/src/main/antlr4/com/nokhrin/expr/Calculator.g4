@@ -16,7 +16,7 @@ mul   : pow ((MUL | DIV) pow)*;
 pow   : unary (POW pow)?;
 unary : (PLUS | MINUS) unary | factorial;
 factorial  : prime (EXCL)?;
-prime : num | id | MOD expression MOD | LPAR expression? RPAR;
+prime : num | id | MOD expression MOD | LPAR expression RPAR;
 num   : NUM;
 id    : ID;
 

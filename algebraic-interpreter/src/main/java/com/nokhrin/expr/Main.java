@@ -13,7 +13,7 @@ public class Main {
         break;
       }
       try {
-        Object result = calculator.parse(input);
+        ExprValue result = calculator.parse(input);
         System.out.println(result);
       } catch (Exception e) {
         System.err.println("Ошибка вычисления: " + e);
