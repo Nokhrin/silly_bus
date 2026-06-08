@@ -1,15 +1,15 @@
 name: Export Diagrams
-
 on:
   push:
     branches: [main]
     paths:
       - 'lambda-parser/docs/**/*.drawio'
+      - 'parser-combinator/docs/**/*.drawio'
   pull_request:
     paths:
       - 'lambda-parser/docs/**/*.drawio'
+      - 'parser-combinator/docs/**/*.drawio'
   workflow_dispatch:  # Ручной запуск
-
 jobs:
   export:
     runs-on: ubuntu-latest
@@ -21,19 +21,23 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
-      - name: Export drawio files
+      - name: Export lambda-parser diagrams
         uses: rlespinasse/drawio-export-action@v2
         with:
           format: svg
           transparent: true
           output: ${{ github.workspace }}/lambda-parser/docs/drawio-assets
           path: ${{ github.workspace }}/lambda-parser/docs
-
+      - name: Export parser-combinator diagrams
+        uses: rlespinasse/drawio-export-action@v2
+        with:
+          format: svg
+          transparent: true
+          output: ${{ github.workspace }}/parser-combinator/docs/drawio-assets
+          path: ${{ github.workspace }}/parser-combinator/docs
       - name: Upload to Pages
         uses: actions/upload-pages-artifact@v3
         with:
           path: .
-
       - name: Deploy to GitHub Pages
         uses: actions/deploy-pages@v4

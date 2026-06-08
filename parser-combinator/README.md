@@ -2,6 +2,8 @@
 
 Построен на парсер-комбинаторах
 
+[Диаграмма контекста](https://nokhrin.github.io/silly_bus/parser-combinator/docs/drawio-assets/architecture-1-context.svg)
+
 ## Установка и запуск
 
 **Требования:** JDK 25+, Maven 3.8+

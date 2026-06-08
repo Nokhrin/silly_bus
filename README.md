@@ -1,12 +1,11 @@
 # Учебный репозиторий с модульной структурой
 
-|      Модуль      |                                       Назначение                                        |                     Ключевые концепции                     |
-|------------------|-----------------------------------------------------------------------------------------|------------------------------------------------------------|
-| `task-tracker/`  | Консольный трекер задач (поэтапное развитие от базового синтаксиса до финальной версии) | Java Core, Collections, File I/O, Maven, SLF4J, JUnit 5    |
-| `fin-calc/`      | Система управления банковскими счетами                                                  | Command Pattern, State Machine, UML, TestNG, JaCoCo        |
-| `calc-parser/`   | Рекурсивный парсер арифметических выражений                                             | Recursive Descent, AST, CLI, юнит-тестирование             |
-| `lambda-parser/` | Библиотека комбинаторных парсеров                                                       | Функциональные комбинаторы, Generics, Java Records, TestNG |
-| `asm-projects/`  | Основы ассемблера x86-64 и системные вызовы                                             | NASM, LD, GDB, Syscalls, ELF-структуры                     |
+## Модули проекта
+
+- [algebraic-interpreter](./algebraic-interpreter/README.md) - калькулятор школьной алгебры с поддержкой переменных, выводом типов в runtime и грамматикой ANTLR4
+- [parser-combinator](./parser-combinator/README.md) - библиотека парсер-комбинаторов для построения рекурсивных спусковых парсеров
+- [task-tracker](./task-tracker/README.md) - система управления задачами
+- [asm-projects](./asm-projects/README.md) - проекты на ассемблере
 
 # Настройка окружения
 
@@ -91,5 +90,21 @@ mvn spotless:check -DspotlessFiles=.*\.md
 
 ---
 
-## [Наставник - Георгий Камнев](https://github.com/gochaorg)
+# Инструменты
+
+## Диаграммы drawio
+
+```shell
+# Стартовать
+docker run -it --rm --name="draw" -p 8080:8080 -p 8443:8443 jgraph/drawio
+# http://localhost:8080/
+# Остановить
+docker stop draw
+```
+
+---
+
+# Благодарность
+
+[Наставник - Георгий Камнев](https://github.com/gochaorg)
 
