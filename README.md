@@ -2,7 +2,7 @@
 
 ## Модули проекта
 
-- [algebraic-interpreter](./algebraic-interpreter/README.md) - калькулятор школьной алгебры с поддержкой переменных, выводом типов в runtime и грамматикой ANTLR4
+- [algebraic-interpreter](mylang-interpreter/README.md) - калькулятор школьной алгебры с поддержкой переменных, выводом типов в runtime и грамматикой ANTLR4
 - [parser-combinator](./parser-combinator/README.md) - библиотека парсер-комбинаторов для построения рекурсивных спусковых парсеров
 - [task-tracker](./task-tracker/README.md) - система управления задачами
 - [asm-projects](./asm-projects/README.md) - проекты на ассемблере

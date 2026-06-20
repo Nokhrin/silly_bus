@@ -13,7 +13,7 @@
         <module>lambda-parser</module>
         <module>parser-combinator</module>
         <module>load-test-target</module>
-        <module>algebraic-interpreter</module>
+        <module>mylang-interpreter</module>
     </modules>
 
     <properties>
@@ -28,36 +28,32 @@
         <spotless-maven-plugin.version>3.6.0</spotless-maven-plugin.version>
         <google-java-format.version>1.35.0</google-java-format.version>
         <guava.version>33.5.0-jre</guava.version>
+        <antlr4.version>4.13.2</antlr4.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
     <dependencyManagement>
         <dependencies>
-            <!-- TestNG -->
+
             <dependency>
                 <groupId>org.testng</groupId>
                 <artifactId>testng</artifactId>
                 <version>${testng.version}</version>
                 <scope>test</scope>
             </dependency>
-            <dependency>
-                <groupId>org.junit.jupiter</groupId>
-                <artifactId>junit-jupiter</artifactId>
-                <version>${junit.version}</version>
-                <scope>test</scope>
-            </dependency>
 
-            <!-- Логирование -->
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
                 <version>${slf4j-api.version}</version>
             </dependency>
+
             <dependency>
                 <groupId>ch.qos.logback</groupId>
                 <artifactId>logback-classic</artifactId>
                 <version>${logback-classic.version}</version>
             </dependency>
+
         </dependencies>
 
     </dependencyManagement>
@@ -65,6 +61,30 @@
     <build>
         <pluginManagement>
             <plugins>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>${maven-compiler-plugin.version}</version>
+                    <configuration>
+                        <release>${java.version}</release>
+                    </configuration>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-jar-plugin</artifactId>
+                    <version>${maven-jar-plugin.version}</version>
+                    <configuration>
+                        <archive>
+                            <manifest>
+                                <addClasspath>true</addClasspath>
+                                <mainClass>Main</mainClass>
+                            </manifest>
+                        </archive>
+                    </configuration>
+                </plugin>
+
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-checkstyle-plugin</artifactId>
@@ -77,10 +97,24 @@
                         </dependency>
                     </dependencies>
                 </plugin>
+
+                <plugin>
+                    <groupId>com.diffplug.spotless</groupId>
+                    <artifactId>spotless-maven-plugin</artifactId>
+                    <version>${spotless-maven-plugin.version}</version>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.antlr</groupId>
+                    <artifactId>antlr4-maven-plugin</artifactId>
+                    <version>${antlr4.version}</version>
+                </plugin>
+
             </plugins>
         </pluginManagement>
 
         <plugins>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
@@ -100,35 +134,19 @@
                 </executions>
             </plugin>
 
-            <!-- Плагин компиляции -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>${maven-compiler-plugin.version}</version>
-                <configuration>
-                    <release>${java.version}</release>
-                </configuration>
             </plugin>
 
-            <!-- Плагин создания JAR -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>${maven-jar-plugin.version}</version>
-                <configuration>
-                    <archive>
-                        <manifest>
-                            <addClasspath>true</addClasspath>
-                            <mainClass>Main</mainClass>
-                        </manifest>
-                    </archive>
-                </configuration>
             </plugin>
 
             <plugin>
                 <groupId>com.diffplug.spotless</groupId>
                 <artifactId>spotless-maven-plugin</artifactId>
-                <version>${spotless-maven-plugin.version}</version>
                 <configuration>
                     <java>
                         <googleJavaFormat>
@@ -143,22 +161,34 @@
                             <include>src/main/antlr4/**/*.g4</include>
                             <include>src/test/antlr4/**/*.g4</include>
                         </includes>
+                        <excludes>
+                            <exclude>**/.*/**</exclude>
+                            <exclude>**/.*</exclude>
+                        </excludes>
                     </antlr4>
                     <markdown>
+                        <flexmark/>
                         <includes>
                             <include>**/*.md</include>
                         </includes>
-                        <flexmark/>
+                        <excludes>
+                            <exclude>**/.*/**</exclude>
+                            <exclude>**/.*</exclude>
+                        </excludes>
                     </markdown>
                     <formats>
                         <format>
+                            <trimTrailingWhitespace/>
+                            <endWithNewline/>
                             <includes>
                                 <include>asm-projects/**/*.asm</include>
                                 <include>asm-projects/**/Makefile</include>
                                 <include>asm-projects/**/.gdbinit</include>
                             </includes>
-                            <trimTrailingWhitespace/>
-                            <endWithNewline/>
+                            <excludes>
+                                <exclude>**/.*/**</exclude>
+                                <exclude>**/.*</exclude>
+                            </excludes>
                         </format>
                     </formats>
                 </configuration>
@@ -172,12 +202,11 @@
                     </execution>
                 </executions>
             </plugin>
-
         </plugins>
     </build>
 
-    <!-- Профили Maven -->
     <profiles>
+
         <profile>
             <id>dev</id>
             <activation>
@@ -195,6 +224,7 @@
                 </plugins>
             </build>
         </profile>
+
     </profiles>
 
 </project>
