@@ -1,10 +1,13 @@
 grammar CSV;
 
-file : hdr row+ ;
+file : hdr row+ EOF ;
 hdr : row ;
-row : field (',' field)* NL ;
-field : QUOTED | NON_QUOTED ;
+row : field (',' field)* '\r'? '\n' ;
+field
+    : STRING        # str
+    | PLAIN         # plain
+    |               # empty
+    ;
 
-QUOTED : '"' ('""'|~'"')* '"' ;
-NON_QUOTED : ~[,"\n\r]+ ;
-NL : '\r'? '\n' ;
+STRING : '"' ('""'|~'"')* '"' ;
+PLAIN : ~[,"\n\r]+ ;

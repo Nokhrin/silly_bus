@@ -1,26 +1,31 @@
 grammar JSON;
-json : elem (',' elem)* ;
-elem: WS* value WS* ;
-obj : '{' WS* '}' | '{' pair (',' pair)* '}' ;
-arr : '[' WS* ']' | '[' value (',' value)* ']' ;
+json : value EOF ;
+obj
+    : '{' pair (',' pair)* '}'  #nonEmptyObject
+    | '{' WS* '}'               #emptyObject
+    ;
+arr
+    : '[' value (',' value)* ']' #nonEmptyArray
+    | '[' WS* ']'                #emptyArray
+    ;
 pair : STR ':' value ;
-num: INT? FRACT? EXP? ;
 value
-    : obj
-    | arr
-    | STR
-    | num
-    | 'false'
-    | 'true'
-    | 'null'
+    : obj       #objectValue
+    | arr       #arrayValue
+    | STR       #stringValue
+    | NUM       #atomValue
+    | 'true'    #atomValue
+    | 'false'   #atomValue
+    | 'null'    #atomValue
     ;
 
 STR : '"' .*? '"' ;
-INT : DIGITS ;
-FRACT
-    : 'E' ('+' | '-')? DIGITS
-    | 'e' ('+' | '-')? DIGITS
+NUM
+    : DIGITS '.' DIGITS EXP?
+    | DIGITS EXP
+    | DIGITS
     ;
-EXP : DIGITS ;
+INT : DIGITS ;
+fragment EXP : [eE] [+-]? DIGITS ;
 fragment DIGITS : [0-9]+ ;
 WS : [ \t\r\n] -> skip ;

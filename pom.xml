@@ -110,6 +110,56 @@
                     <version>${antlr4.version}</version>
                 </plugin>
 
+                <plugin>
+                    <groupId>com.diffplug.spotless</groupId>
+                    <artifactId>spotless-maven-plugin</artifactId>
+                    <configuration>
+                        <java>
+                            <googleJavaFormat>
+                                <version>${google-java-format.version}</version>
+                                <style>GOOGLE</style>
+                            </googleJavaFormat>
+                            <removeUnusedImports/>
+                            <formatAnnotations/>
+                        </java>
+                        <antlr4>
+                            <includes>
+                                <include>src/main/antlr4/**/*.g4</include>
+                                <include>src/test/antlr4/**/*.g4</include>
+                            </includes>
+                            <excludes>
+                                <exclude>**/.*/**</exclude>
+                                <exclude>**/.*</exclude>
+                            </excludes>
+                        </antlr4>
+                        <markdown>
+                            <flexmark/>
+                            <includes>
+                                <include>**/*.md</include>
+                            </includes>
+                            <excludes>
+                                <exclude>**/.*/**</exclude>
+                                <exclude>**/.*</exclude>
+                            </excludes>
+                        </markdown>
+                        <formats>
+                            <format>
+                                <trimTrailingWhitespace/>
+                                <endWithNewline/>
+                                <includes>
+                                    <include>asm-projects/**/*.asm</include>
+                                    <include>asm-projects/**/Makefile</include>
+                                    <include>asm-projects/**/.gdbinit</include>
+                                </includes>
+                                <excludes>
+                                    <exclude>**/.*/**</exclude>
+                                    <exclude>**/.*</exclude>
+                                </excludes>
+                            </format>
+                        </formats>
+                    </configuration>
+                </plugin>
+
             </plugins>
         </pluginManagement>
 
@@ -147,61 +197,8 @@
             <plugin>
                 <groupId>com.diffplug.spotless</groupId>
                 <artifactId>spotless-maven-plugin</artifactId>
-                <configuration>
-                    <java>
-                        <googleJavaFormat>
-                            <version>${google-java-format.version}</version>
-                            <style>GOOGLE</style>
-                        </googleJavaFormat>
-                        <removeUnusedImports/>
-                        <formatAnnotations/>
-                    </java>
-                    <antlr4>
-                        <includes>
-                            <include>src/main/antlr4/**/*.g4</include>
-                            <include>src/test/antlr4/**/*.g4</include>
-                        </includes>
-                        <excludes>
-                            <exclude>**/.*/**</exclude>
-                            <exclude>**/.*</exclude>
-                        </excludes>
-                    </antlr4>
-                    <markdown>
-                        <flexmark/>
-                        <includes>
-                            <include>**/*.md</include>
-                        </includes>
-                        <excludes>
-                            <exclude>**/.*/**</exclude>
-                            <exclude>**/.*</exclude>
-                        </excludes>
-                    </markdown>
-                    <formats>
-                        <format>
-                            <trimTrailingWhitespace/>
-                            <endWithNewline/>
-                            <includes>
-                                <include>asm-projects/**/*.asm</include>
-                                <include>asm-projects/**/Makefile</include>
-                                <include>asm-projects/**/.gdbinit</include>
-                            </includes>
-                            <excludes>
-                                <exclude>**/.*/**</exclude>
-                                <exclude>**/.*</exclude>
-                            </excludes>
-                        </format>
-                    </formats>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>spotless-check</id>
-                        <goals>
-                            <goal>check</goal>
-                        </goals>
-                        <phase>validate</phase>
-                    </execution>
-                </executions>
             </plugin>
+
         </plugins>
     </build>
 
@@ -221,10 +218,37 @@
                             <skip>true</skip>
                         </configuration>
                     </plugin>
+                    <plugin>
+                        <groupId>com.diffplug.spotless</groupId>
+                        <artifactId>spotless-maven-plugin</artifactId>
+                        <configuration>
+                            <skip>true</skip>
+                        </configuration>
+                    </plugin>
                 </plugins>
             </build>
         </profile>
 
+        <profile>
+            <id>ci-checks</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.diffplug.spotless</groupId>
+                        <artifactId>spotless-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>spotless-check</id>
+                                <goals>
+                                    <goal>check</goal>
+                                </goals>
+                                <phase>validate</phase>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
     </profiles>
 
 </project>

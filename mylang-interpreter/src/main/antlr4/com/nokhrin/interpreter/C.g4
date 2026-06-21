@@ -1,29 +1,29 @@
 grammar C;
 
-prog: (var | func)* EOF ;
-var: type ID (EQ expr)? LINETERM ;
-func: type ID '(' params? ')' block ;
+prog: (funcDecl | varDecl )* EOF ;
+varDecl: type ID (EQ expr)? LINETERM ;
+funcDecl: type ID '(' params? ')' block ;
 params: param (',' param)* ;
 param: type ID ;
 block: '{' stat* '}' ;
 stat: block
-    | var
+    | varDecl
     | 'if' expr 'then' stat ('else' stat)?
     | 'return' expr? LINETERM
     | expr EQ expr
     | expr LINETERM
     ;
-expr: ID '(' exprs? ')'
-    | expr '[' expr ']'
-    | '-' expr
-    | '!' expr
-    | expr '*' expr
-    | expr ('+'|'-') expr
-    | expr '==' expr
-    | COMMENT
-    | ID
-    | INT
-    | '(' expr ')'
+expr: ID '(' exprs? ')'    #call
+    | expr '[' expr ']'    #index
+    | '-' expr             #negate
+    | '!' expr             #not
+    | expr '*' expr        #mult
+    | expr ('+'|'-') expr  #addSub
+    | expr '==' expr       #eq
+    | ID                   #var
+    | INT                  #int
+    | COMMENT              #comment
+    | '(' expr ')'         #parens
     ;
 exprs: expr (',' expr)* ;
 type: 'int' | 'float' | 'void' ;
