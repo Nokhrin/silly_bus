@@ -10,7 +10,7 @@ stat: block
     | varDecl
     | 'if' expr 'then' stat ('else' stat)?
     | 'return' expr? LINETERM
-    | expr EQ expr
+    | expr EQ expr LINETERM
     | expr LINETERM
     ;
 expr: ID '(' exprs? ')'    #call
@@ -26,8 +26,11 @@ expr: ID '(' exprs? ')'    #call
     | '(' expr ')'         #parens
     ;
 exprs: expr (',' expr)* ;
-type: 'int' | 'float' | 'void' ;
+type: INT_TYPE | FLOAT_TYPE | VOID_TYPE ;
 
+INT_TYPE: 'int' ;
+FLOAT_TYPE: 'float' ;
+VOID_TYPE: 'void' ;
 ID: LETTER (LETTER | DIGIT)* ;
 EQ: '=' ;
 LINETERM: ';' ;

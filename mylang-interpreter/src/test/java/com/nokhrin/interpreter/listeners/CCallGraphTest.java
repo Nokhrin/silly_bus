@@ -1,9 +1,9 @@
 package com.nokhrin.interpreter.listeners;
 
 import com.nokhrin.interpreter.CLexer;
+import com.nokhrin.interpreter.CParser;
 import com.nokhrin.interpreter.listeners.CCallGraph.FunctionListener;
 import com.nokhrin.interpreter.listeners.CCallGraph.Graph;
-import com.nokhrin.interpreter.CParser;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -20,47 +20,44 @@ public class CCallGraphTest {
     public Object[][] provideCases() {
         return new Object[][]{
 
-//                {
-//                        """
-//            int main() { fact(5); a(); }
-//            float fact(int n) {
-//                print(n);
-//                if (n == 0) then return 1;
-//                return n * fact(n - 1);
-//            }
-//            void a() { b(); c(); }
-//            void b() { c(); }
-//            void c() { }
-//            """,
-//                        """
-//            digraph G {
-//              ranksep=.25;
-//              edge [arrowsize=.5]
-//              node [shape=circle, fontname="ArialNarrow",
-//                    fontsize=12, fixedsize=true, height=.45];
-//              main; fact; print; a; b; c;\s
-//              main -> fact;
-//              main -> a;
-//              fact -> print;
-//              fact -> fact;
-//              a -> b;
-//              a -> c;
-//              b -> c;
-//            }
-//            """
-//                },
+                {
+                        """
+            int main() { fact(5); a(); }
+            float fact(int n) {
+                print(n);
+                if (n == 0) then return 1;
+                return n * fact(n - 1);
+            }
+            void a() { b(); c(); }
+            void b() { c(); }
+            void c() { }
+            """,
+                        """
+            digraph G {
+              ranksep=.25;
+              edge [arrowsize=.5]
+              node [shape=circle, fontname="ArialNarrow",
+                    fontsize=12, fixedsize=true, height=.45];
+              main; fact; a; print; b; c;\s
+              main -> fact;
+              main -> a;
+              fact -> print;
+              fact -> fact;
+              a -> b;
+              a -> c;
+              b -> c;
+            }"""
+                },
 
-//                {
-//                        "",
-//                        """
-//            digraph G {
-//              ranksep=.25;
-//              edge [arrowsize=.5]
-//              node [shape=circle, fontname="ArialNarrow",
-//                    fontsize=12, fixedsize=true, height=.45];
-//            }
-//            """
-//                },
+                {
+                        "",
+                        """
+            digraph G {
+              ranksep=.25;
+              edge [arrowsize=.5]
+              node [shape=circle, fontname="ArialNarrow",
+                    fontsize=12, fixedsize=true, height=.45];
+            }"""},
 
                 {
                         "void isolated() { }",
@@ -71,9 +68,7 @@ public class CCallGraphTest {
               node [shape=circle, fontname="ArialNarrow",
                     fontsize=12, fixedsize=true, height=.45];
               isolated;\s
-            }
-            """
-                },
+            }"""},
 
                 {
                         "int main() { print(42); }",
@@ -85,9 +80,7 @@ public class CCallGraphTest {
                     fontsize=12, fixedsize=true, height=.45];
               main; print;\s
               main -> print;
-            }
-            """
-                },
+            }"""},
 
                 {
                         """
@@ -103,9 +96,7 @@ public class CCallGraphTest {
               ping; pong;\s
               ping -> pong;
               pong -> ping;
-            }
-            """
-                }
+            }"""}
         };
     }
 

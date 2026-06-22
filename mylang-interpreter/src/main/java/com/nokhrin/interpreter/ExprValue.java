@@ -1,18 +1,4 @@
 package com.nokhrin.interpreter;
 
-public sealed interface ExprValue permits ExprValue.IntValue, ExprValue.DoubleValue {
-
-  record IntValue(int value) implements ExprValue {
-    @Override
-    public String toString() {
-      return String.valueOf(value);
-    }
-  }
-
-  record DoubleValue(double value) implements ExprValue {
-    @Override
-    public String toString() {
-      return String.valueOf(value);
-    }
-  }
+public sealed interface ExprValue permits DoubleValue, IntValue {
 }

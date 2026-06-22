@@ -15,10 +15,10 @@ public class CCallGraph {
         MultiMap<String, String> edges = new MultiMap<>();
 
         public void edge(String source, String target) {
+            nodes.add(source);
+            nodes.add(target);
             edges.map(source, target);
         }
-
-        ;
 
         public String toString() {
             return "edges: " + edges.toString() + ", functions: " + nodes;
@@ -31,12 +31,16 @@ public class CCallGraph {
             buf.append("  edge [arrowsize=.5]\n");
             buf.append("  node [shape=circle, fontname=\"ArialNarrow\",\n");
             buf.append("        fontsize=12, fixedsize=true, height=.45];\n");
-            buf.append("  ");
-            for (String node : nodes) { // print all nodes first
-                buf.append(node);
-                buf.append("; ");
+
+            if (!nodes.isEmpty()) {
+                buf.append("  ");
+                for (String node : nodes) {
+                    buf.append(node);
+                    buf.append("; ");
+                }
+                buf.append("\n");
             }
-            buf.append("\n");
+
             for (String src : edges.keySet()) {
                 for (String trg : edges.get(src)) {
                     buf.append("  ");
@@ -46,7 +50,7 @@ public class CCallGraph {
                     buf.append(";\n");
                 }
             }
-            buf.append("}\n");
+            buf.append("}");
             return buf.toString();
         }
 
@@ -73,6 +77,8 @@ public class CCallGraph {
             if (!funcStack.isEmpty()) {
                 String caller = funcStack.peek();
                 graph.edge(caller, callee);
+            } else {
+                graph.nodes.add(callee);
             }
         }
     }

@@ -1,22 +1,28 @@
 grammar Calc;
 
 prog : stat+ EOF;
-stat : assign NEWLINE
-    | expr NEWLINE
-    ;
+stat : assign
+     | expr
+     ;
 assign : ID '=' expr ;
-expr  : mul ((ADD | SUB) mul)* ;
-mul   : unary ((MUL | DIV) unary)* ;
-unary : (ADD | SUB) unary | primary ;
-primary : NUM | ID | '(' expr ')' ;
+expr  :  addSub ;
+addSub:  mulDiv (('+' | '-') mulDiv)* ;
+mulDiv:  pow (('*' | '/') pow)* ;
+pow : unary ('^' <assoc=right> unary)* ;
+unary : '-' unary  #neg
+      | '+' unary  #pos
+      | unary '!'  #fact
+      | atom       #prime
+      ;
+atom : NUM          #number
+     | ID           #id
+     | '|' expr '|' #abs
+     | '(' expr ')' #paren
+     ;
 
 ID    : LETTER ('_' | LETTER | DIGIT)* ;
 NUM   : DIGIT+ ('.' DIGIT*)? | '.' DIGIT+ ;
-MUL : '*' ;
-DIV : '/' ;
-ADD : '+' ;
-SUB : '-' ;
 fragment LETTER : [a-zA-Z] ;
 fragment DIGIT : [0-9] ;
-NEWLINE : '\r'? '\n' ;
-WS : [ \t\r\n]+ -> skip ;
+NEWLINE : '\r'? '\n' -> skip ;
+WS : [ \t]+ -> skip ;

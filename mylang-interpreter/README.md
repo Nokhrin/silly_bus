@@ -1,8 +1,6 @@
 # Interpreter
 
-## Stage 1: Калькулятор школьной алгебры / Algebraic calc
-
----
+# Stage 1: Калькулятор школьной алгебры / Algebraic calc
 
 ## Цель
 
@@ -12,8 +10,6 @@
 
 - Разработать EBNF-грамматику лексем и синтаксических правил для объявлений и операторов присваивания
 - Реализовать парсинг с помощью ANTLR4 и генерацию AST
-
----
 
 ## Грамматика
 
@@ -49,7 +45,7 @@ digit      ::= "0" | "1" | ... | "9"
 
 ---
 
-## Stage 2: trigonometry
+## Stage 2: bool
 
 ---
 
@@ -70,7 +66,11 @@ grun() {
 
 ```shell
 cd ~/projects/silly_bus/mylang-interpreter/
+# Компиляция грамматики с плагином
 mvn clean compile
+# Компиляция грамматики без плагина (в /tmp, для отладки)
+# see how ANTLR translates your left-recursive rules
+antlr -o /tmp -Xlog src/main/antlr4/com/nokhrin/interpreter/Calc.g4
 # Визуализация
 # дерево в консоль
 grun com.nokhrin.interpreter.Algebraic prog -tree < src/test/resources/algebra.txt
