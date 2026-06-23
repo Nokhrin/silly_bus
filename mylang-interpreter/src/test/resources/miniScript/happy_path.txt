@@ -1,0 +1,29 @@
+5 + 3
+10 - 2
+4 * 5
+20 / 4
+2 + 3 * 4
+(2 + 3) * 4
+-5 + 3
++10 - 5
+3.14 + 2.86
+1.234e-3 + 0.001
+.5 * 2
+1E2 + 50
+true
+false
+5 > 3
+10 == 10
+3 != 4
+5 >= 5
+2 <= 3
+true AND false
+true OR false
+NOT true
+5 > 3 AND 10 < 20
+false OR 1 == 1
+NOT (5 < 3)
+x = 5
+y = 3.14
+z = true
+result = x + y > 10 AND z

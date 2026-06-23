@@ -1,7 +1,7 @@
 grammar C;
 
 prog: (funcDecl | varDecl )* EOF ;
-varDecl: type ID (EQ expr)? LINETERM ;
+varDecl: type ID (EQ expr)? LINETERM? ;
 funcDecl: type ID '(' params? ')' block ;
 params: param (',' param)* ;
 param: type ID ;

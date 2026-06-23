@@ -55,6 +55,15 @@ public class CDefineSymbols extends CBaseListener {
         defineVar(ctx.type(), ctx.ID().getSymbol());
     }
 
+    public void enterBlock(CParser.BlockContext ctx) {
+        LocalScope blockScope = new LocalScope(currentScope, "block");
+        scopes.put(ctx, blockScope);
+        currentScope=blockScope;
+    }
+    public void exitBlock(CParser.BlockContext ctx) {
+        currentScope=currentScope.getEnclosingScope();
+    }
+
     void defineVar(CParser.TypeContext typeContext, Token nameToken) {
         int tokenType = typeContext.start.getType();
         Symbol.Type type = resolveType(tokenType);

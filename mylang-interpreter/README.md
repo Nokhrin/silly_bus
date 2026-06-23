@@ -45,7 +45,20 @@ digit      ::= "0" | "1" | ... | "9"
 
 ---
 
-## Stage 2: bool
+## Stage 2: Скриптовый язык
+
+расширение грамматики калькулятора из stage 1
+отличия
+
+- замена на функции
+    ```text
+    pow : unary ('^' <assoc=right> unary)* ;
+    | unary '!'  #fact
+    | '|' expr '|' #abs
+    ```
+- разделение NUM на FLOAT (десятичные дроби, экспоненциальная запись) и INT
+- newline - разделитель утверждений (stat)
+- дополнение правилами ветвлений, циклов, объявлений, вызовов, булевых операторов, справки
 
 ---
 
@@ -70,13 +83,13 @@ cd ~/projects/silly_bus/mylang-interpreter/
 mvn clean compile
 # Компиляция грамматики без плагина (в /tmp, для отладки)
 # see how ANTLR translates your left-recursive rules
-antlr -o /tmp -Xlog src/main/antlr4/com/nokhrin/interpreter/Calc.g4
+antlr -o /tmp -Xlog src/main/antlr4/com/nokhrin/interpreter/MiniScript.g4
 # Визуализация
 # дерево в консоль
-grun com.nokhrin.interpreter.Algebraic prog -tree < src/test/resources/algebra.txt
+grun com.nokhrin.interpreter.MiniScript prog -tree < src/test/resources/miniScript/happy_path.txt
 # дерево в gui
-grun com.nokhrin.interpreter.Algebraic prog -gui < src/test/resources/algebra.txt
+grun com.nokhrin.interpreter.MiniScript prog -gui < src/test/resources/algebra.txt
 # токены
-grun com.nokhrin.interpreter.Algebraic tokens -tokens < src/test/resources/algebra.txt
+grun com.nokhrin.interpreter.MiniScript tokens -tokens < src/test/resources/algebra.txt
 ```
 

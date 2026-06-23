@@ -57,7 +57,7 @@ public class CResolveSymbols extends CBaseListener {
             throw new IllegalArgumentException("No such function: "
                     + ctx.ID().getSymbol());
         }
-        if (var instanceof FunctionSymbol) {
+        if (!(var instanceof FunctionSymbol)) {
             throw new IllegalArgumentException("Not a function: "
                     + ctx.ID().getSymbol());
 
