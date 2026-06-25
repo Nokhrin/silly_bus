@@ -77,6 +77,7 @@ grun() {
 }
 ```
 
+## Отладка грамматики
 ```shell
 cd ~/projects/silly_bus/mylang-interpreter/
 # Компиляция грамматики с плагином
@@ -92,4 +93,3 @@ grun com.nokhrin.interpreter.MiniScript prog -gui < src/test/resources/algebra.t
 # токены
 grun com.nokhrin.interpreter.MiniScript tokens -tokens < src/test/resources/algebra.txt
 ```
-

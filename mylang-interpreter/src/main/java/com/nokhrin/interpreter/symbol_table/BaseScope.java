@@ -33,4 +33,9 @@ public class BaseScope implements Scope{
         if (parent != null) return parent.resolve(name);
         return null;
     }
+
+    @Override
+    public String toString() {
+        return symbolMap.values().toString();
+    }
 }

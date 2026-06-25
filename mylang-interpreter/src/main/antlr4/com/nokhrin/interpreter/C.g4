@@ -8,11 +8,20 @@ param: type ID ;
 block: '{' stat* '}' ;
 stat: block
     | varDecl
-    | 'if' expr 'then' stat ('else' stat)?
-    | 'return' expr? LINETERM
-    | expr EQ expr LINETERM
-    | expr LINETERM
+    | ifStat
+    | whileStat
+    | forStat
+    | returnStat
+    | assignStat
+    | exprStat
     ;
+ifStat : 'if' expr 'then' stat ('else' stat)? ;
+whileStat : 'while' expr 'then' stat ;
+forStat : 'for' expr ';' expr ';' expr 'then' stat ;
+returnStat : 'return' expr? LINETERM ;
+assignStat : expr EQ expr LINETERM ;
+exprStat : expr LINETERM ;
+
 expr: ID '(' exprs? ')'    #call
     | expr '[' expr ']'    #index
     | '-' expr             #negate

@@ -4,6 +4,7 @@ import com.nokhrin.interpreter.CBaseListener;
 import com.nokhrin.interpreter.CParser;
 import com.nokhrin.interpreter.symbol_table.*;
 import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,26 +29,33 @@ public class CDefineSymbols extends CBaseListener {
         currentScope = globals;
     }
     public void exitProg(CParser.ProgContext ctx) {
-        LOGGER.info("Globals: {}", globals);
+        LOGGER.debug("Globals: {}", globals);
     }
 
     public void enterFuncDecl(CParser.FuncDeclContext ctx) {
-        String name = ctx.ID().getText();
+        String funcName = ctx.ID().getText();
         int tokenType = ctx.type().start.getType();
-        Symbol.Type type = resolveType(tokenType);
+        Symbol.Type funcRetType = resolveType(tokenType);
 
-        LocalScope funcScope = new LocalScope(currentScope, name);
-
-        FunctionSymbol function = new FunctionSymbol(name, type, funcScope);
+        LocalScope funcScope = new LocalScope(currentScope, funcName);
+        FunctionSymbol function = new FunctionSymbol(funcName, funcRetType, funcScope);
         currentScope.define(function);
-        currentScope = funcScope;
-        scopes.put(ctx, currentScope);
+        LOGGER.debug("Added function {} to it's local scope {}", funcName, funcScope.getName());
+
+        scopes.put(ctx, funcScope);
+        LOGGER.debug("Created LOCAL scope {}, function {}", funcScope.getName(), funcName);
+
+        currentScope=funcScope;
+        LOGGER.debug("Switched current scope to {}", currentScope.getName());
     }
     public void exitFuncDecl(CParser.FuncDeclContext ctx) {
+        LOGGER.debug("Before exit Function {}, scope: {}", ctx.ID().getText(), currentScope.getName());
         currentScope=currentScope.getEnclosingScope();
+        LOGGER.debug("After Exit Function {}, scope: {}", ctx.ID().getText(), currentScope.getName());
     }
 
     public void enterParam(CParser.ParamContext ctx) {
+        LOGGER.debug("Enter func param {}", ctx.ID().getSymbol());
         defineVar(ctx.type(), ctx.ID().getSymbol());
     }
 
@@ -56,10 +64,24 @@ public class CDefineSymbols extends CBaseListener {
     }
 
     public void enterBlock(CParser.BlockContext ctx) {
-        LocalScope blockScope = new LocalScope(currentScope, "block");
+        String scopeName;
+        ParseTree parent = ctx.getParent();
+
+        scopeName = switch (parent) {
+            case CParser.FuncDeclContext funcDeclContext -> funcDeclContext.ID().getText();
+            case CParser.IfStatContext ifStatContext -> "block-if";
+            case CParser.WhileStatContext whileStatContext -> "block-while";
+            case CParser.ForStatContext forStatContext -> "block-for";
+            case null, default -> "block-nested";
+        };
+
+        LocalScope blockScope = new LocalScope(currentScope, scopeName);
+
+        LOGGER.debug("Created {} scope: {}", scopeName, blockScope.getName());
         scopes.put(ctx, blockScope);
-        currentScope=blockScope;
+        currentScope = blockScope;
     }
+
     public void exitBlock(CParser.BlockContext ctx) {
         currentScope=currentScope.getEnclosingScope();
     }

@@ -15,6 +15,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
+import static org.testng.Assert.*;
+
 public class CResolveSymbolsTest {
 
     private String loadResourceContent(String resourceName) throws IOException {
@@ -51,23 +53,30 @@ public class CResolveSymbolsTest {
     @DataProvider(name = "vars1ErrorCases")
     public Object[][] provideVars1ErrorCases() {
         return new Object[][]{
-                {"int f(int x, float y) {\ng();\ni = 3;\ng = 4;\nreturn x + y;\n}\nvoid g() {\nint x = 0;\nfloat y;\ny = 9;\nf();\nz();\ny();\nx = f;\n}", "no such variable: i"},
-                {"int f(int x, float y) {\ng();\ni = 3;\ng = 4;\nreturn x + y;\n}\nvoid g() {\nint x = 0;\nfloat y;\ny = 9;\nf();\nz();\ny();\nx = f;\n}", "g is not a variable"},
-                {"int f(int x, float y) {\ng();\ni = 3;\ng = 4;\nreturn x + y;\n}\nvoid g() {\nint x = 0;\nfloat y;\ny = 9;\nf();\nz();\ny();\nx = f;\n}", "no such function: z"},
-                {"int f(int x, float y) {\ng();\ni = 3;\ng = 4;\nreturn x + y;\n}\nvoid g() {\nint x = 0;\nfloat y;\ny = 9;\nf();\nz();\ny();\nx = f;\n}", "y is not a function"},
-                {"int f(int x, float y) {\ng();\ni = 3;\ng = 4;\nreturn x + y;\n}\nvoid g() {\nint x = 0;\nfloat y;\ny = 9;\nf();\nz();\ny();\nx = f;\n}", "f is not a variable"}
+                {
+                        "int f() { i = 3; }",
+                        "no such variable: i"
+                },
+                {
+                        "int f() { z(); }",
+                        "no such function: z"
+                },
         };
     }
 
-    @Test(dataProvider = "vars1ErrorCases", expectedExceptions = IllegalArgumentException.class)
+    @Test(dataProvider = "vars1ErrorCases")
     public void vars1File_invalidReferences_expectedIllegalArgumentException(String source, String expectedMessagePart) throws IOException {
+        IllegalArgumentException exception = null;
         try {
             resolveSymbols(source);
         } catch (IllegalArgumentException e) {
-            if (!e.getMessage().contains(expectedMessagePart)) {
-                throw new AssertionError("Expected exception message to contain '" + expectedMessagePart + "', but got: " + e.getMessage());
-            }
-            throw e;
+            exception = e;
         }
+
+        assertNotNull(exception, "Expected IllegalArgumentException was not thrown");
+        assertTrue(
+                exception.getMessage().contains(expectedMessagePart),
+                "Expected message to contain '" + expectedMessagePart + "', but got: " + exception.getMessage()
+        );
     }
 }

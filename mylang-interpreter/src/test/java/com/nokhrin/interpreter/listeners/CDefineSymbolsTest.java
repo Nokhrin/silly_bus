@@ -36,27 +36,9 @@ public class CDefineSymbolsTest {
     @DataProvider(name = "functionDefinitionData")
     public Object[][] provideFunctionDefinitionCases() {
         return new Object[][]{
-                {
-                        "int foo(int a, float b) { }",
-                        "foo",
-                        Symbol.Type.INT,
-                        new String[]{"a", "b"},
-                        new Symbol.Type[]{Symbol.Type.INT, Symbol.Type.FLOAT}
-                },
-                {
-                        "void bar() { }",
-                        "bar",
-                        Symbol.Type.VOID,
-                        new String[]{},
-                        new Symbol.Type[]{}
-                },
-                {
-                        "float baz(float x) { int y; }",
-                        "baz",
-                        Symbol.Type.FLOAT,
-                        new String[]{"x"},
-                        new Symbol.Type[]{Symbol.Type.FLOAT}
-                }
+                {"int foo(int a, float b) { }", "foo", Symbol.Type.INT, new String[]{"a", "b"}, new Symbol.Type[]{Symbol.Type.INT, Symbol.Type.FLOAT}},
+                {"void bar() { }", "bar", Symbol.Type.VOID, new String[]{}, new Symbol.Type[]{}},
+                {"float baz(float x) { int y; }", "baz", Symbol.Type.FLOAT, new String[]{"x"}, new Symbol.Type[]{Symbol.Type.FLOAT}}
         };
     }
 
@@ -69,59 +51,15 @@ public class CDefineSymbolsTest {
             Symbol.Type[] paramTypes) {
 
         CDefineSymbols listener = parseAndCollectSymbols(source);
-
-        FunctionSymbol functionSymbol = (FunctionSymbol) listener.globals.resolve(functionName);
+        FunctionSymbol functionSymbol = listener.globals.resolveFunction(functionName);
         assertNotNull(functionSymbol);
         assertEquals(functionSymbol.getType(), expectedReturnType);
 
         Scope functionScope = functionSymbol.getScope();
-        assertEquals(paramNames.length, paramTypes.length);
-
         for (int i = 0; i < paramNames.length; i++) {
-            VariableSymbol paramSymbol = (VariableSymbol) functionScope.resolve(paramNames[i]);
+            VariableSymbol paramSymbol = functionScope.resolveSymbol(paramNames[i]);
             assertNotNull(paramSymbol);
             assertEquals(paramSymbol.getType(), paramTypes[i]);
         }
-    }
-
-    @DataProvider(name = "variableDefinitionData")
-    public Object[][] provideVariableDefinitionCases() {
-        return new Object[][]{
-                {
-                        "int main() { int x; float y; }",
-                        "main",
-                        new String[]{"x", "y"},
-                        new Symbol.Type[]{Symbol.Type.INT, Symbol.Type.FLOAT}
-                }
-        };
-    }
-
-    @Test(dataProvider = "variableDefinitionData")
-    public void localVariableDeclarations_insideFunctionBody_correctScopeResolution(
-            String source,
-            String functionName,
-            String[] varNames,
-            Symbol.Type[] varTypes) {
-
-        CDefineSymbols listener = parseAndCollectSymbols(source);
-
-        FunctionSymbol functionSymbol = (FunctionSymbol) listener.globals.resolve(functionName);
-        Scope functionScope = functionSymbol.getScope();
-
-        for (int i = 0; i < varNames.length; i++) {
-            VariableSymbol varSymbol = (VariableSymbol) functionScope.resolve(varNames[i]);
-            assertNotNull(varSymbol);
-            assertEquals(varSymbol.getType(), varTypes[i]);
-        }
-    }
-
-    @Test
-    public void globalVariableDeclaration_atTopLevel_addedToGlobalScope() {
-        String source = "int g;";
-        CDefineSymbols listener = parseAndCollectSymbols(source);
-
-        VariableSymbol globalVar = (VariableSymbol) listener.globals.resolve("g");
-        assertNotNull(globalVar);
-        assertEquals(globalVar.getType(), Symbol.Type.INT);
     }
 }

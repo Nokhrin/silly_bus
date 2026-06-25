@@ -37,30 +37,12 @@ public class CResolveSymbols extends CBaseListener {
     }
 
     public void exitVar(CParser.VarContext ctx) {
-        String name = ctx.ID().getSymbol().getText();
-        Symbol var = currentScope.resolve(name);
-        if (var == null) {
-            throw new IllegalArgumentException("No such variable: "
-                    + ctx.ID().getSymbol());
-        }
-        if (var instanceof FunctionSymbol) {
-            throw new IllegalArgumentException("Not a variable: "
-                    + ctx.ID().getSymbol());
-
-        }
+        String varName = ctx.ID().getSymbol().getText();
+        Symbol var = currentScope.resolveSymbol(varName);
     }
 
     public void exitCall(CParser.CallContext ctx) {
-        String name = ctx.ID().getSymbol().getText();
-        Symbol var = currentScope.resolve(name);
-        if (var == null) {
-            throw new IllegalArgumentException("No such function: "
-                    + ctx.ID().getSymbol());
-        }
-        if (!(var instanceof FunctionSymbol)) {
-            throw new IllegalArgumentException("Not a function: "
-                    + ctx.ID().getSymbol());
-
-        }
+        String funcName = ctx.ID().getSymbol().getText();
+        Symbol func = currentScope.resolveFunction(funcName);
     }
 }
