@@ -1,6 +1,6 @@
 grammar MiniScript;
 
-prog : (stat NEWLINE)* EOF ;
+prog : (stat NEWLINE?)* EOF ;
 stat : assign
      | expr
      ;
@@ -21,14 +21,16 @@ unary : 'NOT' unary      #not
 
 atom : FLOAT                #float
      | INT                 #int
-     | 'true'                 #btrue
-     | 'false'                 #bfalse
+     | BOOL                 #bool
+     | VOID                 #void
      | ID                 #id
      | '(' expr ')'       #paren
      ;
 
+BOOL : 'true' | 'false' ;
+VOID : 'void' ;
 ID    : LETTER ('_' | LETTER | DIGIT)* ;
-FLOAT : DIGIT+ ('.' DIGIT*)? ([Ee]? ('+' | '-')? DIGIT+)?
+FLOAT : DIGIT+ '.' DIGIT* ([Ee]? ('+' | '-')? DIGIT+)?
       | '.' DIGIT+ ;
 INT : DIGIT+ ;
 fragment LETTER : [a-zA-Z] ;

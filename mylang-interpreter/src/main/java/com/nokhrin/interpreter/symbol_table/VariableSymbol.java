@@ -1,6 +1,6 @@
 package com.nokhrin.interpreter.symbol_table;
 
-import com.nokhrin.interpreter.ExprValue;
+import com.nokhrin.interpreter.common.ExprValue;
 
 public class VariableSymbol extends BaseSymbol{
     private final Symbol.Type returnType;

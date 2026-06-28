@@ -15,7 +15,7 @@ unary : '-' unary  #neg
       | atom       #prime
       ;
 atom : NUM          #number
-     | ID           #id
+     | ID           #varValue
      | '|' expr '|' #abs
      | '(' expr ')' #paren
      ;

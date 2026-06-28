@@ -4,11 +4,11 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class BaseScope implements Scope{
-    protected Scope parent;
-    protected Map<String, Symbol> symbolMap = new LinkedHashMap<>();
+    protected Scope enclosingScope;
+    protected Map<String, Symbol> symbolTable = new LinkedHashMap<>();
 
-    public BaseScope(Scope parent){
-        this.parent = parent;
+    public BaseScope(Scope enclosingScope){
+        this.enclosingScope = enclosingScope;
     }
 
     @Override
@@ -18,24 +18,24 @@ public class BaseScope implements Scope{
 
     @Override
     public Scope getEnclosingScope() {
-        return parent;
+        return enclosingScope;
     }
 
     @Override
     public void define(Symbol symbol) {
-        symbolMap.put(symbol.getName(), symbol);
+        symbolTable.put(symbol.getName(), symbol);
     }
 
     @Override
-    public Symbol resolve(String name) {
-        Symbol symbol = symbolMap.get(name);
+    public Symbol resolve(String scopeName) {
+        Symbol symbol = symbolTable.get(scopeName);
         if (symbol != null) return symbol;
-        if (parent != null) return parent.resolve(name);
+        if (enclosingScope != null) return enclosingScope.resolve(scopeName);
         return null;
     }
 
     @Override
     public String toString() {
-        return symbolMap.values().toString();
+        return symbolTable.values().toString();
     }
 }
