@@ -30,7 +30,8 @@ atom : FLOAT                #float
 BOOL : 'true' | 'false' ;
 VOID : 'void' ;
 ID    : LETTER ('_' | LETTER | DIGIT)* ;
-FLOAT : DIGIT+ '.' DIGIT* ([Ee]? ('+' | '-')? DIGIT+)?
+FLOAT : DIGIT+ '.' DIGIT* ([Ee] ('+' | '-')? DIGIT+)?
+      | DIGIT+ [Ee] ('+' | '-')? DIGIT+
       | '.' DIGIT+ ;
 INT : DIGIT+ ;
 fragment LETTER : [a-zA-Z] ;
