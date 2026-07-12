@@ -2,10 +2,7 @@ package com.nokhrin.interpreter.miniscript;
 
 import com.nokhrin.interpreter.MiniScriptBaseVisitor;
 import com.nokhrin.interpreter.MiniScriptParser;
-import com.nokhrin.interpreter.common.BoolValue;
-import com.nokhrin.interpreter.common.DoubleValue;
-import com.nokhrin.interpreter.common.ExprValue;
-import com.nokhrin.interpreter.common.IntValue;
+import com.nokhrin.interpreter.common.*;
 import com.nokhrin.interpreter.symbol_table.Scope;
 import com.nokhrin.interpreter.symbol_table.Symbol;
 import com.nokhrin.interpreter.symbol_table.VariableSymbol;
@@ -21,7 +18,7 @@ public class MiniScriptEvalVisitor extends MiniScriptBaseVisitor<ExprValue> {
     private final Scope currentScope;
 
     public MiniScriptEvalVisitor(Scope currentScope) {
-        this.currentScope = currentScope;
+        this.currentScope = Objects.requireNonNull(currentScope, "Precondition: scope must not be null");
     }
 
     //region HELPERS
@@ -37,10 +34,15 @@ public class MiniScriptEvalVisitor extends MiniScriptBaseVisitor<ExprValue> {
             case IntValue _ -> Symbol.Type.INT;
             case DoubleValue _ -> Symbol.Type.FLOAT;
             case BoolValue _ -> Symbol.Type.BOOLEAN;
+            default -> throw new IllegalStateException("Unexpected value: " + varValue);
         };
         VariableSymbol newVar = new VariableSymbol(varName, varType, currentScope);
         currentScope.define(newVar);
         return newVar;
+    }
+
+    private boolean conditionTrue(ExprValue result) {
+        return result instanceof BoolValue(boolean value) && value;
     }
     //endregion HELPERS
 
@@ -80,20 +82,6 @@ public class MiniScriptEvalVisitor extends MiniScriptBaseVisitor<ExprValue> {
         return visit(ctx.expr());
     }
 
-    public ExprValue visitAssign(MiniScriptParser.AssignContext ctx) {
-        Objects.requireNonNull(ctx, "Precondition: ctx must not be null");
-        assert ctx.ID() != null : "Precondition: ID required";
-        assert ctx.expr() != null : "Precondition: expr required";
-
-        String varName = ctx.ID().getText();
-        ExprValue varValue = visit(ctx.expr());
-
-        VariableSymbol varSymbol = resolveVariable(varName)
-                .orElseGet(() -> createVariable(varName, varValue));
-        varSymbol.setValue(varValue);
-        return varValue;
-    }
-
     public ExprValue visitOrExpr(MiniScriptParser.OrExprContext ctx) {
         ExprValue result = visit(ctx.andExpr(0));
         for (int i = 1; i < ctx.andExpr().size(); i++) {
@@ -123,9 +111,6 @@ public class MiniScriptEvalVisitor extends MiniScriptBaseVisitor<ExprValue> {
     }
 
     public ExprValue visitAddSub(MiniScriptParser.AddSubContext ctx) {
-        Objects.requireNonNull(ctx, "Precondition: ctx must not be null");
-        assert !ctx.mulDiv().isEmpty() : "Precondition: at least 1 expr required";
-
         ExprValue result = visit(ctx.mulDiv(0));
         for (int i = 1; i < ctx.mulDiv().size(); i++) {
             String op = ctx.getChild(2 * i - 1).getText();
@@ -140,9 +125,6 @@ public class MiniScriptEvalVisitor extends MiniScriptBaseVisitor<ExprValue> {
     }
 
     public ExprValue visitMulDiv(MiniScriptParser.MulDivContext ctx) {
-        Objects.requireNonNull(ctx, "Precondition: ctx must not be null");
-        assert !ctx.unary().isEmpty() : "Precondition: at least 1 expr required";
-
         ExprValue result = visit(ctx.unary(0));
         for (int i = 1; i < ctx.unary().size(); i++) {
             String op = ctx.getChild(2 * i - 1).getText();
@@ -170,7 +152,53 @@ public class MiniScriptEvalVisitor extends MiniScriptBaseVisitor<ExprValue> {
     public ExprValue visitPos(MiniScriptParser.PosContext ctx) {
         return visit(ctx.unary());
     }
-
-
     //endregion UNARY
+
+    //region STATEMENTS
+
+    public ExprValue visitAssign(MiniScriptParser.AssignContext ctx) {
+        String varName = ctx.ID().getText();
+        ExprValue varValue = visit(ctx.expr());
+
+        VariableSymbol varSymbol = resolveVariable(varName)
+                .orElseGet(() -> createVariable(varName, varValue));
+        varSymbol.setValue(varValue);
+        return varValue;
+    }
+
+    public ExprValue visitIfStat(MiniScriptParser.IfStatContext ctx){
+        ExprValue condition = visit(ctx.expr());
+        if (!(condition instanceof BoolValue(boolean value))){
+            throw new IllegalArgumentException("Condition must be boolean expression. Provided: " + condition);
+        }
+        if (value) {
+            // then branch
+            return visit(ctx.stat(0));
+        } else if (ctx.stat().size() > 1) {
+            // else branch
+            return visit(ctx.stat(1));
+        }
+        return null;
+    }
+
+    public ExprValue visitWhileStat(MiniScriptParser.WhileStatContext ctx) {
+        while (conditionTrue(visit(ctx.expr()))){
+            ExprValue whileBody = visit(ctx.stat());
+            if (whileBody instanceof BreakSignal) {
+                break;
+            } else if (whileBody instanceof ContinueSignal) {
+                continue;
+            }
+        }
+        return null;
+    }
+
+    public ExprValue visitBreakStat(MiniScriptParser.BreakStatContext ctx) {
+        return new BreakSignal();
+    }
+
+    public ExprValue visitContinueStat(MiniScriptParser.ContinueStatContext ctx){
+        return new ContinueSignal();
+    }
+    //endregion
 }

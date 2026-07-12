@@ -2,9 +2,17 @@ grammar MiniScript;
 
 prog : (stat NEWLINE?)* EOF ;
 stat : assign
+     | ifStat
+     | whileStat
+     | breakStat
+     | continueStat
      | expr
      ;
 assign : ID '=' expr ;
+ifStat : 'if' expr 'then' NEWLINE? stat ('else' NEWLINE? stat)? ;
+whileStat : 'while' expr 'do' NEWLINE? stat ;
+breakStat : 'break' ;
+continueStat : 'continue' ;
 expr  :  orExpr ;
 orExpr: andExpr ('OR' andExpr)* ;
 andExpr: compExpr ('AND' compExpr)* ;

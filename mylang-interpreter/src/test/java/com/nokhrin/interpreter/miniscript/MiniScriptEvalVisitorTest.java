@@ -2,10 +2,7 @@ package com.nokhrin.interpreter.miniscript;
 
 import com.nokhrin.interpreter.MiniScriptLexer;
 import com.nokhrin.interpreter.MiniScriptParser;
-import com.nokhrin.interpreter.common.BoolValue;
-import com.nokhrin.interpreter.common.DoubleValue;
-import com.nokhrin.interpreter.common.ExprValue;
-import com.nokhrin.interpreter.common.IntValue;
+import com.nokhrin.interpreter.common.*;
 import com.nokhrin.interpreter.symbol_table.GlobalScope;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -13,11 +10,11 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.*;
 
 public class MiniScriptEvalVisitorTest {
 
-    private ExprValue eval(String input) {
+    private EvalResult eval(String input) {
         var lexer = new MiniScriptLexer(CharStreams.fromString(input));
         var tokens = new CommonTokenStream(lexer);
         var parser = new MiniScriptParser(tokens);
@@ -119,5 +116,42 @@ public class MiniScriptEvalVisitorTest {
     @Test(dataProvider = "miniScriptEvalVisitor_evaluateAssignment_actualEqualsExpected")
     public void miniScriptEvalVisitor_evaluateAssignment_actualEqualsExpected(String input, ExprValue expected) {
         assertEquals(eval(input), expected);
+    }
+
+    @DataProvider
+    public Object[][] miniScriptEvalVisitor_evaluateIfElse_actualEqualsExpected() {
+        return new Object[][] {
+                {"x = 5\nif x > 0 then y = 1\ny\n", new IntValue(1)},
+                {"x = 5\nif x > 0 then y = 1 else y = 0\ny\n", new IntValue(1)},
+                {"x = -1\nif x > 0 then y = 1 else y = 0\ny\n", new IntValue(0)},
+                {"x = 5\nif x > 0 then if x > 10 then y = 2 else y = 1\ny\n", new IntValue(1)},
+                {"x = 5\ny = 3\nif x > 0 AND y > 0 then z = true else z = false\nz\n", new BoolValue(true)},
+        };
+    }
+
+    @Test(dataProvider = "miniScriptEvalVisitor_evaluateIfElse_actualEqualsExpected")
+    public void miniScriptEvalVisitor_evaluateIfElse_actualEqualsExpected(String input, ExprValue expected) {
+        assertEquals(eval(input), expected);
+    }
+
+    @Test
+    public void miniScriptEvalVisitor_evaluateIfElse_yNotDefined_throwsIllegalArgExc() {
+        String input = "x = -1\nif x > 0 then y = 1\ny";
+        assertThrows(IllegalArgumentException.class,
+                ()->eval(input));
+    }
+
+    @Test
+    void visitIfStat_nonBoolCondition_throwsExc(){
+        String input = "x = -1\nif 0 then y = 1\ny";
+        assertThrows(IllegalArgumentException.class,
+                ()->eval(input));
+    }
+
+    @Test
+    void visitIfStat_falseConditionNoElse_returnsVoid(){
+        String input = "x = -1\nif x > 0 then y = 1";
+        EvalResult result = eval(input);
+        assertNull(result);
     }
 }
