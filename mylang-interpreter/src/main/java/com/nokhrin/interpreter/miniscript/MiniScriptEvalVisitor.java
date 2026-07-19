@@ -8,6 +8,8 @@ import com.nokhrin.interpreter.symbol_table.Symbol;
 import com.nokhrin.interpreter.symbol_table.VariableSymbol;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -191,6 +193,28 @@ public class MiniScriptEvalVisitor extends MiniScriptBaseVisitor<ExprValue> {
             }
         }
         return null;
+    }
+
+    public ExprValue visitFuncCall(MiniScriptParser.FuncCallContext ctx){
+        String funcName = ctx.ID().getText();
+
+        if (!BuiltinFunctions.isBuiltin(funcName)) {
+            throw new IllegalArgumentException("Unknown function: " + funcName);
+        }
+
+        BuiltinFunction builtinFunction= BuiltinFunctions.get(funcName);
+        List<ExprValue> args = new ArrayList<>();
+
+        if (ctx.exprList()!=null){
+            for (MiniScriptParser.ExprContext argContext : ctx.exprList().expr()){
+                EvalResult argResult = visit(argContext);
+                if (!(argResult instanceof ExprValue argExpr)) {
+                    throw new IllegalArgumentException("Expected argument type: ExprValue, got: " + argResult.getClass().getSimpleName());
+                }
+                args.add(argExpr);
+            }
+        }
+        return builtinFunction.apply(args);
     }
 
     public ExprValue visitBreakStat(MiniScriptParser.BreakStatContext ctx) {

@@ -154,4 +154,36 @@ public class MiniScriptEvalVisitorTest {
         EvalResult result = eval(input);
         assertNull(result);
     }
+
+    @DataProvider
+    public Object[][] validBuiltInFunctionCalls() {
+        return new Object[][] {
+                {"print(5)\n", null},
+                {"sin(0)\n", new DoubleValue(0.0)},
+                {"abs(-10)\n", new IntValue(10)},
+                {"abs(-3.14)\n", new DoubleValue(3.14)},
+                {"pow(2, 2)\n", new IntValue(4)},
+                {"pow(9, 0.5)\n", new DoubleValue(3.0)},
+                {"pow(1, -1)\n", new DoubleValue(1.0)},
+        };
+    }
+
+    @Test(dataProvider = "miniScriptEvalVisitor_evaluateIfElse_actualEqualsExpected")
+    public void miniScriptEvalVisitor_evaluateBuiltInFunctions_actualEqualsExpected(String input, ExprValue expected) {
+        assertEquals(eval(input), expected);
+    }
+
+    @Test
+    void call_unknownFunction_throwsException(){
+        String input = "unknown(123)\n";
+        assertThrows(IllegalArgumentException.class,
+                ()->eval(input));
+    }
+
+    @Test
+    void call_funcValidCountOfArgsUnexpected_throwsException(){
+        String input = "pow(1,2,3)\n";
+        assertThrows(IllegalArgumentException.class,
+                ()->eval(input));
+    }
 }

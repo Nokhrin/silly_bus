@@ -13,6 +13,8 @@ ifStat : 'if' expr 'then' NEWLINE? stat ('else' NEWLINE? stat)? ;
 whileStat : 'while' expr 'do' NEWLINE? stat ;
 breakStat : 'break' ;
 continueStat : 'continue' ;
+funcCall : ID '(' exprList? ')' ;
+exprList : expr (',' expr)* ;
 expr  :  orExpr ;
 orExpr: andExpr ('OR' andExpr)* ;
 andExpr: compExpr ('AND' compExpr)* ;
@@ -31,6 +33,7 @@ atom : FLOAT                #float
      | INT                 #int
      | BOOL                 #bool
      | VOID                 #void
+     | funcCall             #externalFuncCall
      | ID                 #id
      | '(' expr ')'       #paren
      ;

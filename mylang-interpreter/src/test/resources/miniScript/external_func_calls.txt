@@ -1,0 +1,6 @@
+print(5)
+sin(0)
+abs(-10)
+abs(-3.14)
+while i <= 5 do
+  pow(i, 2)
