@@ -10,8 +10,8 @@ import org.antlr.v4.runtime.tree.AbstractParseTreeVisitor;
 import static com.nokhrin.interpreter.common.ArithmeticOperations.*;
 import static com.nokhrin.interpreter.common.TypeConversion.toLong;
 
-public class CalcEvalVisitor extends AbstractParseTreeVisitor<ExprValue>
-        implements CalcVisitor<ExprValue> {
+public class CalcEvalVisitor extends AbstractParseTreeVisitor<EvalResult>
+        implements CalcVisitor<EvalResult> {
 
     private final GlobalScope globalScope;
 
@@ -20,8 +20,8 @@ public class CalcEvalVisitor extends AbstractParseTreeVisitor<ExprValue>
     }
 
     @Override
-    public ExprValue visitProg(CalcParser.ProgContext ctx) {
-        ExprValue result = null;
+    public EvalResult visitProg(CalcParser.ProgContext ctx) {
+        EvalResult result = null;
         for (var stat : ctx.stat()) {
             result = visit(stat);
         }
@@ -29,7 +29,7 @@ public class CalcEvalVisitor extends AbstractParseTreeVisitor<ExprValue>
     }
 
     @Override
-    public ExprValue visitStat(CalcParser.StatContext ctx) {
+    public EvalResult visitStat(CalcParser.StatContext ctx) {
         if (ctx.assign() != null) {
             return visit(ctx.assign());
         }
@@ -37,9 +37,9 @@ public class CalcEvalVisitor extends AbstractParseTreeVisitor<ExprValue>
     }
 
     @Override
-    public ExprValue visitAssign(CalcParser.AssignContext ctx) {
+    public EvalResult visitAssign(CalcParser.AssignContext ctx) {
         String name = ctx.ID().getText();
-        ExprValue value = visit(ctx.expr());
+        EvalResult value = visit(ctx.expr());
         Symbol symbol = globalScope.resolve(name);
         VariableSymbol var;
         if (symbol instanceof VariableSymbol v) {
@@ -58,16 +58,16 @@ public class CalcEvalVisitor extends AbstractParseTreeVisitor<ExprValue>
     }
 
     @Override
-    public ExprValue visitExpr(CalcParser.ExprContext ctx) {
+    public EvalResult visitExpr(CalcParser.ExprContext ctx) {
         return visit(ctx.addSub());
     }
 
     @Override
-    public ExprValue visitAddSub(CalcParser.AddSubContext ctx) {
-        ExprValue result = visit(ctx.mulDiv(0));
+    public EvalResult visitAddSub(CalcParser.AddSubContext ctx) {
+        EvalResult result = visit(ctx.mulDiv(0));
         for (int i = 1; i < ctx.mulDiv().size(); i++) {
             String op = ctx.getChild(2 * i - 1).getText();
-            ExprValue right = visit(ctx.mulDiv(i));
+            EvalResult right = visit(ctx.mulDiv(i));
             result = switch (op) {
                 case "+" -> add(result, right);
                 case "-" -> sub(result, right);
@@ -78,11 +78,11 @@ public class CalcEvalVisitor extends AbstractParseTreeVisitor<ExprValue>
     }
 
     @Override
-    public ExprValue visitMulDiv(CalcParser.MulDivContext ctx) {
-        ExprValue result = visit(ctx.pow(0));
+    public EvalResult visitMulDiv(CalcParser.MulDivContext ctx) {
+        EvalResult result = visit(ctx.pow(0));
         for (int i = 1; i < ctx.pow().size(); i++) {
             String op = ctx.getChild(2 * i - 1).getText();
-            ExprValue right = visit(ctx.pow(i));
+            EvalResult right = visit(ctx.pow(i));
             result = switch (op) {
                 case "*" -> mul(result, right);
                 case "/" -> div(result, right);
@@ -93,9 +93,9 @@ public class CalcEvalVisitor extends AbstractParseTreeVisitor<ExprValue>
     }
 
     @Override
-    public ExprValue visitPow(CalcParser.PowContext ctx) {
+    public EvalResult visitPow(CalcParser.PowContext ctx) {
         int n = ctx.unary().size();
-        ExprValue result = visit(ctx.unary(n - 1));
+        EvalResult result = visit(ctx.unary(n - 1));
         for (int i = n - 2; i >= 0; i--) {
             result = pow(visit(ctx.unary(i)), result);
         }
@@ -103,18 +103,18 @@ public class CalcEvalVisitor extends AbstractParseTreeVisitor<ExprValue>
     }
 
     @Override
-    public ExprValue visitNeg(CalcParser.NegContext ctx) {
+    public EvalResult visitNeg(CalcParser.NegContext ctx) {
         return neg(visit(ctx.unary()));
     }
 
     @Override
-    public ExprValue visitPos(CalcParser.PosContext ctx) {
+    public EvalResult visitPos(CalcParser.PosContext ctx) {
         return visit(ctx.unary());
     }
 
     @Override
-    public ExprValue visitFact(CalcParser.FactContext ctx) {
-        ExprValue value = visit(ctx.unary());
+    public EvalResult visitFact(CalcParser.FactContext ctx) {
+        EvalResult value = visit(ctx.unary());
         long n = toLong(value);
         if (n < 0) throw new IllegalArgumentException("Factorial of negative");
         long factValue = 1;
@@ -125,7 +125,7 @@ public class CalcEvalVisitor extends AbstractParseTreeVisitor<ExprValue>
     }
 
     @Override
-    public ExprValue visitNumber(CalcParser.NumberContext ctx) {
+    public EvalResult visitNumber(CalcParser.NumberContext ctx) {
         String text = ctx.NUM().getText();
         return text.contains(".")
                 ? new DoubleValue(Double.parseDouble(text))
@@ -133,7 +133,7 @@ public class CalcEvalVisitor extends AbstractParseTreeVisitor<ExprValue>
     }
 
     @Override
-    public ExprValue visitVarValue(CalcParser.VarValueContext ctx) {
+    public EvalResult visitVarValue(CalcParser.VarValueContext ctx) {
         String varName = ctx.ID().getText();
         return resolveVar(varName).getValue();
     }
@@ -145,17 +145,17 @@ public class CalcEvalVisitor extends AbstractParseTreeVisitor<ExprValue>
     }
 
     @Override
-    public ExprValue visitAbs(CalcParser.AbsContext ctx) {
+    public EvalResult visitAbs(CalcParser.AbsContext ctx) {
         return abs(visit(ctx.expr()));
     }
 
     @Override
-    public ExprValue visitParen(CalcParser.ParenContext ctx) {
+    public EvalResult visitParen(CalcParser.ParenContext ctx) {
         return visit(ctx.expr());
     }
 
     @Override
-    public ExprValue visitPrime(CalcParser.PrimeContext ctx) {
+    public EvalResult visitPrime(CalcParser.PrimeContext ctx) {
         return visit(ctx.atom());
     }
 

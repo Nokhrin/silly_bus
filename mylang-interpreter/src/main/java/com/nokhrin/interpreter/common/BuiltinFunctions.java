@@ -17,9 +17,15 @@ public class BuiltinFunctions {
     static {
         REGISTRY.put("print", args -> {
             for (ExprValue value : args){
-                System.out.println(value); //TODO [nohal][2026-07-19 16:08:54]: expressions?
+                String output = switch (value) {
+                    case IntValue(long v) -> String.valueOf(v);
+                    case DoubleValue(double v) -> String.valueOf(v);
+                    case BoolValue(boolean v) -> String.valueOf(v);
+                };
+                System.out.println(output);
             }
-            return null;
+
+            return new VoidValue();
         });
 
         REGISTRY.put("sin", args -> {
@@ -40,7 +46,10 @@ public class BuiltinFunctions {
             if (args.size() != 2 ) {
                 throw new IllegalArgumentException("pow expected 2 arguments, got " + args.size());
             }
-            return ArithmeticOperations.pow(args.getFirst(), new IntValue(Long.parseLong(args.get(1).toString())));
+            EvalResult base = args.getFirst();
+            EvalResult exponent = args.get(1);
+
+            return ArithmeticOperations.pow(base, exponent);
         });
 
     }

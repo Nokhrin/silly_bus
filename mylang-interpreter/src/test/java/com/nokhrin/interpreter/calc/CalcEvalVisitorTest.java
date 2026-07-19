@@ -2,7 +2,7 @@ package com.nokhrin.interpreter.calc;
 
 import com.nokhrin.interpreter.CalcLexer;
 import com.nokhrin.interpreter.CalcParser;
-import com.nokhrin.interpreter.common.ExprValue;
+import com.nokhrin.interpreter.common.EvalResult;
 import com.nokhrin.interpreter.common.IntValue;
 import com.nokhrin.interpreter.symbol_table.GlobalScope;
 import org.antlr.v4.runtime.CharStreams;
@@ -15,7 +15,7 @@ import static org.testng.Assert.assertEquals;
 
 public class CalcEvalVisitorTest {
 
-    private ExprValue eval(String input) {
+    private EvalResult eval(String input) {
         GlobalScope globalScope = new GlobalScope();
       CalcLexer lexer = new CalcLexer(CharStreams.fromString(input));
       CommonTokenStream tokenStream = new CommonTokenStream(lexer);
@@ -36,7 +36,7 @@ public class CalcEvalVisitorTest {
     }
 
     @Test(dataProvider = "operations")
-    public void testOperations(String input, ExprValue expected) {
+    public void testOperations(String input, EvalResult expected) {
       assertEquals(eval(input), expected);
     }
 

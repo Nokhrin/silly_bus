@@ -16,7 +16,7 @@ import java.util.Optional;
 import static com.nokhrin.interpreter.common.ArithmeticOperations.*;
 import static com.nokhrin.interpreter.common.LogicalOperations.*;
 
-public class MiniScriptEvalVisitor extends MiniScriptBaseVisitor<ExprValue> {
+public class MiniScriptEvalVisitor extends MiniScriptBaseVisitor<EvalResult> {
     private final Scope currentScope;
 
     public MiniScriptEvalVisitor(Scope currentScope) {
@@ -31,25 +31,26 @@ public class MiniScriptEvalVisitor extends MiniScriptBaseVisitor<ExprValue> {
         return Optional.empty();
     }
 
-    private VariableSymbol createVariable(String varName, ExprValue varValue) {
+    private VariableSymbol createVariable(String varName, EvalResult varValue) {
         Symbol.Type varType = switch (varValue) {
             case IntValue _ -> Symbol.Type.INT;
             case DoubleValue _ -> Symbol.Type.FLOAT;
             case BoolValue _ -> Symbol.Type.BOOLEAN;
-            default -> throw new IllegalStateException("Unexpected value: " + varValue);
+            case ControlSignal _ -> Symbol.Type.SIGNAL;
+            case VoidValue _ -> Symbol.Type.VOID;
         };
         VariableSymbol newVar = new VariableSymbol(varName, varType, currentScope);
         currentScope.define(newVar);
         return newVar;
     }
 
-    private boolean conditionTrue(ExprValue result) {
+    private boolean conditionTrue(EvalResult result) {
         return result instanceof BoolValue(boolean value) && value;
     }
     //endregion HELPERS
 
-    public ExprValue visitProg(MiniScriptParser.ProgContext ctx) {
-        ExprValue statResult = null;
+    public EvalResult visitProg(MiniScriptParser.ProgContext ctx) {
+        EvalResult statResult = null;
         for (MiniScriptParser.StatContext statContext : ctx.stat()) {
             statResult = visit(statContext);
         }
@@ -58,19 +59,19 @@ public class MiniScriptEvalVisitor extends MiniScriptBaseVisitor<ExprValue> {
 
     //region ATOMS
 
-    public ExprValue visitInt(MiniScriptParser.IntContext ctx) {
+    public EvalResult visitInt(MiniScriptParser.IntContext ctx) {
         return new IntValue(Long.parseLong(ctx.INT().getText()));
     }
 
-    public ExprValue visitFloat(MiniScriptParser.FloatContext ctx) {
+    public EvalResult visitFloat(MiniScriptParser.FloatContext ctx) {
         return new DoubleValue(Double.parseDouble(ctx.FLOAT().getText()));
     }
 
-    public ExprValue visitBool(MiniScriptParser.BoolContext ctx) {
+    public EvalResult visitBool(MiniScriptParser.BoolContext ctx) {
         return new BoolValue(Boolean.parseBoolean(ctx.BOOL().getText()));
     }
 
-    public ExprValue visitId(MiniScriptParser.IdContext ctx) {
+    public EvalResult visitId(MiniScriptParser.IdContext ctx) {
         String varName = ctx.ID().getText();
         VariableSymbol varSymbol = currentScope.resolveSymbol(varName);
         return varSymbol.getValue();
@@ -80,43 +81,43 @@ public class MiniScriptEvalVisitor extends MiniScriptBaseVisitor<ExprValue> {
 
     //region EXPRESSIONS
 
-    public ExprValue visitParen(MiniScriptParser.ParenContext ctx) {
+    public EvalResult visitParen(MiniScriptParser.ParenContext ctx) {
         return visit(ctx.expr());
     }
 
-    public ExprValue visitOrExpr(MiniScriptParser.OrExprContext ctx) {
-        ExprValue result = visit(ctx.andExpr(0));
+    public EvalResult visitOrExpr(MiniScriptParser.OrExprContext ctx) {
+        EvalResult result = visit(ctx.andExpr(0));
         for (int i = 1; i < ctx.andExpr().size(); i++) {
-            ExprValue rightExpr = visit(ctx.andExpr(i));
+            EvalResult rightExpr = visit(ctx.andExpr(i));
             result = or(result, rightExpr);
         }
         return result;
     }
 
-    public ExprValue visitAndExpr(MiniScriptParser.AndExprContext ctx) {
-        ExprValue result = visit(ctx.compExpr(0));
+    public EvalResult visitAndExpr(MiniScriptParser.AndExprContext ctx) {
+        EvalResult result = visit(ctx.compExpr(0));
         for (int i = 1; i < ctx.compExpr().size(); i++) {
-            ExprValue rightExpr = visit(ctx.compExpr(i));
+            EvalResult rightExpr = visit(ctx.compExpr(i));
             result = and(result, rightExpr);
         }
         return result;
     }
 
-    public ExprValue visitCompExpr(MiniScriptParser.CompExprContext ctx) {
-        ExprValue leftValue = visit(ctx.addSub(0));
+    public EvalResult visitCompExpr(MiniScriptParser.CompExprContext ctx) {
+        EvalResult leftValue = visit(ctx.addSub(0));
         if (ctx.addSub().size() == 1) {
             return leftValue;
         }
-        ExprValue rightValue = visit(ctx.addSub(1));
+        EvalResult rightValue = visit(ctx.addSub(1));
         TerminalNode opNode = (TerminalNode) ctx.getChild(1);
         return compare(leftValue, opNode.getText(), rightValue);
     }
 
-    public ExprValue visitAddSub(MiniScriptParser.AddSubContext ctx) {
-        ExprValue result = visit(ctx.mulDiv(0));
+    public EvalResult visitAddSub(MiniScriptParser.AddSubContext ctx) {
+        EvalResult result = visit(ctx.mulDiv(0));
         for (int i = 1; i < ctx.mulDiv().size(); i++) {
             String op = ctx.getChild(2 * i - 1).getText();
-            ExprValue rightExpr = visit(ctx.mulDiv(i));
+            EvalResult rightExpr = visit(ctx.mulDiv(i));
             result = switch (op) {
                 case "+" -> add(result, rightExpr);
                 case "-" -> sub(result, rightExpr);
@@ -126,11 +127,11 @@ public class MiniScriptEvalVisitor extends MiniScriptBaseVisitor<ExprValue> {
         return result;
     }
 
-    public ExprValue visitMulDiv(MiniScriptParser.MulDivContext ctx) {
-        ExprValue result = visit(ctx.unary(0));
+    public EvalResult visitMulDiv(MiniScriptParser.MulDivContext ctx) {
+        EvalResult result = visit(ctx.unary(0));
         for (int i = 1; i < ctx.unary().size(); i++) {
             String op = ctx.getChild(2 * i - 1).getText();
-            ExprValue rightExpr = visit(ctx.unary(i));
+            EvalResult rightExpr = visit(ctx.unary(i));
             result = switch (op) {
                 case "*" -> mul(result, rightExpr);
                 case "/" -> div(result, rightExpr);
@@ -143,24 +144,24 @@ public class MiniScriptEvalVisitor extends MiniScriptBaseVisitor<ExprValue> {
     //endregion EXPRESSIONS
 
     //region UNARY
-    public ExprValue visitNot(MiniScriptParser.NotContext ctx) {
+    public EvalResult visitNot(MiniScriptParser.NotContext ctx) {
         return not(visit(ctx.unary()));
     }
 
-    public ExprValue visitNeg(MiniScriptParser.NegContext ctx) {
+    public EvalResult visitNeg(MiniScriptParser.NegContext ctx) {
         return neg(visit(ctx.unary()));
     }
 
-    public ExprValue visitPos(MiniScriptParser.PosContext ctx) {
+    public EvalResult visitPos(MiniScriptParser.PosContext ctx) {
         return visit(ctx.unary());
     }
     //endregion UNARY
 
     //region STATEMENTS
 
-    public ExprValue visitAssign(MiniScriptParser.AssignContext ctx) {
+    public EvalResult visitAssign(MiniScriptParser.AssignContext ctx) {
         String varName = ctx.ID().getText();
-        ExprValue varValue = visit(ctx.expr());
+        EvalResult varValue = visit(ctx.expr());
 
         VariableSymbol varSymbol = resolveVariable(varName)
                 .orElseGet(() -> createVariable(varName, varValue));
@@ -168,8 +169,8 @@ public class MiniScriptEvalVisitor extends MiniScriptBaseVisitor<ExprValue> {
         return varValue;
     }
 
-    public ExprValue visitIfStat(MiniScriptParser.IfStatContext ctx){
-        ExprValue condition = visit(ctx.expr());
+    public EvalResult visitIfStat(MiniScriptParser.IfStatContext ctx){
+        EvalResult condition = visit(ctx.expr());
         if (!(condition instanceof BoolValue(boolean value))){
             throw new IllegalArgumentException("Condition must be boolean expression. Provided: " + condition);
         }
@@ -180,22 +181,22 @@ public class MiniScriptEvalVisitor extends MiniScriptBaseVisitor<ExprValue> {
             // else branch
             return visit(ctx.stat(1));
         }
-        return null;
+        return new VoidValue();
     }
 
-    public ExprValue visitWhileStat(MiniScriptParser.WhileStatContext ctx) {
+    public EvalResult visitWhileStat(MiniScriptParser.WhileStatContext ctx) {
         while (conditionTrue(visit(ctx.expr()))){
-            ExprValue whileBody = visit(ctx.stat());
+            EvalResult whileBody = visit(ctx.stat());
             if (whileBody instanceof BreakSignal) {
                 break;
             } else if (whileBody instanceof ContinueSignal) {
                 continue;
             }
         }
-        return null;
+        return new VoidValue();
     }
 
-    public ExprValue visitFuncCall(MiniScriptParser.FuncCallContext ctx){
+    public EvalResult visitFuncCall(MiniScriptParser.FuncCallContext ctx){
         String funcName = ctx.ID().getText();
 
         if (!BuiltinFunctions.isBuiltin(funcName)) {
@@ -208,8 +209,9 @@ public class MiniScriptEvalVisitor extends MiniScriptBaseVisitor<ExprValue> {
         if (ctx.exprList()!=null){
             for (MiniScriptParser.ExprContext argContext : ctx.exprList().expr()){
                 EvalResult argResult = visit(argContext);
+
                 if (!(argResult instanceof ExprValue argExpr)) {
-                    throw new IllegalArgumentException("Expected argument type: ExprValue, got: " + argResult.getClass().getSimpleName());
+                    throw new IllegalArgumentException("Expected argument type - ExprValue. Got: " + argResult.getClass().getSimpleName());
                 }
                 args.add(argExpr);
             }
@@ -217,11 +219,11 @@ public class MiniScriptEvalVisitor extends MiniScriptBaseVisitor<ExprValue> {
         return builtinFunction.apply(args);
     }
 
-    public ExprValue visitBreakStat(MiniScriptParser.BreakStatContext ctx) {
+    public EvalResult visitBreakStat(MiniScriptParser.BreakStatContext ctx) {
         return new BreakSignal();
     }
 
-    public ExprValue visitContinueStat(MiniScriptParser.ContinueStatContext ctx){
+    public EvalResult visitContinueStat(MiniScriptParser.ContinueStatContext ctx){
         return new ContinueSignal();
     }
     //endregion

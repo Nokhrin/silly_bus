@@ -22,7 +22,7 @@ public class ArithmeticOperationsTest {
     }
 
     @Test(dataProvider = "additionCases")
-    public void add_validOperands_expectedResult(String description, ExprValue left, ExprValue right, ExprValue expected) {
+    public void add_validOperands_expectedResult(String description, EvalResult left, EvalResult right, EvalResult expected) {
         assertEquals(ArithmeticOperations.add(left, right), expected, description);
     }
 
@@ -38,7 +38,7 @@ public class ArithmeticOperationsTest {
     }
 
     @Test(dataProvider = "divisionCases")
-    public void div_validOperands_expectedResult(String description, ExprValue left, ExprValue right, ExprValue expected) {
+    public void div_validOperands_expectedResult(String description, EvalResult left, EvalResult right, EvalResult expected) {
         assertEquals(ArithmeticOperations.div(left, right), expected, description);
     }
 
@@ -54,7 +54,7 @@ public class ArithmeticOperationsTest {
     }
 
     @Test(dataProvider = "negationCases")
-    public void neg_validOperand_expectedResult(String description, ExprValue operand, ExprValue expected) {
+    public void neg_validOperand_expectedResult(String description, EvalResult operand, EvalResult expected) {
         assertEquals(ArithmeticOperations.neg(operand), expected, description);
     }
 
@@ -66,7 +66,7 @@ public class ArithmeticOperationsTest {
 
     @Test(enabled = false, description = "will be implemented in sprint 3")
     void add_intMaxPlusOne_returnsDouble(){
-        ExprValue result = ArithmeticOperations.add(
+        EvalResult result = ArithmeticOperations.add(
                 new IntValue(Integer.MAX_VALUE),
                 new IntValue(1)
         );

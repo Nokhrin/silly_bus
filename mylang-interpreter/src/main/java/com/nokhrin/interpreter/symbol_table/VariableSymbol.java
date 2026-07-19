@@ -1,10 +1,10 @@
 package com.nokhrin.interpreter.symbol_table;
 
-import com.nokhrin.interpreter.common.ExprValue;
+import com.nokhrin.interpreter.common.EvalResult;
 
 public class VariableSymbol extends BaseSymbol{
     private final Symbol.Type returnType;
-    private ExprValue value;
+    private EvalResult value;
 
     public VariableSymbol(String name, Symbol.Type returnType, Scope scope) {
         super(name, scope);
@@ -21,11 +21,11 @@ public class VariableSymbol extends BaseSymbol{
         return "<" + getName() + ":t" + returnType + ">";
     }
 
-    public ExprValue getValue(){
+    public EvalResult getValue(){
         return value;
     }
 
-    public void setValue(ExprValue value){
+    public void setValue(EvalResult value){
         this.value=value;
     }
 }

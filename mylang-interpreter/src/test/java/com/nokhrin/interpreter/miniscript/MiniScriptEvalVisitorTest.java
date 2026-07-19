@@ -168,7 +168,7 @@ public class MiniScriptEvalVisitorTest {
         };
     }
 
-    @Test(dataProvider = "miniScriptEvalVisitor_evaluateIfElse_actualEqualsExpected")
+    @Test(dataProvider = "validBuiltInFunctionCalls")
     public void miniScriptEvalVisitor_evaluateBuiltInFunctions_actualEqualsExpected(String input, ExprValue expected) {
         assertEquals(eval(input), expected);
     }

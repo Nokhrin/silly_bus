@@ -6,7 +6,7 @@ public class TypeConversion {
         throw new UnsupportedOperationException("Utility class");
     }
 
-    public static long toLong(ExprValue val) {
+    public static long toLong(EvalResult val) {
         return (long) switch (val) {
             case IntValue intValue -> intValue.value();
             case DoubleValue doubleValue -> doubleValue.value();
@@ -14,7 +14,7 @@ public class TypeConversion {
         };
     }
 
-    public static double toDouble(ExprValue val) {
+    public static double toDouble(EvalResult val) {
         return switch (val) {
             case IntValue intValue -> intValue.value();
             case DoubleValue doubleValue -> doubleValue.value();
@@ -22,7 +22,7 @@ public class TypeConversion {
         };
     }
 
-    public static ExprValue wrap(double val) {
+    public static EvalResult wrap(double val) {
         if (val == Math.floor(val) && !Double.isInfinite(val)) {
             return new IntValue((long) val);
         }

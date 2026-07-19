@@ -8,7 +8,7 @@ public class ArithmeticOperations {
         throw new UnsupportedOperationException("Utility class");
     }
 
-    public static ExprValue neg(ExprValue val) {
+    public static EvalResult neg(EvalResult val) {
         if (val instanceof IntValue(long value)) {
             return new IntValue(-value);
         }
@@ -18,7 +18,7 @@ public class ArithmeticOperations {
         throw new IllegalArgumentException("Cannot negate non-numeric: " + val);
     }
 
-    public static ExprValue abs(ExprValue val) {
+    public static EvalResult abs(EvalResult val) {
         if (val instanceof IntValue(long value)) {
             return new IntValue(Math.abs(value));
         }
@@ -28,28 +28,28 @@ public class ArithmeticOperations {
         throw new IllegalArgumentException("Cannot apply abs non-numeric: " + val);
     }
 
-    public static ExprValue add(ExprValue left, ExprValue right) {
+    public static EvalResult add(EvalResult left, EvalResult right) {
         if (left instanceof IntValue(long leftValue) && right instanceof IntValue(long rightValue)) {
             return new IntValue(leftValue + rightValue);
         }
         return new DoubleValue(toDouble(left) + toDouble(right));
     }
 
-    public static ExprValue sub(ExprValue left, ExprValue right) {
+    public static EvalResult sub(EvalResult left, EvalResult right) {
         if (left instanceof IntValue(long leftValue) && right instanceof IntValue(long rightValue)) {
             return new IntValue(leftValue - rightValue);
         }
         return new DoubleValue(toDouble(left) - toDouble(right));
     }
 
-    public static ExprValue mul(ExprValue left, ExprValue right) {
+    public static EvalResult mul(EvalResult left, EvalResult right) {
         if (left instanceof IntValue(long leftValue) && right instanceof IntValue(long rightValue)) {
             return new IntValue(leftValue * rightValue);
         }
         return new DoubleValue(toDouble(left) * toDouble(right));
     }
 
-    public static ExprValue div(ExprValue left, ExprValue right) {
+    public static EvalResult div(EvalResult left, EvalResult right) {
         double divisor = toDouble(right);
         if (divisor == 0) {
             throw new ArithmeticException("Division by zero");
@@ -61,7 +61,7 @@ public class ArithmeticOperations {
         return new DoubleValue(result);
     }
 
-    public static ExprValue pow(ExprValue left, ExprValue right) {
+    public static EvalResult pow(EvalResult left, EvalResult right) {
         double result = Math.pow(toDouble(left), toDouble(right));
         if (left instanceof IntValue
                 && right instanceof IntValue

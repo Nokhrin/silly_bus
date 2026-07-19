@@ -2,6 +2,7 @@ package com.nokhrin.interpreter.calc;
 
 import com.nokhrin.interpreter.CalcLexer;
 import com.nokhrin.interpreter.CalcParser;
+import com.nokhrin.interpreter.common.EvalResult;
 import com.nokhrin.interpreter.common.ExprValue;
 import com.nokhrin.interpreter.symbol_table.GlobalScope;
 import org.antlr.v4.runtime.CharStream;
@@ -20,7 +21,7 @@ public class Calculator {
         this.globalScope = globalScope;
     }
 
-    public ExprValue parse(String input) {
+    public EvalResult parse(String input) {
         CharStream charStream = CharStreams.fromString(input);
         CalcLexer lexer = new CalcLexer(charStream);
         CommonTokenStream tokens = new CommonTokenStream(lexer);
