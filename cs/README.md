@@ -7,10 +7,11 @@
 - Математической строгости в разработке ПО
 
 ## Источники
-
-## Структура
 "The Science of Programming" (David Gries, 1981)
-[логика высказываний](science_of_programming_gries/ch_1.md) - решения упражнений главы 1
+
+## Решения упражнений "The Science of Programming"
+[глава 1 - логика высказываний](science_of_programming_gries/ch_1.md)
+[глава 2 - эквивалентные преобразования](science_of_programming_gries/ch_2.md)
 
 
 
