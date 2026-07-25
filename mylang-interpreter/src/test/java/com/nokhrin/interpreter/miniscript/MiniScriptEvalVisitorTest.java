@@ -25,7 +25,7 @@ public class MiniScriptEvalVisitorTest {
     }
 
     @DataProvider
-    public Object[][] miniScriptEvalVisitor_evaluateArithmetic_actualEqualsExpected() {
+    public Object[][] evaluateArithmetic_actualEqualsExpected() {
         return new Object[][] {
                 {"5 + 3\n", new IntValue(8)},
                 {"10 - 2\n", new IntValue(8)},
@@ -47,13 +47,13 @@ public class MiniScriptEvalVisitorTest {
         };
     }
 
-    @Test(dataProvider = "miniScriptEvalVisitor_evaluateArithmetic_actualEqualsExpected")
-    public void miniScriptEvalVisitor_evaluateArithmetic_actualEqualsExpected(String input, ExprValue expected) {
+    @Test(dataProvider = "evaluateArithmetic_actualEqualsExpected")
+    public void evaluateArithmetic_actualEqualsExpected(String input, ExprValue expected) {
         assertEquals(eval(input), expected);
     }
 
     @DataProvider
-    public Object[][] miniScriptEvalVisitor_evaluateLogic_actualEqualsExpected() {
+    public Object[][] evaluateLogic_actualEqualsExpected() {
         return new Object[][] {
                 {"true AND false\n", new BoolValue(false)},
                 {"true OR false\n", new BoolValue(true)},
@@ -68,13 +68,13 @@ public class MiniScriptEvalVisitorTest {
         };
     }
 
-    @Test(dataProvider = "miniScriptEvalVisitor_evaluateLogic_actualEqualsExpected")
-    public void miniScriptEvalVisitor_evaluateLogic_actualEqualsExpected(String input, ExprValue expected) {
+    @Test(dataProvider = "evaluateLogic_actualEqualsExpected")
+    public void evaluateLogic_actualEqualsExpected(String input, ExprValue expected) {
         assertEquals(eval(input), expected);
     }
 
     @DataProvider
-    public Object[][] miniScriptEvalVisitor_evaluateComparison_actualEqualsExpected() {
+    public Object[][] evaluateComparison_actualEqualsExpected() {
         return new Object[][] {
                 {"5 > 3\n", new BoolValue(true)},
                 {"3 > 5\n", new BoolValue(false)},
@@ -92,13 +92,13 @@ public class MiniScriptEvalVisitorTest {
         };
     }
 
-    @Test(dataProvider = "miniScriptEvalVisitor_evaluateComparison_actualEqualsExpected")
-    public void miniScriptEvalVisitor_evaluateComparison_actualEqualsExpected(String input, ExprValue expected) {
+    @Test(dataProvider = "evaluateComparison_actualEqualsExpected")
+    public void evaluateComparison_actualEqualsExpected(String input, ExprValue expected) {
         assertEquals(eval(input), expected);
     }
 
     @DataProvider
-    public Object[][] miniScriptEvalVisitor_evaluateAssignment_actualEqualsExpected() {
+    public Object[][] evaluateAssignment_actualEqualsExpected() {
         return new Object[][] {
                 {"x = 5\nx\n", new IntValue(5)},
                 {"y = 3.14\ny\n", new DoubleValue(3.14)},
@@ -113,13 +113,13 @@ public class MiniScriptEvalVisitorTest {
         };
     }
 
-    @Test(dataProvider = "miniScriptEvalVisitor_evaluateAssignment_actualEqualsExpected")
-    public void miniScriptEvalVisitor_evaluateAssignment_actualEqualsExpected(String input, ExprValue expected) {
+    @Test(dataProvider = "evaluateAssignment_actualEqualsExpected")
+    public void evaluateAssignment_actualEqualsExpected(String input, ExprValue expected) {
         assertEquals(eval(input), expected);
     }
 
     @DataProvider
-    public Object[][] miniScriptEvalVisitor_evaluateIfElse_actualEqualsExpected() {
+    public Object[][] evaluateIfElse_actualEqualsExpected() {
         return new Object[][] {
                 {"x = 5\nif x > 0 then y = 1\ny\n", new IntValue(1)},
                 {"x = 5\nif x > 0 then y = 1 else y = 0\ny\n", new IntValue(1)},
@@ -129,13 +129,13 @@ public class MiniScriptEvalVisitorTest {
         };
     }
 
-    @Test(dataProvider = "miniScriptEvalVisitor_evaluateIfElse_actualEqualsExpected")
-    public void miniScriptEvalVisitor_evaluateIfElse_actualEqualsExpected(String input, ExprValue expected) {
+    @Test(dataProvider = "evaluateIfElse_actualEqualsExpected")
+    public void evaluateIfElse_actualEqualsExpected(String input, ExprValue expected) {
         assertEquals(eval(input), expected);
     }
 
     @Test
-    public void miniScriptEvalVisitor_evaluateIfElse_yNotDefined_throwsIllegalArgExc() {
+    public void evaluateIfElse_yNotDefined_throwsIllegalArgExc() {
         String input = "x = -1\nif x > 0 then y = 1\ny";
         assertThrows(IllegalArgumentException.class,
                 ()->eval(input));
@@ -169,7 +169,7 @@ public class MiniScriptEvalVisitorTest {
     }
 
     @Test(dataProvider = "validBuiltInFunctionCalls")
-    public void miniScriptEvalVisitor_evaluateBuiltInFunctions_actualEqualsExpected(String input, EvalResult expected) {
+    public void evaluateBuiltInFunctions_actualEqualsExpected(String input, EvalResult expected) {
         assertEquals(eval(input), expected);
     }
 
@@ -251,5 +251,17 @@ public class MiniScriptEvalVisitorTest {
         assertEquals(eval(input), expected);
     }
 
+    @DataProvider
+    public Object[][] validTernary() {
+        return new Object[][] {
+                {"5 > 3 ? 10 : 20\n", new IntValue(10)},
+                {"5+1 > 10-4 ? 10 : 2*10\n", new IntValue(20)},
+        };
+    }
+
+    @Test(dataProvider = "validTernary")
+    public void evaluateTernary_actualEqualsExpected(String input, ExprValue expected) {
+        assertEquals(eval(input), expected);
+    }
 }
 

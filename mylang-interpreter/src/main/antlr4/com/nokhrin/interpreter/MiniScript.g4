@@ -10,6 +10,7 @@ stat : assignStat
      | funcDef
      | block
      | expr
+     | helpStat
      ;
 
 funcDef : 'def' funcSignature ;
@@ -24,18 +25,18 @@ ifStat : 'if' expr 'then' NEWLINE* stat ('else' NEWLINE* stat)? ;
 whileStat : 'while' expr 'do' NEWLINE* stat ;
 breakStat : 'break' ;
 continueStat : 'continue' ;
+helpStat: '?' ID? ;
 
 callExpr : ID '(' arguments? ')' ;
 arguments : expr (',' expr)* ;
 
-expr  : orExpr ;
-orExpr: andExpr ('OR' andExpr)* ;
-andExpr: compExpr ('AND' compExpr)* ;
-compExpr: addSub (('==' | '!=' | '>' | '<' | '>=' | '<=') addSub)? ;
+expr: ternary ;
+ternary: or ('?' ternary ':' ternary)? ;
+or: and ('OR' and)* ;
+and: comp ('AND' comp)* ;
+comp: addSub (('==' | '!=' | '>' | '<' | '>=' | '<=') addSub)? ;
 addSub:  mulDiv (('+' | '-') mulDiv)* ;
-
 mulDiv:  unary (('*' | '/') unary)* ;
-
 unary : 'NOT' unary      #not
       | '-' unary  #neg
       | '+' unary  #pos

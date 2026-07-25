@@ -1,3 +1,12 @@
+print(5)
+sin(0)
+abs(-10)
+abs(-3.14)
+while i <= 5 do
+  pow(i, 2)
+
+
+
 def add(a, b) { a + b }
 add(2, 3)
 
@@ -14,14 +23,14 @@ def calc(x) { y = x * 2
   y + 10
 
 
-} 
+}
 calc(5)
 
-x = 100 
-def modify() { 
-  x = 5 
-} 
-modify() 
+x = 100
+def modify() {
+  x = 5
+}
+modify()
 x
 
 multiplier = 3

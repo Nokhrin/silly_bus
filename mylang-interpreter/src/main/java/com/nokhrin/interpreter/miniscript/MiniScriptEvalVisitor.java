@@ -140,25 +140,36 @@ public class MiniScriptEvalVisitor extends MiniScriptBaseVisitor<EvalResult> {
         return visit(ctx.expr());
     }
 
-    public EvalResult visitOrExpr(MiniScriptParser.OrExprContext ctx) {
-        EvalResult result = visit(ctx.andExpr(0));
-        for (int i = 1; i < ctx.andExpr().size(); i++) {
-            EvalResult rightExpr = visit(ctx.andExpr(i));
+    public EvalResult visitTernary(MiniScriptParser.TernaryContext ctx) {
+        EvalResult ifExpr = visit(ctx.or());
+
+        if (ctx.ternary().size() < 2) {
+            return ifExpr;
+        }
+        EvalResult thenExpr = visit(ctx.ternary(0));
+        EvalResult elseExpr = visit(ctx.ternary(1));
+        return conditionTrue(ifExpr) ? thenExpr : elseExpr;
+    }
+
+    public EvalResult visitOr(MiniScriptParser.OrContext ctx) {
+        EvalResult result = visit(ctx.and(0));
+        for (int i = 1; i < ctx.and().size(); i++) {
+            EvalResult rightExpr = visit(ctx.and(i));
             result = or(result, rightExpr);
         }
         return result;
     }
 
-    public EvalResult visitAndExpr(MiniScriptParser.AndExprContext ctx) {
-        EvalResult result = visit(ctx.compExpr(0));
-        for (int i = 1; i < ctx.compExpr().size(); i++) {
-            EvalResult rightExpr = visit(ctx.compExpr(i));
+    public EvalResult visitAnd(MiniScriptParser.AndContext ctx) {
+        EvalResult result = visit(ctx.comp(0));
+        for (int i = 1; i < ctx.comp().size(); i++) {
+            EvalResult rightExpr = visit(ctx.comp(i));
             result = and(result, rightExpr);
         }
         return result;
     }
 
-    public EvalResult visitCompExpr(MiniScriptParser.CompExprContext ctx) {
+    public EvalResult visitComp(MiniScriptParser.CompContext ctx) {
         EvalResult leftValue = visit(ctx.addSub(0));
         if (ctx.addSub().size() == 1) {
             return leftValue;
