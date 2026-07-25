@@ -6,6 +6,7 @@ import com.nokhrin.interpreter.symbol_table.Scope;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class BuiltinFunctions {
     private static final Map<String,BuiltinFunction> REGISTRY = new HashMap<>();
@@ -62,5 +63,24 @@ public class BuiltinFunctions {
             return ArithmeticOperations.pow(base, exponent);
         });
 
+    }
+
+    private static final Map<String, String> BUILTINS_HELP = Map.of(
+            "print", "print(value) - output <value> to stdout\n Example: print(42)",
+            "sin","sin(x) - sine of angle <x> in radians\n Example: sin(0) -> 0.0",
+            "abs","abs(x) - absolute value of number <x>\n Example: abs(-1) -> 1",
+            "pow","pow(base, exponent) - number <base> raised to <exponent>\n Example: pow(2, 3) -> 8"
+    );
+
+    public static String getFuncHelp(String funcName) {
+        return BUILTINS_HELP.getOrDefault(funcName, "No help for: " + funcName);
+    }
+
+    public static String getGeneralHelp(){
+        return "Built-in functions:\n" +
+                BUILTINS_HELP.keySet().stream()
+                        .map(key -> " " + key)
+                        .collect(Collectors.joining("\n")) +
+                "\n\nUse ?<name> for details. Example: ?print";
     }
 }

@@ -1,26 +1,16 @@
 package com.nokhrin.interpreter;
 
-import com.nokhrin.interpreter.calc.Calculator;
-import com.nokhrin.interpreter.common.EvalResult;
-
-import java.util.Scanner;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 public class Main {
-    static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
-        Calculator calculator = new Calculator();
-        System.out.println("Введите выражение (\\q для выхода)");
-        while (scanner.hasNextLine()) {
-            String input = scanner.nextLine().trim();
-            if (input.isEmpty() || input.equals("\\q")) {
-                break;
-            }
-            try {
-                EvalResult result = calculator.parse(input);
-                System.out.println(result);
-            } catch (Exception e) {
-                System.err.println("Ошибка вычисления: " + e);
-            }
+    static void main(String[] args) throws IOException {
+        if (args.length > 0) {
+            String text = Files.readString(Path.of(args[0]));
+            new Repl().runSource(text);
+        } else {
+            new Repl().run();
         }
     }
 }

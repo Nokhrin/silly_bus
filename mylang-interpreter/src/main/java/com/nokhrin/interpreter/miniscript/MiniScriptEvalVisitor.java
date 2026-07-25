@@ -323,5 +323,19 @@ public class MiniScriptEvalVisitor extends MiniScriptBaseVisitor<EvalResult> {
         EvalResult value = visit(ctx.expr());
         throw new ReturnSignal(value);
     }
+
+    public EvalResult visitHelpStat(MiniScriptParser.HelpStatContext ctx) {
+        if (ctx.ID() != null) {
+            String funcName = ctx.ID().getText();
+            if (BuiltinFunctions.isBuiltin(funcName)){
+                System.out.println(BuiltinFunctions.getFuncHelp(funcName));
+            }else{
+                System.err.println("Unknown function: " + funcName);
+            }
+        }else{
+            System.out.println(BuiltinFunctions.getGeneralHelp());
+        }
+        return new VoidValue();
+    }
     //endregion
 }
