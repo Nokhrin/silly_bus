@@ -1,21 +1,34 @@
 grammar MiniScript;
 
-prog : (stat NEWLINE?)* EOF ;
-stat : assign
+prog : (NEWLINE* stat NEWLINE*)* EOF ;
+stat : assignStat
      | ifStat
      | whileStat
      | breakStat
      | continueStat
+     | returnStat
+     | funcDef
+     | block
      | expr
      ;
-assign : ID '=' expr ;
-ifStat : 'if' expr 'then' NEWLINE? stat ('else' NEWLINE? stat)? ;
-whileStat : 'while' expr 'do' NEWLINE? stat ;
+
+funcDef : 'def' funcSignature ;
+funcSignature : ID '(' parameters? ')' block ;
+parameters : ID (',' ID)* ;
+
+block: '{' NEWLINE* (stat NEWLINE*)* '}' ;
+returnStat : 'return' expr ;
+
+assignStat : ID '=' expr ;
+ifStat : 'if' expr 'then' NEWLINE* stat ('else' NEWLINE* stat)? ;
+whileStat : 'while' expr 'do' NEWLINE* stat ;
 breakStat : 'break' ;
 continueStat : 'continue' ;
-funcCall : ID '(' exprList? ')' ;
-exprList : expr (',' expr)* ;
-expr  :  orExpr ;
+
+callExpr : ID '(' arguments? ')' ;
+arguments : expr (',' expr)* ;
+
+expr  : orExpr ;
 orExpr: andExpr ('OR' andExpr)* ;
 andExpr: compExpr ('AND' compExpr)* ;
 compExpr: addSub (('==' | '!=' | '>' | '<' | '>=' | '<=') addSub)? ;
@@ -33,7 +46,7 @@ atom : FLOAT                #float
      | INT                 #int
      | BOOL                 #bool
      | VOID                 #void
-     | funcCall             #externalFuncCall
+     | callExpr             #funcCall
      | ID                 #id
      | '(' expr ')'       #paren
      ;

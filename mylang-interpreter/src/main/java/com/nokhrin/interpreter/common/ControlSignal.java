@@ -1,4 +1,4 @@
 package com.nokhrin.interpreter.common;
 
-public sealed interface ControlSignal extends EvalResult permits BreakSignal, ContinueSignal {
+public sealed class ControlSignal extends RuntimeException permits BreakSignal, ContinueSignal, ReturnSignal {
 }

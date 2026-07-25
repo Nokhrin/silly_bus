@@ -152,24 +152,24 @@ public class MiniScriptEvalVisitorTest {
     void visitIfStat_falseConditionNoElse_returnsVoid(){
         String input = "x = -1\nif x > 0 then y = 1";
         EvalResult result = eval(input);
-        assertNull(result);
+        assertEquals(result, new VoidValue());
     }
 
     @DataProvider
     public Object[][] validBuiltInFunctionCalls() {
         return new Object[][] {
-                {"print(5)\n", null},
+                {"print(5)\n", new VoidValue()},
                 {"sin(0)\n", new DoubleValue(0.0)},
                 {"abs(-10)\n", new IntValue(10)},
                 {"abs(-3.14)\n", new DoubleValue(3.14)},
                 {"pow(2, 2)\n", new IntValue(4)},
                 {"pow(9, 0.5)\n", new DoubleValue(3.0)},
-                {"pow(1, -1)\n", new DoubleValue(1.0)},
+                {"pow(1, -1)\n", new IntValue(1)},
         };
     }
 
     @Test(dataProvider = "validBuiltInFunctionCalls")
-    public void miniScriptEvalVisitor_evaluateBuiltInFunctions_actualEqualsExpected(String input, ExprValue expected) {
+    public void miniScriptEvalVisitor_evaluateBuiltInFunctions_actualEqualsExpected(String input, EvalResult expected) {
         assertEquals(eval(input), expected);
     }
 
@@ -186,4 +186,70 @@ public class MiniScriptEvalVisitorTest {
         assertThrows(IllegalArgumentException.class,
                 ()->eval(input));
     }
+    @DataProvider
+    public Object[][] userDefinedFunctionCalls(){
+        return new Object[][]{
+        {
+            """
+        def add(a,b) { a + b }
+        add(2,3)
+        """, new IntValue(5)},
+        {
+            """
+        def isPositive(x) {
+            if x >= 0 then { return true }
+        }
+        isPositive(1)
+        """, new BoolValue(true)},
+        {
+            """
+        def square(x) { x * x }
+        def add(a, b) { a + b }
+        square(add(1,2))
+        """, new IntValue(9)}
+    };
+    }
+
+    @Test(dataProvider = "userDefinedFunctionCalls")
+    void visitFuncCall_userDefinedValid_resultCorrect(String input, ExprValue expected){
+        assertEquals(eval(input), expected);
+    }
+
+    @DataProvider
+    public Object[][] userDefinedRecursiveFunctionCalls(){
+        return new Object[][]{
+        {
+                        """
+        def factorial(x) {
+            if x <= 1 then { return 1 }
+            return x * factorial(x - 1)
+        }
+        factorial(5)
+        """, new IntValue(120)},
+        {
+                        """
+        def fibonacci(x) {
+            if x <= 0 then { return 0 }
+            if x == 1 then { return 1 }
+            return fibonacci(x-1) + fibonacci(x - 2)
+        }
+        fibonacci(8)
+        """, new IntValue(21)},
+        {
+                        """
+        def sum_to(x) {
+            if x <= 0 then { return 0 }
+            return x + sum_to(x-1)
+        }
+        sum_to(10)
+        """, new IntValue(55)},
+        };
+    }
+
+    @Test(dataProvider = "userDefinedRecursiveFunctionCalls")
+    void visitFuncCall_userDefinedRecursiveValid_resultCorrect(String input, ExprValue expected){
+        assertEquals(eval(input), expected);
+    }
+
 }
+

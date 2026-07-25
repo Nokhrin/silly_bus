@@ -1,6 +1,10 @@
 package com.nokhrin.interpreter.common;
 
+import com.nokhrin.interpreter.MiniScriptParser;
+import com.nokhrin.interpreter.symbol_table.Scope;
+
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class BuiltinFunctions {
@@ -21,6 +25,12 @@ public class BuiltinFunctions {
                     case IntValue(long v) -> String.valueOf(v);
                     case DoubleValue(double v) -> String.valueOf(v);
                     case BoolValue(boolean v) -> String.valueOf(v);
+                    case FuncValue(
+                            String name,
+                            List<String> parameters,
+                            MiniScriptParser.BlockContext body,
+                            Scope enclosingScope
+                    ) -> name;
                 };
                 System.out.println(output);
             }

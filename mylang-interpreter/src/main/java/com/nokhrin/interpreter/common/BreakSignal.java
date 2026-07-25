@@ -1,4 +1,4 @@
 package com.nokhrin.interpreter.common;
 
-public record BreakSignal() implements ControlSignal {
+public final class BreakSignal extends ControlSignal {
 }

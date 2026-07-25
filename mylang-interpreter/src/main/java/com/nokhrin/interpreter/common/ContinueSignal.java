@@ -1,4 +1,4 @@
 package com.nokhrin.interpreter.common;
 
-public record ContinueSignal() implements ControlSignal {
+public final class ContinueSignal extends ControlSignal {
 }

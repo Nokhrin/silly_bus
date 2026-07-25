@@ -18,7 +18,7 @@ public class VariableSymbol extends BaseSymbol{
 
     @Override
     public String toString() {
-        return "<" + getName() + ":t" + returnType + ">";
+        return "<" + getName() + ":type=" + returnType + ">";
     }
 
     public EvalResult getValue(){
