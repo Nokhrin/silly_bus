@@ -2,9 +2,9 @@ package com.nokhrin.interpreter.c;
 
 import com.nokhrin.interpreter.CBaseListener;
 import com.nokhrin.interpreter.CParser;
-import com.nokhrin.interpreter.symbol_table.GlobalScope;
-import com.nokhrin.interpreter.symbol_table.Scope;
-import com.nokhrin.interpreter.symbol_table.Symbol;
+import com.nokhrin.interpreter.common.compiletime.Scope;
+import com.nokhrin.interpreter.common.compiletime.Symbol;
+import com.nokhrin.interpreter.common.runtime.GlobalScope;
 import org.antlr.v4.runtime.tree.ParseTreeProperty;
 
 public class CResolveSymbols extends CBaseListener {
@@ -37,11 +37,11 @@ public class CResolveSymbols extends CBaseListener {
 
     public void exitVar(CParser.VarContext ctx) {
         String varName = ctx.ID().getSymbol().getText();
-        Symbol var = currentScope.resolveSymbol(varName);
+        Symbol var = currentScope.resolve(varName);
     }
 
     public void exitCall(CParser.CallContext ctx) {
         String funcName = ctx.ID().getSymbol().getText();
-        Symbol func = currentScope.resolveFunction(funcName);
+        Symbol func = currentScope.resolve(funcName);
     }
 }

@@ -1,7 +1,7 @@
 package com.nokhrin.interpreter;
 
 import com.nokhrin.interpreter.calc.Calculator;
-import com.nokhrin.interpreter.common.EvalResult;
+import com.nokhrin.interpreter.common.values.EvalResult;
 
 import java.util.Scanner;
 

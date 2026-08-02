@@ -1,39 +1,31 @@
-package com.nokhrin.interpreter.miniscript;
+package com.nokhrin.interpreter.minityped;
 
-import com.nokhrin.interpreter.MiniScriptBaseVisitor;
-import com.nokhrin.interpreter.MiniScriptParser;
-import com.nokhrin.interpreter.MiniScriptParser.BlockContext;
-import com.nokhrin.interpreter.MiniScriptParser.CallExprContext;
-import com.nokhrin.interpreter.MiniScriptParser.ExprContext;
-import com.nokhrin.interpreter.MiniScriptParser.StatContext;
+import com.nokhrin.interpreter.MiniTypedBaseVisitor;
+import com.nokhrin.interpreter.MiniTypedParser;
+import com.nokhrin.interpreter.MiniTypedParser.*;
 import com.nokhrin.interpreter.common.compiletime.*;
 import com.nokhrin.interpreter.common.runtime.*;
 import com.nokhrin.interpreter.common.values.*;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
-import java.util.*;
-import java.util.function.Function;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 import static com.nokhrin.interpreter.common.operations.ArithmeticOperations.*;
 import static com.nokhrin.interpreter.common.operations.LogicalOperations.*;
 import static com.nokhrin.interpreter.common.operations.TypeConversion.inferType;
 
-public class MiniScriptEvalVisitor extends MiniScriptBaseVisitor<EvalResult> {
-    private Scope currentScope;
+public class MiniTypedEvalVisitor extends MiniTypedBaseVisitor<EvalResult> {
+    private BaseScope currentScope;
     private final MethodRegistry methodRegistry;
 
-    public MiniScriptEvalVisitor(Scope currentScope, MethodRegistry methodRegistry) {
+    public MiniTypedEvalVisitor(BaseScope currentScope, MethodRegistry methodRegistry) {
         this.currentScope = currentScope;
         this.methodRegistry = methodRegistry;
     }
 
     //region HELPERS
-
-    private Optional<VariableSymbol> resolveVariable(String varName) {
-        Symbol varSymbol = currentScope.resolve(varName);
-        if (varSymbol instanceof VariableSymbol vs) return Optional.of(vs);
-        return Optional.empty();
-    }
 
     private boolean conditionTrue(EvalResult result) {
         return result instanceof BoolValue(boolean value) && value;
@@ -54,19 +46,24 @@ public class MiniScriptEvalVisitor extends MiniScriptBaseVisitor<EvalResult> {
     }
 
     private EvalResult evaluateUserDefinedFunc(String funcName, CallExprContext ctx) {
-
         Symbol symbol = currentScope.resolve(funcName);
         if (!(symbol instanceof FunctionSymbol functionSymbol)) {
-            throw new IllegalArgumentException("Undefined function: " + funcName);
+            throw new IllegalArgumentException("Function " + symbol.getName() + " is not defined");
         }
 
         FunctionBody body = methodRegistry.fetch(funcName);
-
-        LocalScope localScope = new LocalScope(functionSymbol.scope(), functionSymbol.name());
-        List<Parameter> parameters = functionSymbol.parameters();
         List<ExprValue> args = evaluateArguments(ctx);
+        List<Parameter> parameters = functionSymbol.parameters();
 
-        Iterator<Parameter> parameterIterator=parameters.iterator();
+        if (args.size() != parameters.size()) {
+            throw new IllegalArgumentException("Fuction " + funcName
+                    + ", args expected: " + parameters.size()
+                    + ", args provided: " + args.size());
+        }
+
+        LocalScope localScope=new LocalScope(functionSymbol.scope(), funcName);
+
+        Iterator<Parameter>parameterIterator=parameters.iterator();
         Iterator<ExprValue>argIterator=args.iterator();
         while (parameterIterator.hasNext() && argIterator.hasNext()){
             Parameter parameter=parameterIterator.next();
@@ -81,7 +78,7 @@ public class MiniScriptEvalVisitor extends MiniScriptBaseVisitor<EvalResult> {
     //endregion HELPERS
 
     //region START
-    public EvalResult visitProg(MiniScriptParser.ProgContext ctx) {
+    public EvalResult visitProg(ProgContext ctx) {
         EvalResult statResult = new VoidValue();
         for (StatContext statContext : ctx.stat()) {
             statResult = visit(statContext);
@@ -92,33 +89,33 @@ public class MiniScriptEvalVisitor extends MiniScriptBaseVisitor<EvalResult> {
 
     //region ATOMS
 
-    public EvalResult visitInt(MiniScriptParser.IntContext ctx) {
+    public EvalResult visitInt(IntContext ctx) {
         return new IntValue(Long.parseLong(ctx.INT().getText()));
     }
 
-    public EvalResult visitFloat(MiniScriptParser.FloatContext ctx) {
+    public EvalResult visitFloat(FloatContext ctx) {
         return new DoubleValue(Double.parseDouble(ctx.FLOAT().getText()));
     }
 
-    public EvalResult visitBool(MiniScriptParser.BoolContext ctx) {
+    public EvalResult visitBool(BoolContext ctx) {
         return new BoolValue(Boolean.parseBoolean(ctx.BOOL().getText()));
     }
 
-    public EvalResult visitId(MiniScriptParser.IdContext ctx) {
+    public EvalResult visitId(IdContext ctx) {
         String varName = ctx.ID().getText();
         VariableSymbol varSymbol = (VariableSymbol) currentScope.resolve(varName);
-        return ((BaseScope)currentScope).getValue(varSymbol);
+        return currentScope.getValue(varSymbol);
     }
 
     //endregion ATOMS
 
     //region EXPRESSIONS
 
-    public EvalResult visitParen(MiniScriptParser.ParenContext ctx) {
+    public EvalResult visitParen(ParenContext ctx) {
         return visit(ctx.expr());
     }
 
-    public EvalResult visitTernary(MiniScriptParser.TernaryContext ctx) {
+    public EvalResult visitTernary(TernaryContext ctx) {
         EvalResult ifExpr = visit(ctx.or());
 
         if (ctx.ternary().size() < 2) {
@@ -129,7 +126,7 @@ public class MiniScriptEvalVisitor extends MiniScriptBaseVisitor<EvalResult> {
         return conditionTrue(ifExpr) ? thenExpr : elseExpr;
     }
 
-    public EvalResult visitOr(MiniScriptParser.OrContext ctx) {
+    public EvalResult visitOr(OrContext ctx) {
         EvalResult result = visit(ctx.and(0));
         for (int i = 1; i < ctx.and().size(); i++) {
             EvalResult rightExpr = visit(ctx.and(i));
@@ -138,7 +135,7 @@ public class MiniScriptEvalVisitor extends MiniScriptBaseVisitor<EvalResult> {
         return result;
     }
 
-    public EvalResult visitAnd(MiniScriptParser.AndContext ctx) {
+    public EvalResult visitAnd(AndContext ctx) {
         EvalResult result = visit(ctx.comp(0));
         for (int i = 1; i < ctx.comp().size(); i++) {
             EvalResult rightExpr = visit(ctx.comp(i));
@@ -147,7 +144,7 @@ public class MiniScriptEvalVisitor extends MiniScriptBaseVisitor<EvalResult> {
         return result;
     }
 
-    public EvalResult visitComp(MiniScriptParser.CompContext ctx) {
+    public EvalResult visitComp(CompContext ctx) {
         EvalResult leftValue = visit(ctx.addSub(0));
         if (ctx.addSub().size() == 1) {
             return leftValue;
@@ -157,7 +154,7 @@ public class MiniScriptEvalVisitor extends MiniScriptBaseVisitor<EvalResult> {
         return compare(leftValue, opNode.getText(), rightValue);
     }
 
-    public EvalResult visitAddSub(MiniScriptParser.AddSubContext ctx) {
+    public EvalResult visitAddSub(AddSubContext ctx) {
         EvalResult result = visit(ctx.mulDiv(0));
         for (int i = 1; i < ctx.mulDiv().size(); i++) {
             String op = ctx.getChild(2 * i - 1).getText();
@@ -171,7 +168,7 @@ public class MiniScriptEvalVisitor extends MiniScriptBaseVisitor<EvalResult> {
         return result;
     }
 
-    public EvalResult visitMulDiv(MiniScriptParser.MulDivContext ctx) {
+    public EvalResult visitMulDiv(MulDivContext ctx) {
         EvalResult result = visit(ctx.unary(0));
         for (int i = 1; i < ctx.unary().size(); i++) {
             String op = ctx.getChild(2 * i - 1).getText();
@@ -188,38 +185,39 @@ public class MiniScriptEvalVisitor extends MiniScriptBaseVisitor<EvalResult> {
     //endregion EXPRESSIONS
 
     //region UNARY
-    public EvalResult visitNot(MiniScriptParser.NotContext ctx) {
+    public EvalResult visitNot(NotContext ctx) {
         return not(visit(ctx.unary()));
     }
 
-    public EvalResult visitNeg(MiniScriptParser.NegContext ctx) {
+    public EvalResult visitNeg(NegContext ctx) {
         return neg(visit(ctx.unary()));
     }
 
-    public EvalResult visitPos(MiniScriptParser.PosContext ctx) {
+    public EvalResult visitPos(PosContext ctx) {
         return visit(ctx.unary());
     }
     //endregion UNARY
 
     //region STATEMENTS
 
-    public EvalResult visitAssignStat(MiniScriptParser.AssignStatContext ctx) {
+    public EvalResult visitAssignStat(AssignStatContext ctx) {
         String varName = ctx.ID().getText();
         EvalResult varValue = visit(ctx.expr());
         Symbol symbol = currentScope.resolve(varName);
-        VariableSymbol varSymbol;
-        if (symbol instanceof VariableSymbol v) {
-            varSymbol = v;
-        }else{
-            Symbol.Type varType=inferType(varValue);
-            varSymbol=new VariableSymbol(varName,varType,currentScope);
-            currentScope.define(varSymbol);
+        VariableSymbol variableSymbol;
+
+        if (symbol instanceof VariableSymbol varSym) {
+            variableSymbol = varSym;
+        } else {
+            Symbol.Type varType = inferType(varValue);
+            variableSymbol = new VariableSymbol(varName, varType, currentScope);
+            currentScope.define(variableSymbol);
         }
-        ((BaseScope)currentScope).setValue(varSymbol,varValue);
+        currentScope.setValue(variableSymbol, varValue);
         return varValue;
     }
 
-    public EvalResult visitIfStat(MiniScriptParser.IfStatContext ctx) {
+    public EvalResult visitIfStat(IfStatContext ctx) {
         EvalResult condition = visit(ctx.expr());
         if (!(condition instanceof BoolValue(boolean value))) {
             throw new IllegalArgumentException("Condition must be boolean expression. Provided: " + condition);
@@ -234,7 +232,7 @@ public class MiniScriptEvalVisitor extends MiniScriptBaseVisitor<EvalResult> {
         return new VoidValue();
     }
 
-    public EvalResult visitWhileStat(MiniScriptParser.WhileStatContext ctx) {
+    public EvalResult visitWhileStat(WhileStatContext ctx) {
         while (conditionTrue(visit(ctx.expr()))) {
             try {
                 visit(ctx.stat());
@@ -247,7 +245,7 @@ public class MiniScriptEvalVisitor extends MiniScriptBaseVisitor<EvalResult> {
         return new VoidValue();
     }
 
-    public EvalResult visitFuncCall(MiniScriptParser.FuncCallContext ctx) {
+    public EvalResult visitFuncCall(FuncCallContext ctx) {
         String funcName = ctx.callExpr().ID().getText();
 
         if (BuiltinFunctions.isBuiltin(funcName)) {
@@ -262,47 +260,59 @@ public class MiniScriptEvalVisitor extends MiniScriptBaseVisitor<EvalResult> {
         return builtinFunction.apply(args);
     }
 
-    public EvalResult visitBreakStat(MiniScriptParser.BreakStatContext ctx) {
+    public EvalResult visitBreakStat(BreakStatContext ctx) {
         throw new BreakSignal();
     }
 
-    public EvalResult visitContinueStat(MiniScriptParser.ContinueStatContext ctx) {
+    public EvalResult visitContinueStat(ContinueStatContext ctx) {
         throw new ContinueSignal();
     }
 
-    public EvalResult visitFuncDef(MiniScriptParser.FuncDefContext ctx) {
+    public EvalResult visitFuncDefinition(FuncDefinitionContext ctx) {
         String funcName = ctx.funcSignature().ID().getText();
+        Symbol.Type returnType = resolveType(ctx.funcSignature().type().start.getType());
+        List<Parameter> parameters = new ArrayList<>();
 
-        List<Parameter> funcParams = new ArrayList<>();
-        if (ctx.funcSignature().parameters() != null) {
-            for (TerminalNode paramCtx : ctx.funcSignature().parameters().ID()) {
-                funcParams.add(new Parameter(paramCtx.getText(), Symbol.Type.VOID));
+        if (ctx.funcSignature().funcParameters() != null) {
+            for (FuncParameterContext parameterContext : ctx.funcSignature().funcParameters().funcParameter()) {
+                parameters.add(new Parameter(parameterContext.ID().getText(), resolveType(parameterContext.type().start.getType())));
             }
         }
 
-        BlockContext blockContext=ctx.funcSignature().block();
-        Scope lexicalScope = currentScope;
+        BaseScope lexicalScope = currentScope;
+        BlockContext blockContext = ctx.funcSignature().block();
 
-        FunctionBody body = (runtimeScope)->{
-            Scope parentScope= currentScope;
-            currentScope=runtimeScope;
+        FunctionBody funcBody = (runtimeScope) -> {
+            BaseScope callerScope = currentScope;
+            currentScope = (BaseScope) runtimeScope;
             try {
-                EvalResult lastResult = new VoidValue();
-                for (StatContext bodyStatement:blockContext.stat()){
-                    lastResult=visit(bodyStatement);
+                EvalResult statementResult = new VoidValue();
+                for (StatContext statContext : blockContext.stat()) {
+                    statementResult = visit(statContext);
                 }
-                return lastResult;
-            }catch (ReturnSignal returnSignal){
+                return statementResult;
+            } catch (ReturnSignal returnSignal) {
                 return returnSignal.value;
-            }finally {
-                currentScope=parentScope;
+            } finally {
+                currentScope = callerScope;
             }
         };
 
-        FunctionSymbol funcSymbol = new FunctionSymbol(funcName, funcParams, Symbol.Type.VOID, lexicalScope);
+        FunctionSymbol funcSymbol = new FunctionSymbol(funcName, parameters, returnType, lexicalScope);
         currentScope.define(funcSymbol);
-        methodRegistry.register(funcName,body);
+        methodRegistry.register(funcName,funcBody);
+
         return new VoidValue();
+    }
+
+    private Symbol.Type resolveType(int tokenType) {
+        return switch (tokenType) {
+            case MiniTypedParser.INT_TYPE -> Symbol.Type.INTEGER;
+            case MiniTypedParser.FLOAT_TYPE -> Symbol.Type.FLOAT;
+            case MiniTypedParser.BOOL_TYPE -> Symbol.Type.BOOLEAN;
+            case MiniTypedParser.VOID_TYPE -> Symbol.Type.VOID;
+            default -> throw new IllegalStateException("Unexpected value: " + tokenType);
+        };
     }
 
     public EvalResult visitBlock(BlockContext ctx) {
@@ -313,23 +323,12 @@ public class MiniScriptEvalVisitor extends MiniScriptBaseVisitor<EvalResult> {
         return lastEvalResult;
     }
 
-    public EvalResult visitReturnStat(MiniScriptParser.ReturnStatContext ctx) {
-        EvalResult value = visit(ctx.expr());
-        throw new ReturnSignal(value);
-    }
-
-    public EvalResult visitHelpStat(MiniScriptParser.HelpStatContext ctx) {
-        if (ctx.ID() != null) {
-            String funcName = ctx.ID().getText();
-            if (BuiltinFunctions.isBuiltin(funcName)){
-                System.out.println(BuiltinFunctions.getFuncHelp(funcName));
-            }else{
-                System.err.println("Unknown function: " + funcName);
-            }
-        }else{
-            System.out.println(BuiltinFunctions.getGeneralHelp());
+    public EvalResult visitReturnStat(ReturnStatContext ctx) {
+        EvalResult value = new VoidValue();
+        if (ctx.expr() != null) {
+            value = visit(ctx.expr());
         }
-        return new VoidValue();
+        throw new ReturnSignal(value);
     }
     //endregion
 }

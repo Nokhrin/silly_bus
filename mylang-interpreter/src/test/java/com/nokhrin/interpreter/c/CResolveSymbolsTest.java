@@ -2,7 +2,7 @@ package com.nokhrin.interpreter.c;
 
 import com.nokhrin.interpreter.CLexer;
 import com.nokhrin.interpreter.CParser;
-import com.nokhrin.interpreter.symbol_table.GlobalScope;
+import com.nokhrin.interpreter.common.runtime.GlobalScope;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;

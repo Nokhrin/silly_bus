@@ -2,10 +2,10 @@ package com.nokhrin.interpreter.c;
 
 import com.nokhrin.interpreter.CLexer;
 import com.nokhrin.interpreter.CParser;
-import com.nokhrin.interpreter.symbol_table.FunctionSymbol;
-import com.nokhrin.interpreter.symbol_table.Scope;
-import com.nokhrin.interpreter.symbol_table.Symbol;
-import com.nokhrin.interpreter.symbol_table.VariableSymbol;
+import com.nokhrin.interpreter.common.compiletime.FunctionSymbol;
+import com.nokhrin.interpreter.common.compiletime.Scope;
+import com.nokhrin.interpreter.common.compiletime.Symbol;
+import com.nokhrin.interpreter.common.compiletime.VariableSymbol;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -36,7 +36,7 @@ public class CDefineSymbolsTest {
     @DataProvider(name = "functionDefinitionData")
     public Object[][] provideFunctionDefinitionCases() {
         return new Object[][]{
-                {"int foo(int a, float b) { }", "foo", Symbol.Type.INT, new String[]{"a", "b"}, new Symbol.Type[]{Symbol.Type.INT, Symbol.Type.FLOAT}},
+                {"int foo(int a, float b) { }", "foo", Symbol.Type.INTEGER, new String[]{"a", "b"}, new Symbol.Type[]{Symbol.Type.INTEGER, Symbol.Type.FLOAT}},
                 {"void bar() { }", "bar", Symbol.Type.VOID, new String[]{}, new Symbol.Type[]{}},
                 {"float baz(float x) { int y; }", "baz", Symbol.Type.FLOAT, new String[]{"x"}, new Symbol.Type[]{Symbol.Type.FLOAT}}
         };

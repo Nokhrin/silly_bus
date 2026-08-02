@@ -1,5 +1,8 @@
 package com.nokhrin.interpreter.common;
 
+import com.nokhrin.interpreter.common.operations.LogicalOperations;
+import com.nokhrin.interpreter.common.values.BoolValue;
+import com.nokhrin.interpreter.common.values.ExprValue;
 import net.jqwik.api.ForAll;
 import net.jqwik.api.Property;
 

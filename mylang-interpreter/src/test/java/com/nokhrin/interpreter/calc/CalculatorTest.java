@@ -2,9 +2,9 @@ package com.nokhrin.interpreter.calc;
 
 import static org.testng.Assert.assertEquals;
 
-import com.nokhrin.interpreter.common.DoubleValue;
-import com.nokhrin.interpreter.common.ExprValue;
-import com.nokhrin.interpreter.common.IntValue;
+import com.nokhrin.interpreter.common.values.DoubleValue;
+import com.nokhrin.interpreter.common.values.ExprValue;
+import com.nokhrin.interpreter.common.values.IntValue;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 

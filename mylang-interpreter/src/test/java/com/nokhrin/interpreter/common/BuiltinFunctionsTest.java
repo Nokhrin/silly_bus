@@ -1,5 +1,6 @@
 package com.nokhrin.interpreter.common;
 
+import com.nokhrin.interpreter.common.runtime.BuiltinFunctions;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 

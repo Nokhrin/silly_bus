@@ -1,5 +1,8 @@
 package com.nokhrin.interpreter.common;
 
+import com.nokhrin.interpreter.common.operations.ArithmeticOperations;
+import com.nokhrin.interpreter.common.values.ExprValue;
+import com.nokhrin.interpreter.common.values.IntValue;
 import net.jqwik.api.ForAll;
 import net.jqwik.api.Property;
 import net.jqwik.api.constraints.IntRange;

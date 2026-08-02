@@ -1,19 +1,22 @@
 package com.nokhrin.interpreter.calc;
 
 import com.nokhrin.interpreter.*;
-import com.nokhrin.interpreter.common.*;
-import com.nokhrin.interpreter.symbol_table.GlobalScope;
-import com.nokhrin.interpreter.symbol_table.Symbol;
-import com.nokhrin.interpreter.symbol_table.VariableSymbol;
+import com.nokhrin.interpreter.common.compiletime.Symbol;
+import com.nokhrin.interpreter.common.compiletime.VariableSymbol;
+import com.nokhrin.interpreter.common.runtime.BaseScope;
+import com.nokhrin.interpreter.common.runtime.GlobalScope;
+import com.nokhrin.interpreter.common.values.DoubleValue;
+import com.nokhrin.interpreter.common.values.EvalResult;
+import com.nokhrin.interpreter.common.values.IntValue;
 import org.antlr.v4.runtime.tree.AbstractParseTreeVisitor;
 
-import static com.nokhrin.interpreter.common.ArithmeticOperations.*;
-import static com.nokhrin.interpreter.common.TypeConversion.toLong;
+import static com.nokhrin.interpreter.common.operations.ArithmeticOperations.*;
+import static com.nokhrin.interpreter.common.operations.TypeConversion.toLong;
 
 public class CalcEvalVisitor extends AbstractParseTreeVisitor<EvalResult>
         implements CalcVisitor<EvalResult> {
 
-    private final GlobalScope globalScope;
+    private final BaseScope globalScope;
 
     public CalcEvalVisitor(GlobalScope globalScope) {
         this.globalScope = globalScope;
@@ -39,22 +42,22 @@ public class CalcEvalVisitor extends AbstractParseTreeVisitor<EvalResult>
     @Override
     public EvalResult visitAssign(CalcParser.AssignContext ctx) {
         String name = ctx.ID().getText();
-        EvalResult value = visit(ctx.expr());
+        EvalResult variableValue = visit(ctx.expr());
         Symbol symbol = globalScope.resolve(name);
-        VariableSymbol var;
+        VariableSymbol variableSymbol;
         if (symbol instanceof VariableSymbol v) {
-            var = v;
+            variableSymbol = v;
         } else {
-            Symbol.Type inferredType = switch (value) {
-                case IntValue _ -> Symbol.Type.INT;
+            Symbol.Type inferredType = switch (variableValue) {
+                case IntValue _ -> Symbol.Type.INTEGER;
                 case DoubleValue _ -> Symbol.Type.FLOAT;
-                default -> throw new IllegalStateException("Unexpected value: " + value);
+                default -> throw new IllegalStateException("Unexpected value: " + variableValue);
             };
-            var = new VariableSymbol(name, inferredType, globalScope);
-            globalScope.define(var);
+            variableSymbol = new VariableSymbol(name, inferredType, globalScope);
+            globalScope.define(variableSymbol);
         }
-        var.setValue(value);
-        return value;
+        globalScope.setValue(variableSymbol, variableValue);
+        return variableValue;
     }
 
     @Override
@@ -134,14 +137,9 @@ public class CalcEvalVisitor extends AbstractParseTreeVisitor<EvalResult>
 
     @Override
     public EvalResult visitVarValue(CalcParser.VarValueContext ctx) {
-        String varName = ctx.ID().getText();
-        return resolveVar(varName).getValue();
-    }
-
-    public VariableSymbol resolveVar(String varName) {
-        Symbol symbol = globalScope.resolve(varName);
-        if (symbol instanceof VariableSymbol var) return var;
-        throw new IllegalArgumentException("Undefined variable: " + varName);
+        String name = ctx.ID().getText();
+        VariableSymbol symbol = (VariableSymbol) globalScope.resolve(name);
+        return globalScope.getValue(symbol);
     }
 
     @Override

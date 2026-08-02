@@ -2,12 +2,17 @@ package com.nokhrin.interpreter.c;
 
 import com.nokhrin.interpreter.CBaseListener;
 import com.nokhrin.interpreter.CParser;
-import com.nokhrin.interpreter.symbol_table.*;
+import com.nokhrin.interpreter.common.compiletime.*;
+import com.nokhrin.interpreter.common.runtime.GlobalScope;
+import com.nokhrin.interpreter.common.runtime.LocalScope;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class CDefineSymbols extends CBaseListener {
     static final Logger LOGGER = LoggerFactory.getLogger(CDefineSymbols.class);
@@ -17,7 +22,7 @@ public class CDefineSymbols extends CBaseListener {
 
     private Symbol.Type resolveType(int tokenType){
         return switch (tokenType) {
-            case CParser.INT_TYPE -> Symbol.Type.INT;
+            case CParser.INT_TYPE -> Symbol.Type.INTEGER;
             case CParser.FLOAT_TYPE -> Symbol.Type.FLOAT;
             case CParser.VOID_TYPE -> Symbol.Type.VOID;
             default -> throw new IllegalArgumentException("Unknown type token: " + tokenType);
@@ -37,8 +42,17 @@ public class CDefineSymbols extends CBaseListener {
         int tokenType = ctx.type().start.getType();
         Symbol.Type funcRetType = resolveType(tokenType);
 
+        List<Parameter> parameterList=new ArrayList<>();
+        if (ctx.params()!=null){
+            for(CParser.ParamContext paramContext:ctx.params().param()){
+                String paramName = paramContext.ID().getText();
+                Symbol.Type paramType = resolveType(paramContext.type().start.getType());
+                parameterList.add(new Parameter(paramName, paramType));
+            }
+        }
+
         LocalScope funcScope = new LocalScope(currentScope, funcName);
-        FunctionSymbol function = new FunctionSymbol(funcName, funcRetType, funcScope);
+        FunctionSymbol function = new FunctionSymbol(funcName, parameterList, funcRetType, funcScope);
         currentScope.define(function);
         LOGGER.debug("Added function {} to it's local scope {}", funcName, funcScope.getName());
 

@@ -1,8 +1,9 @@
-package com.nokhrin.interpreter.miniscript;
+package com.nokhrin.interpreter.minityped;
 
-import com.nokhrin.interpreter.MiniScriptLexer;
-import com.nokhrin.interpreter.MiniScriptParser;
+import com.nokhrin.interpreter.MiniTypedLexer;
+import com.nokhrin.interpreter.MiniTypedParser;
 import com.nokhrin.interpreter.common.runtime.GlobalScope;
+import com.nokhrin.interpreter.common.runtime.MethodRegistry;
 import com.nokhrin.interpreter.common.values.*;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -10,17 +11,19 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-import static org.testng.Assert.*;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertThrows;
 
-public class MiniScriptEvalVisitorTest {
+public class MiniTypedEvalVisitorTest {
 
     private EvalResult eval(String input) {
-        var lexer = new MiniScriptLexer(CharStreams.fromString(input));
+        var lexer = new MiniTypedLexer(CharStreams.fromString(input));
         var tokens = new CommonTokenStream(lexer);
-        var parser = new MiniScriptParser(tokens);
+        var parser = new MiniTypedParser(tokens);
         ParseTree tree = parser.prog();
-        GlobalScope globals = new GlobalScope();
-        var visitor = new MiniScriptEvalVisitor(globals);
+        MiniTypedSemanticBuilder semanticBuilder = new MiniTypedSemanticBuilder();
+        MethodRegistry methodRegistry = new MethodRegistry();
+        var visitor = new MiniTypedEvalVisitor(semanticBuilder.getGlobalScope(), methodRegistry);
         return visitor.visit(tree);
     }
 

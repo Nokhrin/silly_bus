@@ -76,14 +76,23 @@ digit      ::= "0" | "1" | ... | "9"
 - функция должна иметь типы аргументов и результата - типы задаются в исходном коде
 - тип тела функции должно сходиться / совпадать по типу с ожидаемым результатом - эта проверка должна выполняться в compile time
 - компиляция кода в байт код jvm
++ комментарии
 
 план:
-
+- реализовать поддержку комментариев
+- устранить конфликт helpStat и ternary
+- разработать синтаксис - грамматику MiniTyped.g4
+  - обозначение типа переменной
+  - обозначение типов параметров и результата функции 
+- реализовать семантический анализ - TypeChecking
+  - проверка соответствия типа переменной, параметров и результата функции типу переданного значения
+- реализовать BytecodeGenerator
+- реализовать Classloader
 
 ---
 
 # Cheatsheet
-
+Настройка для работы с antlr без maven плагина
 ```shell
 # ANTLR4 в .bashrc
 export ANTLR_JAR=~/.local/share/java/antlr-4.13.2-complete.jar
@@ -99,17 +108,17 @@ grun() {
 
 ## Отладка грамматики
 ```shell
-cd ~/projects/silly_bus/mylang-interpreter/
-# Компиляция грамматики с плагином
-mvn clean compile
 # Компиляция грамматики без плагина (в /tmp, для отладки)
+mvn clean compile
 # see how ANTLR translates your left-recursive rules
-antlr -o /tmp -Xlog src/main/antlr4/com/nokhrin/interpreter/MiniScript.g4
+antlr -o /tmp -Xlog src/main/antlr4/com/nokhrin/interpreter/MiniTyped.g4
+# сгенерирует классы лексер, парсер, слушатель в /tmp/src/main/antlr4/com/nokhrin/interpreter
+
 # Визуализация
 # дерево в консоль
-grun com.nokhrin.interpreter.MiniScript prog -tree < src/test/resources/miniScript/happy_path.txt
+grun com.nokhrin.interpreter.MiniTyped prog -tree < src/test/resources/miniTyped/possible_problems.txt
 # дерево в gui
-grun com.nokhrin.interpreter.MiniScript prog -gui < src/test/resources/algebra.txt
+grun com.nokhrin.interpreter.MiniTyped prog -gui < src/test/resources/miniTyped/possible_problems.txt
 # токены
-grun com.nokhrin.interpreter.MiniScript tokens -tokens < src/test/resources/algebra.txt
+grun com.nokhrin.interpreter.MiniTyped tokens -tokens < src/test/resources/miniTyped/possible_problems.txt
 ```

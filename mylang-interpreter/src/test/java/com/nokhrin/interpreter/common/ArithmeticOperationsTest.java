@@ -1,7 +1,9 @@
 package com.nokhrin.interpreter.common;
 
-import net.jqwik.api.ForAll;
-import net.jqwik.api.constraints.IntRange;
+import com.nokhrin.interpreter.common.operations.ArithmeticOperations;
+import com.nokhrin.interpreter.common.values.DoubleValue;
+import com.nokhrin.interpreter.common.values.EvalResult;
+import com.nokhrin.interpreter.common.values.IntValue;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 

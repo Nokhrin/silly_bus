@@ -2,9 +2,9 @@ package com.nokhrin.interpreter.calc;
 
 import com.nokhrin.interpreter.CalcLexer;
 import com.nokhrin.interpreter.CalcParser;
-import com.nokhrin.interpreter.common.EvalResult;
-import com.nokhrin.interpreter.common.IntValue;
-import com.nokhrin.interpreter.symbol_table.GlobalScope;
+import com.nokhrin.interpreter.common.values.EvalResult;
+import com.nokhrin.interpreter.common.values.IntValue;
+import com.nokhrin.interpreter.common.runtime.GlobalScope;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;

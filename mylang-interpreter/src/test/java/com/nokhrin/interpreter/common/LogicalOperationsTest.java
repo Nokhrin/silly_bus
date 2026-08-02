@@ -1,5 +1,10 @@
 package com.nokhrin.interpreter.common;
 
+import com.nokhrin.interpreter.common.operations.LogicalOperations;
+import com.nokhrin.interpreter.common.values.BoolValue;
+import com.nokhrin.interpreter.common.values.DoubleValue;
+import com.nokhrin.interpreter.common.values.ExprValue;
+import com.nokhrin.interpreter.common.values.IntValue;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 import static org.testng.Assert.assertEquals;
