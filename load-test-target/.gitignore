@@ -1,7 +1,0 @@
-# JMeter
-jmeter/temp/
-jmeter/reports/*
-!jmeter/reports/.gitkeep
-*.jtl
-*.log
-jmeter/*.log
