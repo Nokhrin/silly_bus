@@ -2,6 +2,7 @@ target/
 out/
 .idea/
 *.iml
+.allure/
 
 dependency-reduced-pom.xml
 .jqwik-database

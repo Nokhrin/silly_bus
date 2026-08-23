@@ -1,6 +1,5 @@
-# Функциональный калькулятор
-
-Построен на парсер-комбинаторах
+# Комбинаторный парсер
+Комбинаторный парсинг, отложенное выполнение
 
 [Диаграмма контекста](https://nokhrin.github.io/silly_bus/parser-combinator/docs/drawio-assets/architecture-1-context.svg)
 
